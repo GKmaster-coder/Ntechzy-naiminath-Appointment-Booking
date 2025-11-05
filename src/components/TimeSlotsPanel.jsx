@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 
 const TimeSlotsPanel = ({ selectedDate, timeSlots, onTimeSelect }) => {
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [selectedType, setSelectedType] = useState(null); // ✅ Store Online / Offline
 
   // Reset selection when date changes
   useEffect(() => {
     setSelectedSlot(null);
+    setSelectedType(null);
   }, [selectedDate]);
 
   if (!selectedDate) return null;
@@ -24,7 +26,8 @@ const TimeSlotsPanel = ({ selectedDate, timeSlots, onTimeSelect }) => {
   };
 
   const handleAppointmentTypeSelect = (slot, type) => {
-    onTimeSelect(slot, type);
+    setSelectedType(type); // ✅ Save mode locally
+    onTimeSelect(slot, type); // ✅ Also send upward
     setSelectedSlot(null);
   };
 
