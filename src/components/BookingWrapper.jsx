@@ -1,4 +1,6 @@
+// src/components/BookingWrapper.jsx
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ServiceInfo from "./ServiceInfo";
 import CalendarPicker from "./CalendarPicker";
 import TimeSlotsPanel from "./TimeSlotsPanel";
@@ -6,15 +8,32 @@ import { slotsData } from "../data/slotsData";
 
 const BookingWrapper = () => {
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedTime, setSelectedTime] = useState(null);
+  const navigate = useNavigate();
 
   const handleDateSelect = (date) => {
     setSelectedDate(date);
-    setSelectedTime(null);
   };
 
-  const handleTimeSelect = (timeSlot) => {
-    setSelectedTime(timeSlot);
+  const dateFormatter = (date) => {
+    const options = { weekday: "long", month: "long", day: "numeric" };
+    return date.toLocaleDateString("en-US", options);
+  };
+
+  const handleTimeSelect = (slot, type) => {
+    const formattedDate = dateFormatter(selectedDate);
+
+    navigate("/booking-details", {
+      state: {
+        collegeName: "Naiminath Medical College",
+        selectedType: type,
+        selectedSlot: {
+          time: slot.time,
+          total: slot.total,
+          booked: slot.booked,
+          dateFormatted: formattedDate,
+        },
+      },
+    });
   };
 
   const getTimeSlotsForSelectedDate = () => {
@@ -26,12 +45,11 @@ const BookingWrapper = () => {
   return (
     <div className="min-h-screen bg-gray-100 py-12 flex justify-center">
       <div className="w-full max-w-7xl h-[80vh] flex gap-6 p-6 bg-white rounded-2xl shadow-lg overflow-hidden">
-        {/* LEFT FIXED SERVICE CARD */}
+
         <div className="w-[28%] min-w-[260px]">
           <ServiceInfo />
         </div>
 
-        {/* CALENDAR SECTION */}
         <div
           className={`transition-all duration-300 ${
             selectedDate ? "w-[60%]" : "flex-1"
@@ -43,7 +61,6 @@ const BookingWrapper = () => {
           />
         </div>
 
-        {/* TIME SLOT PANEL (scrollable) */}
         <div
           className={`transition-all duration-300 ${
             selectedDate
@@ -52,11 +69,10 @@ const BookingWrapper = () => {
           }`}
         >
           {selectedDate && (
-            <div className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 rounded-lg p-1 scrollbar-hide">
+            <div className="h-full overflow-y-auto p-1 scrollbar-hide">
               <TimeSlotsPanel
                 selectedDate={selectedDate}
                 timeSlots={getTimeSlotsForSelectedDate()}
-                selectedTime={selectedTime}
                 onTimeSelect={handleTimeSelect}
               />
             </div>
