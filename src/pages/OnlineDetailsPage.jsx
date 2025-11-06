@@ -9,11 +9,27 @@ export default function OnlineDetailsPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
+  const [isFormComplete, setIsFormComplete] = useState(false);
+  const [formData, setFormData] = useState(null);
 
   if (!state) return <div className="p-8 text-center">No data found.</div>;
 
   const handleNext = () => {
-    navigate("/payment", { state });
+    if (!isFormComplete) {
+      alert("Please complete the case form before proceeding to payment.");
+      return;
+    }
+    navigate("/payment", { state: { ...state, formData } });
+  };
+
+  const handleFormComplete = (complete) => {
+    setIsFormComplete(complete);
+  };
+
+  const handleFormSubmit = (submittedFormData) => {
+    setFormData(submittedFormData);
+    setIsFormComplete(true);
+    setShowModal(false); // Auto-close modal on submit
   };
 
   return (
@@ -44,15 +60,27 @@ export default function OnlineDetailsPage() {
               onClick={() => setShowModal(true)}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-md transition"
             >
-              Fill Case Form
+              {isFormComplete ? 'View/Edit Case Form' : 'Fill Case Form'}
             </button>
+
+            {/* Form Completion Status */}
+            <div className="mt-4 p-3 rounded-md bg-gray-100">
+              <p className={`text-sm font-medium ${isFormComplete ? 'text-green-600' : 'text-yellow-600'}`}>
+                {isFormComplete ? '✓ Case form completed' : 'Case form not completed'}
+              </p>
+            </div>
 
             {/* Continue Button (After Form) */}
             <button
               onClick={handleNext}
-              className="w-full mt-4 border border-blue-600 text-blue-600 hover:bg-blue-50 font-medium py-3 rounded-md transition"
+              disabled={!isFormComplete}
+              className={`w-full mt-4 font-medium py-3 rounded-md transition ${
+                isFormComplete
+                  ? 'border border-blue-600 text-blue-600 hover:bg-blue-50'
+                  : 'border border-gray-400 text-gray-400 cursor-not-allowed bg-gray-100'
+              }`}
             >
-              Continue to Payment
+              {isFormComplete ? 'Continue to Payment' : 'Complete Form to Continue'}
             </button>
           </div>
         </div>
@@ -73,16 +101,11 @@ export default function OnlineDetailsPage() {
 
             {/* Scrollable Case Form */}
             <div>
-              <CompleteCaseForm />
-            </div>
-
-            <div className="text-center mt-6">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium"
-              >
-                Done
-              </button>
+              <CompleteCaseForm 
+                onFormComplete={handleFormComplete}
+                onFormSubmit={handleFormSubmit}
+                isFormComplete={isFormComplete}
+              />
             </div>
           </div>
         </div>

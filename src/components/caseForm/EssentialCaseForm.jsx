@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const EssentialCaseForm = () => {
+const EssentialCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: externalIsFormComplete }) => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isFormComplete, setIsFormComplete] = useState(externalIsFormComplete || false);
+  const [isEditing, setIsEditing] = useState(false);
   const totalSteps = 4;
 
   const [formData, setFormData] = useState({
@@ -32,6 +34,45 @@ const EssentialCaseForm = () => {
     // Essential Family History
     familyHealthSummary: '',
   });
+
+  // Check if form is complete
+  const checkFormCompletion = () => {
+    // Check required fields
+    const requiredFields = [
+      formData.timeline,
+      formData.childhood,
+      formData.majorIllnesses,
+      formData.mainSymptoms,
+      formData.symptomLocation,
+      formData.symptomDuration,
+      formData.dailyBasis,
+      formData.familyHealthSummary,
+    ];
+
+    // Check if all required fields are filled
+    const isComplete = requiredFields.every(field => field && field.trim() !== '');
+    
+    if (isComplete !== isFormComplete) {
+      setIsFormComplete(isComplete);
+      if (onFormComplete) {
+        onFormComplete(isComplete);
+      }
+    }
+    
+    return isComplete;
+  };
+
+  // Check form completion on form data changes
+  useEffect(() => {
+    checkFormCompletion();
+  }, [formData]);
+
+  // Sync with external form completion state
+  useEffect(() => {
+    if (externalIsFormComplete !== undefined) {
+      setIsFormComplete(externalIsFormComplete);
+    }
+  }, [externalIsFormComplete]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -68,7 +109,32 @@ const EssentialCaseForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Essential Form Data:', formData);
+    
+    // Mark form as complete
+    setIsFormComplete(true);
+    if (onFormComplete) {
+      onFormComplete(true);
+    }
+    
+    // Trigger auto-close
+    if (onFormSubmit) {
+      onFormSubmit(formData);
+    }
+    
     alert('Form submitted successfully! Check console for data.');
+  };
+
+  const handleEditForm = () => {
+    setIsEditing(true);
+  };
+
+  const handleSaveEdit = () => {
+    setIsEditing(false);
+    // Form remains complete after editing
+    setIsFormComplete(true);
+    if (onFormComplete) {
+      onFormComplete(true);
+    }
   };
 
   const progressPercentage = (currentStep / totalSteps) * 100;
@@ -80,13 +146,54 @@ const EssentialCaseForm = () => {
     { number: 4, title: 'Family History' }
   ];
 
+  // If form is complete and not in edit mode, show completion message
+  if (isFormComplete && !isEditing) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white shadow-lg rounded-lg p-8 text-center">
+            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Case Form Completed!</h2>
+            <p className="text-gray-600 mb-6">
+              Your essential case form has been successfully submitted. You can now proceed to payment.
+            </p>
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={handleEditForm}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition"
+              >
+                Edit Form
+              </button>
+              <button
+                onClick={() => {
+                  if (onFormSubmit) {
+                    onFormSubmit(formData);
+                  }
+                }}
+                className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md transition"
+              >
+                Close Form
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Case Form</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+              {isEditing ? 'Edit Essential Case Form' : 'Essential Case Form'}
+            </h1>
             <span className="text-sm font-medium text-gray-600">Step {currentStep} of {totalSteps}</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
@@ -441,12 +548,23 @@ const EssentialCaseForm = () => {
                   Next →
                 </button>
               ) : (
-                <button
-                  type="submit"
-                  className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-md transition"
-                >
-                  Submit Form ✓
-                </button>
+                <div className="flex space-x-4">
+                  {isEditing && (
+                    <button
+                      type="button"
+                      onClick={handleSaveEdit}
+                      className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md transition"
+                    >
+                      Save Changes
+                    </button>
+                  )}
+                  <button
+                    type="submit"
+                    className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-md transition"
+                  >
+                    {isEditing ? 'Update Form' : 'Submit Form'} ✓
+                  </button>
+                </div>
               )}
             </div>
           </form>
@@ -455,6 +573,11 @@ const EssentialCaseForm = () => {
         {/* Footer Info */}
         <div className="mt-6 text-center text-sm text-gray-600">
           <p>Your information is confidential and secure.</p>
+          {isFormComplete && (
+            <p className="text-green-600 font-semibold mt-2">
+              ✓ Form is complete. You can proceed to payment.
+            </p>
+          )}
         </div>
       </div>
     </div>
