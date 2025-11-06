@@ -57,7 +57,11 @@ const TimeSlotsPanel = ({ selectedDate, timeSlots, onTimeSelect }) => {
               `}
             >
               {/* Time Text */}
-              <span className={`font-medium ${isSelected ? "text-white" : "text-gray-900"}`}>
+              <span
+                className={`font-medium ${
+                  isSelected ? "text-white" : "text-gray-900"
+                }`}
+              >
                 {slot.time}
               </span>
 

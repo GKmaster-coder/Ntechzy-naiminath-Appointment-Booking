@@ -5,8 +5,18 @@ const CalendarPicker = ({ selectedDate, onDateSelect }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const MONTHS = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -14,7 +24,7 @@ const CalendarPicker = ({ selectedDate, onDateSelect }) => {
   // Date utilities
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
+
   const isToday = (date) => date.toDateString() === today.toDateString();
   const isPastOrToday = (date) => date <= today;
   const formatDateKey = (date) => date.toISOString().split("T")[0];
@@ -35,10 +45,10 @@ const CalendarPicker = ({ selectedDate, onDateSelect }) => {
     // Previous month filler days
     for (let i = startingDay - 1; i >= 0; i--) {
       const date = new Date(year, month - 1, prevMonthLastDay - i);
-      daysArray.push({ 
-        date, 
-        isCurrentMonth: false, 
-        isSelectable: false 
+      daysArray.push({
+        date,
+        isCurrentMonth: false,
+        isSelectable: false,
       });
     }
 
@@ -57,10 +67,10 @@ const CalendarPicker = ({ selectedDate, onDateSelect }) => {
     let nextMonthDay = 1;
     while (daysArray.length < TOTAL_CALENDAR_CELLS) {
       const date = new Date(year, month + 1, nextMonthDay);
-      daysArray.push({ 
-        date, 
-        isCurrentMonth: false, 
-        isSelectable: false 
+      daysArray.push({
+        date,
+        isCurrentMonth: false,
+        isSelectable: false,
       });
       nextMonthDay++;
     }
@@ -130,7 +140,8 @@ const CalendarPicker = ({ selectedDate, onDateSelect }) => {
       <div className="grid grid-cols-7 gap-1">
         {calendarDays.map((day, index) => {
           const dateKey = formatDateKey(day.date);
-          const isSelected = selectedDate && formatDateKey(selectedDate) === dateKey;
+          const isSelected =
+            selectedDate && formatDateKey(selectedDate) === dateKey;
           const isTodayDate = isToday(day.date);
 
           return (
@@ -141,14 +152,19 @@ const CalendarPicker = ({ selectedDate, onDateSelect }) => {
               className={`
                 h-10 text-sm rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
                 ${day.isCurrentMonth ? "text-gray-900" : "text-gray-400"}
-                ${isSelected 
-                  ? "bg-blue-600 text-white hover:bg-blue-700" 
-                  : day.isSelectable 
-                    ? "hover:bg-gray-100 hover:text-gray-900" 
+                ${
+                  isSelected
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                    : day.isSelectable
+                    ? "hover:bg-gray-100 hover:text-gray-900"
                     : ""
                 }
                 ${isTodayDate && !isSelected ? "border-2 border-blue-500" : ""}
-                ${!day.isSelectable ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}
+                ${
+                  !day.isSelectable
+                    ? "opacity-40 cursor-not-allowed"
+                    : "cursor-pointer"
+                }
               `}
               aria-label={`Select ${day.date.toDateString()}`}
               aria-disabled={!day.isSelectable}

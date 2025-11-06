@@ -1,6 +1,7 @@
 // src/components/BookingWrapper.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import BackButton from "./BackButton";
 import ServiceInfo from "./ServiceInfo";
 import CalendarPicker from "./CalendarPicker";
 import TimeSlotsPanel from "./TimeSlotsPanel";
@@ -18,7 +19,7 @@ const BookingWrapper = () => {
     const options = { weekday: "long", month: "long", day: "numeric" };
     return date.toLocaleDateString("en-US", options);
   };
-
+  
   const handleTimeSelect = (slot, type) => {
     const formattedDate = dateFormatter(selectedDate);
 
@@ -43,9 +44,14 @@ const BookingWrapper = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 flex justify-center">
-      <div className="w-full max-w-7xl h-[80vh] flex gap-6 p-6 bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div className="min-h-screen bg-gray-100 py-10 px-4 flex flex-col items-center">
+      {/* ✅ Back Button */}
+      <div className="w-full max-w-7xl mb-4">
+        <BackButton />
+      </div>
 
+      {/* Main Booking Wrapper */}
+      <div className="w-full max-w-7xl h-[80vh] flex gap-6 p-6 bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="w-[28%] min-w-[260px]">
           <ServiceInfo />
         </div>

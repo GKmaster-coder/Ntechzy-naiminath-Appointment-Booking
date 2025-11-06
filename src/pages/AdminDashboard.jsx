@@ -1,11 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { HiMenu, HiX, HiCalendar, HiOfficeBuilding, HiBan } from 'react-icons/hi';
-import OnlineAppointments from '../components/AdminDashboard/OnlineAppointments';
-import OfflineAppointments from '../components/AdminDashboard/OfflineAppointments';
-import DisableSlot from '../components/AdminDashboard/DisableSlot';
+import React, { useState, useEffect } from "react";
+import {
+  HiMenu,
+  HiX,
+  HiCalendar,
+  HiOfficeBuilding,
+  HiBan,
+} from "react-icons/hi";
+import OnlineAppointments from "../components/AdminDashboard/OnlineAppointments";
+import OfflineAppointments from "../components/AdminDashboard/OfflineAppointments";
+import DisableSlot from "../components/AdminDashboard/DisableSlot";
 
 const AdminDashboard = () => {
-  const [activeComponent, setActiveComponent] = useState('online');
+  const [activeComponent, setActiveComponent] = useState("online");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
@@ -17,17 +23,17 @@ const AdminDashboard = () => {
       }
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const renderMainContent = () => {
     switch (activeComponent) {
-      case 'online':
+      case "online":
         return <OnlineAppointments />;
-      case 'offline':
+      case "offline":
         return <OfflineAppointments />;
-      case 'disable':
+      case "disable":
         return <DisableSlot />;
       default:
         return <OnlineAppointments />;
@@ -35,9 +41,9 @@ const AdminDashboard = () => {
   };
 
   const navItems = [
-    { key: 'online', label: 'Online Appointments', icon: HiCalendar },
-    { key: 'offline', label: 'Offline Appointments', icon: HiOfficeBuilding },
-    { key: 'disable', label: 'Disable Slot/Off Day', icon: HiBan },
+    { key: "online", label: "Online Appointments", icon: HiCalendar },
+    { key: "offline", label: "Offline Appointments", icon: HiOfficeBuilding },
+    { key: "disable", label: "Disable Slot/Off Day", icon: HiBan },
   ];
 
   const handleNavigation = (key) => {
@@ -55,10 +61,12 @@ const AdminDashboard = () => {
 
   // Desktop Sidebar component
   const DesktopSidebar = () => (
-    <div className={`
+    <div
+      className={`
       hidden md:flex flex-col bg-white shadow-lg transition-all duration-300
-      ${sidebarOpen ? 'w-64' : 'w-20'}
-    `}>
+      ${sidebarOpen ? "w-64" : "w-20"}
+    `}
+    >
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
@@ -87,15 +95,15 @@ const AdminDashboard = () => {
               key={item.key}
               className={`w-full flex items-center p-3 rounded-lg transition-all duration-200 ${
                 activeComponent === item.key
-                  ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
+                  ? "bg-blue-50 text-blue-600 border border-blue-200"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-800"
               }`}
               onClick={() => handleNavigation(item.key)}
             >
-              <IconComponent className={`w-5 h-5 ${sidebarOpen ? 'mr-3' : ''}`} />
-              {sidebarOpen && (
-                <span className="font-medium">{item.label}</span>
-              )}
+              <IconComponent
+                className={`w-5 h-5 ${sidebarOpen ? "mr-3" : ""}`}
+              />
+              {sidebarOpen && <span className="font-medium">{item.label}</span>}
             </button>
           );
         })}
@@ -120,10 +128,12 @@ const AdminDashboard = () => {
 
   // Mobile Sidebar component
   const MobileSidebar = () => (
-    <div className={`
+    <div
+      className={`
       fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out md:hidden
-      ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-    `}>
+      ${mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+    `}
+    >
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
@@ -146,8 +156,8 @@ const AdminDashboard = () => {
               key={item.key}
               className={`w-full flex items-center p-3 rounded-lg transition-all duration-200 ${
                 activeComponent === item.key
-                  ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
+                  ? "bg-blue-50 text-blue-600 border border-blue-200"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-800"
               }`}
               onClick={() => handleNavigation(item.key)}
             >
@@ -175,10 +185,10 @@ const AdminDashboard = () => {
 
   // Mobile overlay
   const MobileOverlay = () => (
-    <div 
+    <div
       className={`
         fixed inset-0 z-40 transition-opacity duration-300 md:hidden
-        ${mobileSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}
+        ${mobileSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"}
       `}
       onClick={() => setMobileSidebarOpen(false)}
     />
@@ -208,12 +218,12 @@ const AdminDashboard = () => {
               >
                 <HiMenu className="w-5 h-5" />
               </button>
-              
+
               <h2 className="text-xl md:text-2xl font-bold text-gray-800">
-                {navItems.find(item => item.key === activeComponent)?.label}
+                {navItems.find((item) => item.key === activeComponent)?.label}
               </h2>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center ">
                 <span className="text-white text-sm font-bold">A</span>
@@ -224,9 +234,7 @@ const AdminDashboard = () => {
 
         {/* Content Area */}
         <main className="flex-1 overflow-auto p-4 md:p-6 bg-gray-50">
-          <div className="max-w-7xl mx-auto w-full">
-            {renderMainContent()}
-          </div>
+          <div className="max-w-7xl mx-auto w-full">{renderMainContent()}</div>
         </main>
       </div>
     </div>

@@ -9,25 +9,33 @@ const OfflineAppointments = () => {
     date: "",
     opdNumber: "",
     timeSlot: "",
-    patientName: ""
+    patientName: "",
   });
 
   const rowsPerPage = 10;
 
   // Get unique values for filter dropdowns
-  const uniqueDates = [...new Set(appointments.map(apt => apt.date))].sort();
-  const uniqueOpdNumbers = [...new Set(appointments.map(apt => apt.opdNumber))].sort();
-  const uniqueTimeSlots = [...new Set(appointments.map(apt => apt.timeSlot))].sort();
+  const uniqueDates = [...new Set(appointments.map((apt) => apt.date))].sort();
+  const uniqueOpdNumbers = [
+    ...new Set(appointments.map((apt) => apt.opdNumber)),
+  ].sort();
+  const uniqueTimeSlots = [
+    ...new Set(appointments.map((apt) => apt.timeSlot)),
+  ].sort();
 
   // Filter appointments based on filters
   const filteredAppointments = useMemo(() => {
-    return appointments.filter(appointment => {
+    return appointments.filter((appointment) => {
       return (
         (filters.date === "" || appointment.date === filters.date) &&
-        (filters.opdNumber === "" || appointment.opdNumber === filters.opdNumber) &&
-        (filters.timeSlot === "" || appointment.timeSlot === filters.timeSlot) &&
-        (filters.patientName === "" || 
-          appointment.name.toLowerCase().includes(filters.patientName.toLowerCase()))
+        (filters.opdNumber === "" ||
+          appointment.opdNumber === filters.opdNumber) &&
+        (filters.timeSlot === "" ||
+          appointment.timeSlot === filters.timeSlot) &&
+        (filters.patientName === "" ||
+          appointment.name
+            .toLowerCase()
+            .includes(filters.patientName.toLowerCase()))
       );
     });
   }, [filters]);
@@ -53,9 +61,9 @@ const OfflineAppointments = () => {
   };
 
   const handleFilterChange = (filterType, value) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      [filterType]: value
+      [filterType]: value,
     }));
     setCurrentPage(1); // Reset to first page when filters change
   };
@@ -65,7 +73,7 @@ const OfflineAppointments = () => {
       date: "",
       opdNumber: "",
       timeSlot: "",
-      patientName: ""
+      patientName: "",
     });
     setCurrentPage(1);
   };
@@ -73,7 +81,6 @@ const OfflineAppointments = () => {
   return (
     <div className="py-6 bg-gray-50 min-h-screen scrollbar-hide">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
         {/* Filters Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
@@ -85,7 +92,7 @@ const OfflineAppointments = () => {
               Clear All Filters
             </button>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Date Filter */}
             <div>
@@ -94,12 +101,14 @@ const OfflineAppointments = () => {
               </label>
               <select
                 value={filters.date}
-                onChange={(e) => handleFilterChange('date', e.target.value)}
+                onChange={(e) => handleFilterChange("date", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Dates</option>
-                {uniqueDates.map(date => (
-                  <option key={date} value={date}>{date}</option>
+                {uniqueDates.map((date) => (
+                  <option key={date} value={date}>
+                    {date}
+                  </option>
                 ))}
               </select>
             </div>
@@ -111,12 +120,16 @@ const OfflineAppointments = () => {
               </label>
               <select
                 value={filters.opdNumber}
-                onChange={(e) => handleFilterChange('opdNumber', e.target.value)}
+                onChange={(e) =>
+                  handleFilterChange("opdNumber", e.target.value)
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All OPD Numbers</option>
-                {uniqueOpdNumbers.map(opd => (
-                  <option key={opd} value={opd}>{opd}</option>
+                {uniqueOpdNumbers.map((opd) => (
+                  <option key={opd} value={opd}>
+                    {opd}
+                  </option>
                 ))}
               </select>
             </div>
@@ -128,12 +141,14 @@ const OfflineAppointments = () => {
               </label>
               <select
                 value={filters.timeSlot}
-                onChange={(e) => handleFilterChange('timeSlot', e.target.value)}
+                onChange={(e) => handleFilterChange("timeSlot", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 scrollbar-hide"
               >
                 <option value="">All Time Slots</option>
-                {uniqueTimeSlots.map(slot => (
-                  <option key={slot} value={slot}>{slot}</option>
+                {uniqueTimeSlots.map((slot) => (
+                  <option key={slot} value={slot}>
+                    {slot}
+                  </option>
                 ))}
               </select>
             </div>
@@ -146,7 +161,9 @@ const OfflineAppointments = () => {
               <input
                 type="text"
                 value={filters.patientName}
-                onChange={(e) => handleFilterChange('patientName', e.target.value)}
+                onChange={(e) =>
+                  handleFilterChange("patientName", e.target.value)
+                }
                 placeholder="Search by name..."
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
@@ -233,16 +250,27 @@ const OfflineAppointments = () => {
                   ))
                 ) : (
                   <tr>
-                    <td
-                      colSpan="7"
-                      className="px-6 py-12 text-center"
-                    >
+                    <td colSpan="7" className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center justify-center">
-                        <svg className="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        <svg
+                          className="w-12 h-12 text-gray-400 mb-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                          />
                         </svg>
-                        <p className="text-gray-500 text-lg font-medium">No appointments found</p>
-                        <p className="text-gray-400 text-sm mt-1">Try adjusting your filters to see more results</p>
+                        <p className="text-gray-500 text-lg font-medium">
+                          No appointments found
+                        </p>
+                        <p className="text-gray-400 text-sm mt-1">
+                          Try adjusting your filters to see more results
+                        </p>
                       </div>
                     </td>
                   </tr>
@@ -257,11 +285,18 @@ const OfflineAppointments = () => {
               <div className="text-sm text-gray-700">
                 Showing <span className="font-medium">{startIndex + 1}</span> to{" "}
                 <span className="font-medium">
-                  {Math.min(startIndex + rowsPerPage, filteredAppointments.length)}
+                  {Math.min(
+                    startIndex + rowsPerPage,
+                    filteredAppointments.length
+                  )}
                 </span>{" "}
-                of <span className="font-medium">{filteredAppointments.length}</span> results
+                of{" "}
+                <span className="font-medium">
+                  {filteredAppointments.length}
+                </span>{" "}
+                results
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <button
                   onClick={handlePrevPage}
@@ -274,23 +309,25 @@ const OfflineAppointments = () => {
                 >
                   Previous
                 </button>
-                
+
                 <div className="flex items-center space-x-1">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                        currentPage === page
-                          ? "bg-blue-600 text-white border border-blue-600"
-                          : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                          currentPage === page
+                            ? "bg-blue-600 text-white border border-blue-600"
+                            : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    )
+                  )}
                 </div>
-                
+
                 <button
                   onClick={handleNextPage}
                   disabled={currentPage === totalPages}

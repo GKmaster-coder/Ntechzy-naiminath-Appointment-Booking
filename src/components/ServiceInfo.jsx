@@ -2,7 +2,7 @@
 import React from "react";
 import hospitalLogo from "/logo2.png";
 
-const ServiceInfo = () => {
+const ServiceInfo = ({ textData }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 h-full flex flex-col">
       {/* Header Section */}
@@ -98,14 +98,7 @@ const ServiceInfo = () => {
           </span>
         </div>
         {/* ✅ Added descriptive section */}
-        <p className="text-gray-600 mt-3 leading-relaxed">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-          egestas sapien non justo tincidunt, non semper magna vestibulum. Donec
-          lacinia, odio quis bibendum tincidunt, mi augue facilisis risus, at
-          sodales dui nulla vel sapien.sodales dui nulla vel sapien.sodales dui
-          nulla vel sapien.sodales dui nulla vel sapien.sodales dui nulla vel
-          sapien.sodales dui nulla vel sapien.sodales dui nulla vel sapien.
-        </p>
+        <p className="text-gray-600 mt-3 leading-relaxed">{textData}</p>
       </div>
 
       {/* Footer / Helpline */}

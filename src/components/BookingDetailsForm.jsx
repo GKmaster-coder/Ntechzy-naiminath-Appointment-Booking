@@ -40,10 +40,13 @@ const BookingDetailsForm = ({
   return (
     <div className="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-0">
       <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-gray-200 shadow-lg flex flex-col lg:flex-row gap-0 overflow-hidden">
-
         {/* ✅ Left Service Info Panel */}
         <div className="lg:w-[40%] min-w-[280px] border-r border-gray-200 bg-white">
-          <ServiceInfo />
+          <ServiceInfo
+            textData={
+              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse egestas sapien non justo tincidunt, non semper magna vestibulum. Donec lacinia, odio quis bibendum tincidunt, mi augue facilisis risus, atsodales dui nulla vel sapien.sodales dui nulla vel sapien.sodales duinulla vel sapien.sodales dui nulla vel sapien.sodales dui nulla velsapien.sodales dui nulla vel sapien.sodales dui nulla vel sapien."
+            }
+          />
         </div>
 
         {/* ✅ Right Form Section */}
@@ -56,7 +59,6 @@ const BookingDetailsForm = ({
           </p>
 
           <form onSubmit={formik.handleSubmit} className="mt-6 space-y-6">
-            
             {/* Name */}
             <div>
               <label className="text-sm font-medium text-gray-800">
@@ -75,7 +77,9 @@ const BookingDetailsForm = ({
                 placeholder="Enter your full name"
               />
               {formik.touched.name && formik.errors.name && (
-                <p className="text-xs text-red-500 mt-1">{formik.errors.name}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {formik.errors.name}
+                </p>
               )}
             </div>
 
@@ -99,7 +103,9 @@ const BookingDetailsForm = ({
                 />
               </div>
               {formik.touched.phone && formik.errors.phone && (
-                <p className="text-xs text-red-500 mt-1">{formik.errors.phone}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {formik.errors.phone}
+                </p>
               )}
             </div>
 
@@ -122,7 +128,9 @@ const BookingDetailsForm = ({
                 placeholder="example@mail.com"
               />
               {formik.touched.email && formik.errors.email && (
-                <p className="text-xs text-red-500 mt-1">{formik.errors.email}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {formik.errors.email}
+                </p>
               )}
             </div>
 
@@ -166,7 +174,6 @@ const BookingDetailsForm = ({
             >
               Continue →
             </button>
-
           </form>
         </div>
       </div>

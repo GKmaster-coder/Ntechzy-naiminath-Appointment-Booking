@@ -1,7 +1,6 @@
-// src/pages/PaymentPage.jsx
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import BackButton from "../components/BackButton"; // ✅ Import Back Button
+import BackButton from "../components/BackButton";
 
 export default function PaymentPage() {
   const { state } = useLocation();
@@ -9,10 +8,18 @@ export default function PaymentPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("card");
 
+  // ✅ Updated Success Handler
   const handleSuccess = () => {
     setIsProcessing(true);
+
     setTimeout(() => {
-      navigate("/confirmation", { state });
+      const mode = (state?.selectedType || "").toLowerCase();
+
+      if (mode === "online") {
+        navigate("/onlineconfirmation", { state });
+      } else {
+        navigate("/confirmation", { state });
+      }
     }, 2000);
   };
 
@@ -22,7 +29,6 @@ export default function PaymentPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-
       {/* ✅ Back Button */}
       <div className="mb-6 max-w-2xl mx-auto">
         <BackButton />
@@ -31,7 +37,9 @@ export default function PaymentPage() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Complete Your Payment</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Complete Your Payment
+          </h1>
           <p className="text-gray-600">Secure payment for your appointment</p>
         </div>
 
@@ -59,7 +67,6 @@ export default function PaymentPage() {
           <div className="p-6 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Payment Method</h2>
             <div className="space-y-3">
-              
               {/* Card */}
               <label className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
                 <input
@@ -119,7 +126,6 @@ export default function PaymentPage() {
                   <span className="font-medium text-gray-900">Net Banking</span>
                 </div>
               </label>
-
             </div>
           </div>
 
@@ -166,7 +172,6 @@ export default function PaymentPage() {
             <span>RBI Certified</span>
           </div>
         </div>
-
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-// src/App.jsx
+import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import BookingWrapper from "./components/BookingWrapper";
 import BookingDetailsPage from "./pages/BookingDetailsPage";
@@ -7,7 +7,7 @@ import OfflineDetailsPage from "./pages/OfflineDetailsPage";
 import PaymentPage from "./pages/PaymentPage";
 import ConfirmationPage from "./pages/ConfirmationPage";
 import AdminDashboard from "./pages/AdminDashboard";
-import OnlineConfirmationPage from "./pages/OnlineConfirmationPage"
+import OnlineConfirmationPage from "./pages/OnlineConfirmationPage";
 
 function App() {
   return (
@@ -20,7 +20,10 @@ function App() {
         <Route path="/offline-details" element={<OfflineDetailsPage />} />
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/confirmation" element={<ConfirmationPage />} />
-        <Route path="/onlineconfirmation" element={<OnlineConfirmationPage />} />
+        <Route
+          path="/onlineconfirmation"
+          element={<OnlineConfirmationPage />}
+        />
       </Routes>
     </BrowserRouter>
   );
