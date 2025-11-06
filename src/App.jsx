@@ -16,9 +16,9 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/f" element={<BookingWrapper />} />
+        <Route path="/" element={<BookingWrapper />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/" element={<BookingDetailsPage />} />
+        <Route path="/lijr" element={<BookingDetailsPage />} />
         <Route path="/online-details" element={<OnlineDetailsPage />} />
         <Route path="/offline-details" element={<OfflineDetailsPage />} />
         <Route path="/payment" element={<PaymentPage />} />

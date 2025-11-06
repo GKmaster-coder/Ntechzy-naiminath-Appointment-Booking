@@ -2,12 +2,10 @@ import React, { useState, useEffect } from "react";
 
 const TimeSlotsPanel = ({ selectedDate, timeSlots, onTimeSelect }) => {
   const [selectedSlot, setSelectedSlot] = useState(null);
-  const [selectedType, setSelectedType] = useState(null); // ✅ Store Online / Offline
 
   // Reset selection when date changes
   useEffect(() => {
     setSelectedSlot(null);
-    setSelectedType(null);
   }, [selectedDate]);
 
   if (!selectedDate) return null;
@@ -25,10 +23,9 @@ const TimeSlotsPanel = ({ selectedDate, timeSlots, onTimeSelect }) => {
     setSelectedSlot(selectedSlot === index ? null : index);
   };
 
-  const handleAppointmentTypeSelect = (slot, type) => {
-    setSelectedType(type); // ✅ Save mode locally
-    onTimeSelect(slot, type); // ✅ Also send upward
-    setSelectedSlot(null);
+  const handleSelectClick = (slot) => {
+    onTimeSelect(slot); // Send the selected slot to parent
+    setSelectedSlot(null); // Reset selection
   };
 
   return (
@@ -64,28 +61,17 @@ const TimeSlotsPanel = ({ selectedDate, timeSlots, onTimeSelect }) => {
                 {slot.time}
               </span>
 
-              {/* Online/Offline Buttons if Selected */}
+              {/* Select Button if Selected */}
               {isSelected ? (
-                <div className="flex gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAppointmentTypeSelect(slot, "Online");
-                    }}
-                    className="bg-white text-blue-600 text-xs font-semibold px-3 py-1.5 rounded-md hover:bg-gray-100 transition"
-                  >
-                    Online
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAppointmentTypeSelect(slot, "Offline");
-                    }}
-                    className="bg-white text-blue-600 text-xs font-semibold px-3 py-1.5 rounded-md hover:bg-gray-100 transition"
-                  >
-                    Offline
-                  </button>
-                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSelectClick(slot);
+                  }}
+                  className="bg-white text-blue-600 text-xs font-semibold px-4 py-1.5 rounded-md hover:bg-gray-100 transition"
+                >
+                  Select
+                </button>
               ) : (
                 <span
                   className={`text-xs font-medium px-2 py-1 rounded 
