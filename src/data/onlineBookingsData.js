@@ -1,4 +1,3 @@
-
 export const onlineAppointments = [
   {
     id: 1,
@@ -199,5 +198,5 @@ export const onlineAppointments = [
     timeSlot: "06:30 PM - 07:00 PM",
     opdNumber: 5,
     status: "pending",
-  }
+  },
 ];

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const CompleteCaseForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -6,9 +6,9 @@ const CompleteCaseForm = () => {
 
   const [formData, setFormData] = useState({
     // Significant Life Events
-    timeline: '',
-    childhood: '',
-    specificFear: '',
+    timeline: "",
+    childhood: "",
+    specificFear: "",
     nature: {
       throwingThings: false,
       shouting: false,
@@ -18,47 +18,47 @@ const CompleteCaseForm = () => {
       introverted: false,
       likesToBeAlone: false,
     },
-    pleasantTime: '',
-    strugglingTime: '',
-    painfulTime: '',
-    hobbies: '',
+    pleasantTime: "",
+    strugglingTime: "",
+    painfulTime: "",
+    hobbies: "",
     stressFactors: {
       family: false,
       professional: false,
       personal: false,
       anyOther: false,
     },
-    
+
     // Baby Development
-    goodBaby: '',
-    cryingReason: '',
+    goodBaby: "",
+    cryingReason: "",
     developmentAges: {
-      teeth: '',
-      crawl: '',
-      walk: '',
-      talk: '',
+      teeth: "",
+      crawl: "",
+      walk: "",
+      talk: "",
     },
-    standardAgeFrames: '',
-    
+    standardAgeFrames: "",
+
     // Illness History
     illnessHistory: {
-      chickenPox: '',
-      mumps: '',
-      germanMeasles: '',
-      pneumonia: '',
-      measles: '',
-      scarletFever: '',
-      mononucleosis: '',
-      whoopingCough: '',
-      typhoid: '',
-      accidentInjury: '',
-      dengue: '',
-      animalBite: '',
-      malaria: '',
-      surgicalHistory: '',
-      otherIllnesses: '',
+      chickenPox: "",
+      mumps: "",
+      germanMeasles: "",
+      pneumonia: "",
+      measles: "",
+      scarletFever: "",
+      mononucleosis: "",
+      whoopingCough: "",
+      typhoid: "",
+      accidentInjury: "",
+      dengue: "",
+      animalBite: "",
+      malaria: "",
+      surgicalHistory: "",
+      otherIllnesses: "",
     },
-    
+
     // Recurring Issues
     recurring: {
       boils: false,
@@ -75,12 +75,12 @@ const CompleteCaseForm = () => {
       warts: false,
       yeastInfections: false,
     },
-    
+
     // Vaccinations
-    vaccinationReaction: '',
-    healthDecline: '',
-    allergyInjections: '',
-    
+    vaccinationReaction: "",
+    healthDecline: "",
+    allergyInjections: "",
+
     // Symptoms
     symptoms: {
       aching: false,
@@ -114,97 +114,97 @@ const CompleteCaseForm = () => {
       pinching: false,
       throbbing: false,
     },
-    symptomsBetter: '',
-    symptomsWorse: '',
-    symptomsTimeOfDay: '',
-    dailyBasis: '',
-    painLocation: '',
-    painExtends: '',
-    
+    symptomsBetter: "",
+    symptomsWorse: "",
+    symptomsTimeOfDay: "",
+    dailyBasis: "",
+    painLocation: "",
+    painExtends: "",
+
     // Family Health History
     familyHealth: {
-      mother: { ageAlive: '', agePassing: '', ailments: '' },
-      father: { ageAlive: '', agePassing: '', ailments: '' },
-      siblings: { ageAlive: '', agePassing: '', ailments: '' },
-      maternalGrandmother: { ageAlive: '', agePassing: '', ailments: '' },
-      maternalGrandfather: { ageAlive: '', agePassing: '', ailments: '' },
-      maternalAuntsUncles: { ageAlive: '', agePassing: '', ailments: '' },
-      paternalGrandmother: { ageAlive: '', agePassing: '', ailments: '' },
-      paternalGrandfather: { ageAlive: '', agePassing: '', ailments: '' },
-      paternalAuntsUncles: { ageAlive: '', agePassing: '', ailments: '' },
+      mother: { ageAlive: "", agePassing: "", ailments: "" },
+      father: { ageAlive: "", agePassing: "", ailments: "" },
+      siblings: { ageAlive: "", agePassing: "", ailments: "" },
+      maternalGrandmother: { ageAlive: "", agePassing: "", ailments: "" },
+      maternalGrandfather: { ageAlive: "", agePassing: "", ailments: "" },
+      maternalAuntsUncles: { ageAlive: "", agePassing: "", ailments: "" },
+      paternalGrandmother: { ageAlive: "", agePassing: "", ailments: "" },
+      paternalGrandfather: { ageAlive: "", agePassing: "", ailments: "" },
+      paternalAuntsUncles: { ageAlive: "", agePassing: "", ailments: "" },
     },
   });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleCheckboxChange = (section, field) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [section]: {
         ...prev[section],
-        [field]: !prev[section][field]
-      }
+        [field]: !prev[section][field],
+      },
     }));
   };
 
   const handleNestedInputChange = (section, field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [section]: {
         ...prev[section],
-        [field]: value
-      }
+        [field]: value,
+      },
     }));
   };
 
   const handleFamilyHealthChange = (relation, field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       familyHealth: {
         ...prev.familyHealth,
         [relation]: {
           ...prev.familyHealth[relation],
-          [field]: value
-        }
-      }
+          [field]: value,
+        },
+      },
     }));
   };
 
   const nextStep = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form Data:', formData);
-    alert('Form submitted successfully! Check console for data.');
+    console.log("Form Data:", formData);
+    alert("Form submitted successfully! Check console for data.");
   };
 
   const progressPercentage = (currentStep / totalSteps) * 100;
 
   const steps = [
-    { number: 1, title: 'Life Events' },
-    { number: 2, title: 'Early Development' },
-    { number: 3, title: 'Illness History' },
-    { number: 4, title: 'Recurring Issues' },
-    { number: 5, title: 'Symptoms' },
-    { number: 6, title: 'Family History' }
+    { number: 1, title: "Life Events" },
+    { number: 2, title: "Early Development" },
+    { number: 3, title: "Illness History" },
+    { number: 4, title: "Recurring Issues" },
+    { number: 5, title: "Symptoms" },
+    { number: 6, title: "Family History" },
   ];
 
   return (
@@ -213,11 +213,15 @@ const CompleteCaseForm = () => {
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Case Form</h1>
-            <span className="text-sm font-medium text-gray-600">Step {currentStep} of {totalSteps}</span>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+              Case Form
+            </h1>
+            <span className="text-sm font-medium text-gray-600">
+              Step {currentStep} of {totalSteps}
+            </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
-            <div 
+            <div
               className="bg-blue-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${progressPercentage}%` }}
             ></div>
@@ -226,19 +230,28 @@ const CompleteCaseForm = () => {
           {/* Step Indicators */}
           <div className="flex justify-between items-center">
             {steps.map((step) => (
-              <div key={step.number} className="flex flex-col items-center flex-1">
-                <div 
+              <div
+                key={step.number}
+                className="flex flex-col items-center flex-1"
+              >
+                <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold mb-2 transition-all duration-300 ${
-                    step.number === currentStep 
-                      ? 'bg-blue-600 shadow-md scale-110' 
-                      : step.number < currentStep 
-                      ? 'bg-green-500' 
-                      : 'bg-gray-300'
+                    step.number === currentStep
+                      ? "bg-blue-600 shadow-md scale-110"
+                      : step.number < currentStep
+                      ? "bg-green-500"
+                      : "bg-gray-300"
                   }`}
                 >
-                  {step.number < currentStep ? '✓' : step.number}
+                  {step.number < currentStep ? "✓" : step.number}
                 </div>
-                <span className={`text-xs text-center ${step.number === currentStep ? 'font-semibold text-blue-600' : 'text-gray-600'}`}>
+                <span
+                  className={`text-xs text-center ${
+                    step.number === currentStep
+                      ? "font-semibold text-blue-600"
+                      : "text-gray-600"
+                  }`}
+                >
                   {step.title}
                 </span>
               </div>
@@ -248,15 +261,18 @@ const CompleteCaseForm = () => {
 
         <div className="bg-white shadow-lg rounded-lg p-6 md:p-8">
           <form onSubmit={handleSubmit}>
-            
             {/* Step 1: Significant Life Events */}
             {currentStep === 1 && (
               <div className="space-y-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">Significant Life Events</h2>
-                
+                <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">
+                  Significant Life Events
+                </h2>
+
                 <div className="bg-blue-50 border-l-4 border-blue-600 p-4 mb-6 rounded">
                   <p className="text-sm text-gray-700">
-                    <strong>Optional:</strong> Traumatic events can impact your health. It's helpful to know the effects and how they left you feeling. You can discuss details in person if preferred.
+                    <strong>Optional:</strong> Traumatic events can impact your
+                    health. It's helpful to know the effects and how they left
+                    you feeling. You can discuss details in person if preferred.
                   </p>
                 </div>
 
@@ -265,7 +281,9 @@ const CompleteCaseForm = () => {
                     Timeline from birth to present
                   </label>
                   <p className="text-xs text-gray-500 mb-2">
-                    Include: traumas, romantic disappointments, divorces, work/family issues, deaths, humiliations, major illnesses, onset of conditions, medications.
+                    Include: traumas, romantic disappointments, divorces,
+                    work/family issues, deaths, humiliations, major illnesses,
+                    onset of conditions, medications.
                   </p>
                   <textarea
                     name="timeline"
@@ -287,22 +305,26 @@ const CompleteCaseForm = () => {
                         type="radio"
                         name="childhood"
                         value="pleasant"
-                        checked={formData.childhood === 'pleasant'}
+                        checked={formData.childhood === "pleasant"}
                         onChange={handleInputChange}
                         className="form-radio text-blue-600 w-4 h-4"
                       />
-                      <span className="ml-3 text-sm text-gray-700">Pleasant</span>
+                      <span className="ml-3 text-sm text-gray-700">
+                        Pleasant
+                      </span>
                     </label>
                     <label className="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition">
                       <input
                         type="radio"
                         name="childhood"
                         value="specificFear"
-                        checked={formData.childhood === 'specificFear'}
+                        checked={formData.childhood === "specificFear"}
                         onChange={handleInputChange}
                         className="form-radio text-blue-600 w-4 h-4"
                       />
-                      <span className="ml-3 text-sm text-gray-700">Specific Fear during childhood</span>
+                      <span className="ml-3 text-sm text-gray-700">
+                        Specific Fear during childhood
+                      </span>
                     </label>
                   </div>
                 </div>
@@ -313,15 +335,18 @@ const CompleteCaseForm = () => {
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {Object.keys(formData.nature).map((key) => (
-                      <label key={key} className="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition">
+                      <label
+                        key={key}
+                        className="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition"
+                      >
                         <input
                           type="checkbox"
                           checked={formData.nature[key]}
-                          onChange={() => handleCheckboxChange('nature', key)}
+                          onChange={() => handleCheckboxChange("nature", key)}
                           className="form-checkbox text-blue-600 rounded w-4 h-4"
                         />
                         <span className="ml-3 text-sm text-gray-700 capitalize">
-                          {key.replace(/([A-Z])/g, ' $1').trim()}
+                          {key.replace(/([A-Z])/g, " $1").trim()}
                         </span>
                       </label>
                     ))}
@@ -389,15 +414,20 @@ const CompleteCaseForm = () => {
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {Object.keys(formData.stressFactors).map((key) => (
-                      <label key={key} className="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition">
+                      <label
+                        key={key}
+                        className="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition"
+                      >
                         <input
                           type="checkbox"
                           checked={formData.stressFactors[key]}
-                          onChange={() => handleCheckboxChange('stressFactors', key)}
+                          onChange={() =>
+                            handleCheckboxChange("stressFactors", key)
+                          }
                           className="form-checkbox text-blue-600 rounded w-4 h-4"
                         />
                         <span className="ml-3 text-sm text-gray-700 capitalize">
-                          {key.replace(/([A-Z])/g, ' $1').trim()}
+                          {key.replace(/([A-Z])/g, " $1").trim()}
                         </span>
                       </label>
                     ))}
@@ -409,8 +439,10 @@ const CompleteCaseForm = () => {
             {/* Step 2: Early Development */}
             {currentStep === 2 && (
               <div className="space-y-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">Early Development</h2>
-                
+                <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">
+                  Early Development
+                </h2>
+
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Were you a "good" baby?
@@ -445,41 +477,73 @@ const CompleteCaseForm = () => {
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">Teeth</label>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Teeth
+                      </label>
                       <input
                         type="text"
                         value={formData.developmentAges.teeth}
-                        onChange={(e) => handleNestedInputChange('developmentAges', 'teeth', e.target.value)}
+                        onChange={(e) =>
+                          handleNestedInputChange(
+                            "developmentAges",
+                            "teeth",
+                            e.target.value
+                          )
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
                         placeholder="Age..."
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">Ability to crawl</label>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Ability to crawl
+                      </label>
                       <input
                         type="text"
                         value={formData.developmentAges.crawl}
-                        onChange={(e) => handleNestedInputChange('developmentAges', 'crawl', e.target.value)}
+                        onChange={(e) =>
+                          handleNestedInputChange(
+                            "developmentAges",
+                            "crawl",
+                            e.target.value
+                          )
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
                         placeholder="Age..."
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">Ability to walk</label>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Ability to walk
+                      </label>
                       <input
                         type="text"
                         value={formData.developmentAges.walk}
-                        onChange={(e) => handleNestedInputChange('developmentAges', 'walk', e.target.value)}
+                        onChange={(e) =>
+                          handleNestedInputChange(
+                            "developmentAges",
+                            "walk",
+                            e.target.value
+                          )
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
                         placeholder="Age..."
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">Ability to talk</label>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Ability to talk
+                      </label>
                       <input
                         type="text"
                         value={formData.developmentAges.talk}
-                        onChange={(e) => handleNestedInputChange('developmentAges', 'talk', e.target.value)}
+                        onChange={(e) =>
+                          handleNestedInputChange(
+                            "developmentAges",
+                            "talk",
+                            e.target.value
+                          )
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
                         placeholder="Age..."
                       />
@@ -489,7 +553,8 @@ const CompleteCaseForm = () => {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    If you are unsure, do you know if these events occurred within the standard age frames?
+                    If you are unsure, do you know if these events occurred
+                    within the standard age frames?
                   </label>
                   <input
                     type="text"
@@ -506,21 +571,30 @@ const CompleteCaseForm = () => {
             {/* Step 3: Illness History */}
             {currentStep === 3 && (
               <div className="space-y-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">Illness History</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">
+                  Illness History
+                </h2>
                 <p className="text-sm text-gray-600 mb-4 bg-gray-100 p-3 rounded-md border">
-                  If affected by any illness, indicate age and severity (severe/mild/long-lasting)
+                  If affected by any illness, indicate age and severity
+                  (severe/mild/long-lasting)
                 </p>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {Object.keys(formData.illnessHistory).map((illness) => (
                     <div key={illness}>
                       <label className="block text-xs font-medium text-gray-700 mb-1 capitalize">
-                        {illness.replace(/([A-Z])/g, ' $1').trim()}
+                        {illness.replace(/([A-Z])/g, " $1").trim()}
                       </label>
                       <input
                         type="text"
                         value={formData.illnessHistory[illness]}
-                        onChange={(e) => handleNestedInputChange('illnessHistory', illness, e.target.value)}
+                        onChange={(e) =>
+                          handleNestedInputChange(
+                            "illnessHistory",
+                            illness,
+                            e.target.value
+                          )
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
                         placeholder="Age and severity..."
                       />
@@ -534,20 +608,29 @@ const CompleteCaseForm = () => {
             {currentStep === 4 && (
               <div className="space-y-8">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">Recurring Issues</h2>
-                  <p className="text-sm text-gray-600 mb-4">Have you suffered from recurring:</p>
-                  
+                  <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">
+                    Recurring Issues
+                  </h2>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Have you suffered from recurring:
+                  </p>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {Object.keys(formData.recurring).map((issue) => (
-                      <label key={issue} className="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition">
+                      <label
+                        key={issue}
+                        className="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition"
+                      >
                         <input
                           type="checkbox"
                           checked={formData.recurring[issue]}
-                          onChange={() => handleCheckboxChange('recurring', issue)}
+                          onChange={() =>
+                            handleCheckboxChange("recurring", issue)
+                          }
                           className="form-checkbox text-blue-600 rounded w-4 h-4"
                         />
                         <span className="ml-3 text-sm text-gray-700 capitalize">
-                          {issue.replace(/([A-Z])/g, ' $1').trim()}
+                          {issue.replace(/([A-Z])/g, " $1").trim()}
                         </span>
                       </label>
                     ))}
@@ -555,8 +638,10 @@ const CompleteCaseForm = () => {
                 </div>
 
                 <div className="border-t pt-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-6 border-b pb-3">Vaccinations</h2>
-                  
+                  <h2 className="text-xl font-bold text-gray-900 mb-6 border-b pb-3">
+                    Vaccinations
+                  </h2>
+
                   <div className="space-y-6">
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-3">
@@ -568,22 +653,26 @@ const CompleteCaseForm = () => {
                             type="radio"
                             name="vaccinationReaction"
                             value="yes"
-                            checked={formData.vaccinationReaction === 'yes'}
+                            checked={formData.vaccinationReaction === "yes"}
                             onChange={handleInputChange}
                             className="form-radio text-blue-600 w-4 h-4"
                           />
-                          <span className="ml-3 text-sm text-gray-700 font-medium">Yes</span>
+                          <span className="ml-3 text-sm text-gray-700 font-medium">
+                            Yes
+                          </span>
                         </label>
                         <label className="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition flex-1">
                           <input
                             type="radio"
                             name="vaccinationReaction"
                             value="no"
-                            checked={formData.vaccinationReaction === 'no'}
+                            checked={formData.vaccinationReaction === "no"}
                             onChange={handleInputChange}
                             className="form-radio text-blue-600 w-4 h-4"
                           />
-                          <span className="ml-3 text-sm text-gray-700 font-medium">No</span>
+                          <span className="ml-3 text-sm text-gray-700 font-medium">
+                            No
+                          </span>
                         </label>
                       </div>
                     </div>
@@ -598,22 +687,26 @@ const CompleteCaseForm = () => {
                             type="radio"
                             name="healthDecline"
                             value="yes"
-                            checked={formData.healthDecline === 'yes'}
+                            checked={formData.healthDecline === "yes"}
                             onChange={handleInputChange}
                             className="form-radio text-blue-600 w-4 h-4"
                           />
-                          <span className="ml-3 text-sm text-gray-700 font-medium">Yes</span>
+                          <span className="ml-3 text-sm text-gray-700 font-medium">
+                            Yes
+                          </span>
                         </label>
                         <label className="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition flex-1">
                           <input
                             type="radio"
                             name="healthDecline"
                             value="no"
-                            checked={formData.healthDecline === 'no'}
+                            checked={formData.healthDecline === "no"}
                             onChange={handleInputChange}
                             className="form-radio text-blue-600 w-4 h-4"
                           />
-                          <span className="ml-3 text-sm text-gray-700 font-medium">No</span>
+                          <span className="ml-3 text-sm text-gray-700 font-medium">
+                            No
+                          </span>
                         </label>
                       </div>
                     </div>
@@ -628,22 +721,26 @@ const CompleteCaseForm = () => {
                             type="radio"
                             name="allergyInjections"
                             value="yes"
-                            checked={formData.allergyInjections === 'yes'}
+                            checked={formData.allergyInjections === "yes"}
                             onChange={handleInputChange}
                             className="form-radio text-blue-600 w-4 h-4"
                           />
-                          <span className="ml-3 text-sm text-gray-700 font-medium">Yes</span>
+                          <span className="ml-3 text-sm text-gray-700 font-medium">
+                            Yes
+                          </span>
                         </label>
                         <label className="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition flex-1">
                           <input
                             type="radio"
                             name="allergyInjections"
                             value="no"
-                            checked={formData.allergyInjections === 'no'}
+                            checked={formData.allergyInjections === "no"}
                             onChange={handleInputChange}
                             className="form-radio text-blue-600 w-4 h-4"
                           />
-                          <span className="ml-3 text-sm text-gray-700 font-medium">No</span>
+                          <span className="ml-3 text-sm text-gray-700 font-medium">
+                            No
+                          </span>
                         </label>
                       </div>
                     </div>
@@ -655,21 +752,30 @@ const CompleteCaseForm = () => {
             {/* Step 5: Symptoms */}
             {currentStep === 5 && (
               <div className="space-y-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">Symptoms & Pain</h2>
-                
+                <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">
+                  Symptoms & Pain
+                </h2>
+
                 <div>
-                  <p className="text-sm font-semibold text-gray-700 mb-3">Check all boxes that describe the symptoms/pain:</p>
+                  <p className="text-sm font-semibold text-gray-700 mb-3">
+                    Check all boxes that describe the symptoms/pain:
+                  </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                     {Object.keys(formData.symptoms).map((symptom) => (
-                      <label key={symptom} className="flex items-center p-2 border border-gray-300 rounded hover:bg-gray-50 cursor-pointer transition text-xs">
+                      <label
+                        key={symptom}
+                        className="flex items-center p-2 border border-gray-300 rounded hover:bg-gray-50 cursor-pointer transition text-xs"
+                      >
                         <input
                           type="checkbox"
                           checked={formData.symptoms[symptom]}
-                          onChange={() => handleCheckboxChange('symptoms', symptom)}
+                          onChange={() =>
+                            handleCheckboxChange("symptoms", symptom)
+                          }
                           className="form-checkbox text-blue-600 rounded w-4 h-4"
                         />
                         <span className="ml-2 text-gray-700 capitalize">
-                          {symptom.replace(/([A-Z])/g, ' $1').trim()}
+                          {symptom.replace(/([A-Z])/g, " $1").trim()}
                         </span>
                       </label>
                     ))}
@@ -681,7 +787,10 @@ const CompleteCaseForm = () => {
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       What makes the pain/symptom better?
                     </label>
-                    <p className="text-xs text-gray-500 mb-2">Heat, cold, motion, being still, menstrual cycle, sitting, lying, etc.</p>
+                    <p className="text-xs text-gray-500 mb-2">
+                      Heat, cold, motion, being still, menstrual cycle, sitting,
+                      lying, etc.
+                    </p>
                     <input
                       type="text"
                       name="symptomsBetter"
@@ -708,7 +817,8 @@ const CompleteCaseForm = () => {
 
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Is there a specific time of day that your symptoms are worse?
+                      Is there a specific time of day that your symptoms are
+                      worse?
                     </label>
                     <input
                       type="text"
@@ -730,22 +840,26 @@ const CompleteCaseForm = () => {
                           type="radio"
                           name="dailyBasis"
                           value="yes"
-                          checked={formData.dailyBasis === 'yes'}
+                          checked={formData.dailyBasis === "yes"}
                           onChange={handleInputChange}
                           className="form-radio text-blue-600 w-4 h-4"
                         />
-                        <span className="ml-3 text-sm text-gray-700 font-medium">Yes</span>
+                        <span className="ml-3 text-sm text-gray-700 font-medium">
+                          Yes
+                        </span>
                       </label>
                       <label className="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition flex-1">
                         <input
                           type="radio"
                           name="dailyBasis"
                           value="no"
-                          checked={formData.dailyBasis === 'no'}
+                          checked={formData.dailyBasis === "no"}
                           onChange={handleInputChange}
                           className="form-radio text-blue-600 w-4 h-4"
                         />
-                        <span className="ml-3 text-sm text-gray-700 font-medium">No</span>
+                        <span className="ml-3 text-sm text-gray-700 font-medium">
+                          No
+                        </span>
                       </label>
                     </div>
                   </div>
@@ -784,11 +898,14 @@ const CompleteCaseForm = () => {
             {/* Step 6: Family Health History */}
             {currentStep === 6 && (
               <div className="space-y-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">Family Health History</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">
+                  Family Health History
+                </h2>
                 <p className="text-sm text-gray-600 mb-4 bg-gray-100 p-3 rounded-md border">
-                  Indicate which ailments have affected your relatives, including their ages, to the best of your ability.
+                  Indicate which ailments have affected your relatives,
+                  including their ages, to the best of your ability.
                 </p>
-                
+
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200 border border-gray-300 rounded-md">
                     <thead className="bg-gray-100">
@@ -808,40 +925,67 @@ const CompleteCaseForm = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {Object.keys(formData.familyHealth).map((relation, index) => (
-                        <tr key={relation} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 capitalize border-r">
-                            {relation.replace(/([A-Z])/g, ' $1').trim()}
-                          </td>
-                          <td className="px-4 py-3 whitespace-nowrap border-r">
-                            <input
-                              type="text"
-                              value={formData.familyHealth[relation].ageAlive}
-                              onChange={(e) => handleFamilyHealthChange(relation, 'ageAlive', e.target.value)}
-                              className="w-full px-2 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
-                              placeholder="Age"
-                            />
-                          </td>
-                          <td className="px-4 py-3 whitespace-nowrap border-r">
-                            <input
-                              type="text"
-                              value={formData.familyHealth[relation].agePassing}
-                              onChange={(e) => handleFamilyHealthChange(relation, 'agePassing', e.target.value)}
-                              className="w-full px-2 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
-                              placeholder="Age"
-                            />
-                          </td>
-                          <td className="px-4 py-3">
-                            <input
-                              type="text"
-                              value={formData.familyHealth[relation].ailments}
-                              onChange={(e) => handleFamilyHealthChange(relation, 'ailments', e.target.value)}
-                              className="w-full px-2 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
-                              placeholder="List ailments..."
-                            />
-                          </td>
-                        </tr>
-                      ))}
+                      {Object.keys(formData.familyHealth).map(
+                        (relation, index) => (
+                          <tr
+                            key={relation}
+                            className={
+                              index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                            }
+                          >
+                            <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 capitalize border-r">
+                              {relation.replace(/([A-Z])/g, " $1").trim()}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap border-r">
+                              <input
+                                type="text"
+                                value={formData.familyHealth[relation].ageAlive}
+                                onChange={(e) =>
+                                  handleFamilyHealthChange(
+                                    relation,
+                                    "ageAlive",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full px-2 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+                                placeholder="Age"
+                              />
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap border-r">
+                              <input
+                                type="text"
+                                value={
+                                  formData.familyHealth[relation].agePassing
+                                }
+                                onChange={(e) =>
+                                  handleFamilyHealthChange(
+                                    relation,
+                                    "agePassing",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full px-2 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+                                placeholder="Age"
+                              />
+                            </td>
+                            <td className="px-4 py-3">
+                              <input
+                                type="text"
+                                value={formData.familyHealth[relation].ailments}
+                                onChange={(e) =>
+                                  handleFamilyHealthChange(
+                                    relation,
+                                    "ailments",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full px-2 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+                                placeholder="List ailments..."
+                              />
+                            </td>
+                          </tr>
+                        )
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -856,8 +1000,8 @@ const CompleteCaseForm = () => {
                 disabled={currentStep === 1}
                 className={`px-6 py-3 rounded-md font-semibold transition ${
                   currentStep === 1
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-600 hover:bg-gray-700 text-white'
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-gray-600 hover:bg-gray-700 text-white"
                 }`}
               >
                 ← Previous

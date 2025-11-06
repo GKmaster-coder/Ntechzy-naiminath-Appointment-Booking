@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const EssentialCaseForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -6,78 +6,78 @@ const EssentialCaseForm = () => {
 
   const [formData, setFormData] = useState({
     // Essential Personal Information
-    timeline: '',
-    childhood: '',
-    hobbies: '',
+    timeline: "",
+    childhood: "",
+    hobbies: "",
     stressFactors: {
       family: false,
       professional: false,
       personal: false,
       anyOther: false,
     },
-    
+
     // Essential Illness History
-    majorIllnesses: '',
-    surgicalHistory: '',
-    currentMedications: '',
-    
+    majorIllnesses: "",
+    surgicalHistory: "",
+    currentMedications: "",
+
     // Essential Symptoms
-    mainSymptoms: '',
-    symptomLocation: '',
-    symptomDuration: '',
-    symptomsBetter: '',
-    symptomsWorse: '',
-    dailyBasis: '',
-    
+    mainSymptoms: "",
+    symptomLocation: "",
+    symptomDuration: "",
+    symptomsBetter: "",
+    symptomsWorse: "",
+    dailyBasis: "",
+
     // Essential Family History
-    familyHealthSummary: '',
+    familyHealthSummary: "",
   });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleCheckboxChange = (section, field) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [section]: {
         ...prev[section],
-        [field]: !prev[section][field]
-      }
+        [field]: !prev[section][field],
+      },
     }));
   };
 
   const nextStep = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Essential Form Data:', formData);
-    alert('Form submitted successfully! Check console for data.');
+    console.log("Essential Form Data:", formData);
+    alert("Form submitted successfully! Check console for data.");
   };
 
   const progressPercentage = (currentStep / totalSteps) * 100;
 
   const steps = [
-    { number: 1, title: 'Background' },
-    { number: 2, title: 'Medical History' },
-    { number: 3, title: 'Symptoms' },
-    { number: 4, title: 'Family History' }
+    { number: 1, title: "Background" },
+    { number: 2, title: "Medical History" },
+    { number: 3, title: "Symptoms" },
+    { number: 4, title: "Family History" },
   ];
 
   return (
@@ -86,11 +86,15 @@ const EssentialCaseForm = () => {
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Case Form</h1>
-            <span className="text-sm font-medium text-gray-600">Step {currentStep} of {totalSteps}</span>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+              Case Form
+            </h1>
+            <span className="text-sm font-medium text-gray-600">
+              Step {currentStep} of {totalSteps}
+            </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
-            <div 
+            <div
               className="bg-blue-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${progressPercentage}%` }}
             ></div>
@@ -99,19 +103,28 @@ const EssentialCaseForm = () => {
           {/* Step Indicators */}
           <div className="flex justify-between items-center">
             {steps.map((step) => (
-              <div key={step.number} className="flex flex-col items-center flex-1">
-                <div 
+              <div
+                key={step.number}
+                className="flex flex-col items-center flex-1"
+              >
+                <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold mb-2 transition-all duration-300 ${
-                    step.number === currentStep 
-                      ? 'bg-blue-600 shadow-md scale-110' 
-                      : step.number < currentStep 
-                      ? 'bg-green-500' 
-                      : 'bg-gray-300'
+                    step.number === currentStep
+                      ? "bg-blue-600 shadow-md scale-110"
+                      : step.number < currentStep
+                      ? "bg-green-500"
+                      : "bg-gray-300"
                   }`}
                 >
-                  {step.number < currentStep ? '✓' : step.number}
+                  {step.number < currentStep ? "✓" : step.number}
                 </div>
-                <span className={`text-xs text-center ${step.number === currentStep ? 'font-semibold text-blue-600' : 'text-gray-600'}`}>
+                <span
+                  className={`text-xs text-center ${
+                    step.number === currentStep
+                      ? "font-semibold text-blue-600"
+                      : "text-gray-600"
+                  }`}
+                >
                   {step.title}
                 </span>
               </div>
@@ -121,12 +134,13 @@ const EssentialCaseForm = () => {
 
         <div className="bg-white shadow-lg rounded-lg p-6 md:p-8">
           <form onSubmit={handleSubmit}>
-            
             {/* Step 1: Personal Background */}
             {currentStep === 1 && (
               <div className="space-y-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">Personal Background</h2>
-                
+                <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">
+                  Personal Background
+                </h2>
+
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Brief timeline of significant life events *
@@ -152,34 +166,40 @@ const EssentialCaseForm = () => {
                         type="radio"
                         name="childhood"
                         value="pleasant"
-                        checked={formData.childhood === 'pleasant'}
+                        checked={formData.childhood === "pleasant"}
                         onChange={handleInputChange}
                         required
                         className="form-radio text-blue-600 w-4 h-4"
                       />
-                      <span className="ml-3 text-sm text-gray-700">Pleasant</span>
+                      <span className="ml-3 text-sm text-gray-700">
+                        Pleasant
+                      </span>
                     </label>
                     <label className="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition">
                       <input
                         type="radio"
                         name="childhood"
                         value="challenging"
-                        checked={formData.childhood === 'challenging'}
+                        checked={formData.childhood === "challenging"}
                         onChange={handleInputChange}
                         className="form-radio text-blue-600 w-4 h-4"
                       />
-                      <span className="ml-3 text-sm text-gray-700">Challenging</span>
+                      <span className="ml-3 text-sm text-gray-700">
+                        Challenging
+                      </span>
                     </label>
                     <label className="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition">
                       <input
                         type="radio"
                         name="childhood"
                         value="traumatic"
-                        checked={formData.childhood === 'traumatic'}
+                        checked={formData.childhood === "traumatic"}
                         onChange={handleInputChange}
                         className="form-radio text-blue-600 w-4 h-4"
                       />
-                      <span className="ml-3 text-sm text-gray-700">Traumatic</span>
+                      <span className="ml-3 text-sm text-gray-700">
+                        Traumatic
+                      </span>
                     </label>
                   </div>
                 </div>
@@ -204,15 +224,20 @@ const EssentialCaseForm = () => {
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     {Object.keys(formData.stressFactors).map((key) => (
-                      <label key={key} className="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition">
+                      <label
+                        key={key}
+                        className="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition"
+                      >
                         <input
                           type="checkbox"
                           checked={formData.stressFactors[key]}
-                          onChange={() => handleCheckboxChange('stressFactors', key)}
+                          onChange={() =>
+                            handleCheckboxChange("stressFactors", key)
+                          }
                           className="form-checkbox text-blue-600 rounded w-4 h-4"
                         />
                         <span className="ml-3 text-sm text-gray-700 capitalize">
-                          {key.replace(/([A-Z])/g, ' $1').trim()}
+                          {key.replace(/([A-Z])/g, " $1").trim()}
                         </span>
                       </label>
                     ))}
@@ -224,8 +249,10 @@ const EssentialCaseForm = () => {
             {/* Step 2: Medical History */}
             {currentStep === 2 && (
               <div className="space-y-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">Medical History</h2>
-                
+                <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">
+                  Medical History
+                </h2>
+
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Major Illnesses & Diagnoses *
@@ -274,8 +301,10 @@ const EssentialCaseForm = () => {
             {/* Step 3: Current Symptoms */}
             {currentStep === 3 && (
               <div className="space-y-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">Current Symptoms</h2>
-                
+                <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">
+                  Current Symptoms
+                </h2>
+
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Main Symptoms/Complaints *
@@ -361,7 +390,7 @@ const EssentialCaseForm = () => {
                         type="radio"
                         name="dailyBasis"
                         value="yes"
-                        checked={formData.dailyBasis === 'yes'}
+                        checked={formData.dailyBasis === "yes"}
                         onChange={handleInputChange}
                         required
                         className="form-radio text-blue-600 w-4 h-4"
@@ -373,7 +402,7 @@ const EssentialCaseForm = () => {
                         type="radio"
                         name="dailyBasis"
                         value="no"
-                        checked={formData.dailyBasis === 'no'}
+                        checked={formData.dailyBasis === "no"}
                         onChange={handleInputChange}
                         className="form-radio text-blue-600 w-4 h-4"
                       />
@@ -384,11 +413,13 @@ const EssentialCaseForm = () => {
                         type="radio"
                         name="dailyBasis"
                         value="intermittent"
-                        checked={formData.dailyBasis === 'intermittent'}
+                        checked={formData.dailyBasis === "intermittent"}
                         onChange={handleInputChange}
                         className="form-radio text-blue-600 w-4 h-4"
                       />
-                      <span className="ml-3 text-sm text-gray-700">Intermittent</span>
+                      <span className="ml-3 text-sm text-gray-700">
+                        Intermittent
+                      </span>
                     </label>
                   </div>
                 </div>
@@ -398,8 +429,10 @@ const EssentialCaseForm = () => {
             {/* Step 4: Family Health History */}
             {currentStep === 4 && (
               <div className="space-y-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">Family Health History</h2>
-                
+                <h2 className="text-xl font-bold text-gray-900 mb-4 border-b pb-3">
+                  Family Health History
+                </h2>
+
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Significant family health issues *
@@ -425,8 +458,8 @@ const EssentialCaseForm = () => {
                 disabled={currentStep === 1}
                 className={`px-6 py-3 rounded-md font-semibold transition ${
                   currentStep === 1
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-600 hover:bg-gray-700 text-white'
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-gray-600 hover:bg-gray-700 text-white"
                 }`}
               >
                 ← Previous

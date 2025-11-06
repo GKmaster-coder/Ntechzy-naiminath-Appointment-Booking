@@ -4,10 +4,8 @@ import React from "react";
 const BookingSummaryStaticPanel = () => {
   return (
     <div className="bg-gray-50 h-full lg:h-[70vh] w-full flex flex-col justify-between p-5 sm:p-6 md:p-8 border-r border-gray-200">
-      
       {/* Top Section */}
       <div className="space-y-8">
-        
         {/* Logo + Title */}
         <div className="flex items-center gap-4">
           <img
@@ -27,7 +25,9 @@ const BookingSummaryStaticPanel = () => {
 
         {/* Mode Display */}
         <div>
-          <p className="text-xs text-gray-500 uppercase tracking-wide">Consultation Mode</p>
+          <p className="text-xs text-gray-500 uppercase tracking-wide">
+            Consultation Mode
+          </p>
           <p className="text-blue-600 font-semibold text-base sm:text-lg mt-1">
             Online
           </p>

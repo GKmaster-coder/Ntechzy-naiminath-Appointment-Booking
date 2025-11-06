@@ -10,7 +10,11 @@ const BookingDetailsPage = () => {
 
   // If coming directly to homepage — do not show "No booking selected"
   // Instead, allow form to work standalone by providing fallback empty state
-  const bookingState = state || { collegeName: "", selectedSlot: "", selectedType: "" };
+  const bookingState = state || {
+    collegeName: "",
+    selectedSlot: "",
+    selectedType: "",
+  };
 
   const handleSubmit = (formData) => {
     const payload = { ...bookingState, userDetails: formData };
@@ -25,7 +29,6 @@ const BookingDetailsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-10">
-
       {/* Centered Form */}
       <div className="flex justify-center">
         <BookingDetailsForm

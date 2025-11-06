@@ -24,7 +24,6 @@ export default function OfflineDetailsPage() {
 
       {/* Wrapper Container */}
       <div className="max-w-6xl mx-auto bg-white border border-gray-200 rounded-xl shadow-sm flex flex-col lg:flex-row overflow-hidden">
-
         {/* Left: Summary */}
         <BookingSummaryPanel
           collegeName={state.collegeName}
@@ -65,7 +64,6 @@ export default function OfflineDetailsPage() {
         <div className="fixed inset-0 z-9999 flex items-center justify-center backdrop-blur-sm bg-black/40">
           {/* MODAL BOX WITH INTERNAL SCROLL */}
           <div className="bg-white rounded-lg shadow-lg max-w-3xl w-full mx-4 p-6 relative max-h-[90vh] overflow-y-auto">
-
             {/* Close Button */}
             <button
               onClick={() => setShowModal(false)}
@@ -87,7 +85,6 @@ export default function OfflineDetailsPage() {
                 Done
               </button>
             </div>
-
           </div>
         </div>
       )}
