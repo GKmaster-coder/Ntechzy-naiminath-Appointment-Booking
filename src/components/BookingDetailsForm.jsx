@@ -46,7 +46,7 @@ const BookingDetailsForm = ({
     chooseConsultation: "Please choose Online or Offline consultation / कृपया ऑनलाइन या ऑफलाइन परामर्श चुनें",
     
     // Service Info Text (you can replace this with actual bilingual content)
-    serviceText: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse egestas sapien non justo tincidunt, non semper magna vestibulum. Donec lacinia, odio quis bibendum tincidunt, mi augue facilisis risus, atsodales dui nulla vel sapien."
+    serviceText: "Naiminath Homoeopathic Medical Hospital provides holistic healthcare through classical homeopathy, emphasizing natural healing and patient-centered treatment. Our expert physicians blend traditional principles with modern care to address acute and chronic diseases. The hospital promotes safe, gentle, and effective remedies that restore health, harmony, and balance across body, mind, and spirit."
   };
 
   const formik = useFormik({
