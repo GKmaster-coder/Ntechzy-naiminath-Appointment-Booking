@@ -5,31 +5,30 @@ const CalendarPicker = ({ selectedDate, onDateSelect }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const MONTHS = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
   ];
 
   const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-  // Date utilities
+  // Date helpers
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const isToday = (date) => date.toDateString() === today.toDateString();
-  const isPastOrToday = (date) => date <= today;
   const formatDateKey = (date) => date.toISOString().split("T")[0];
 
-  // Calendar generation
+  // ✅ NEW RULE: Date is selectable only until 10:00 AM of that date
+  const isSelectableDate = (date) => {
+    const now = new Date();
+
+    const cutoff = new Date(date);
+    cutoff.setHours(10, 0, 0, 0); // 10:00 AM cutoff time
+
+    return now < cutoff;
+  };
+
+  // Generate Calendar
   const generateCalendarDays = () => {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
@@ -40,39 +39,31 @@ const CalendarPicker = ({ selectedDate, onDateSelect }) => {
     const startingDay = firstDay.getDay();
 
     const daysArray = [];
+
     const prevMonthLastDay = new Date(year, month, 0).getDate();
 
-    // Previous month filler days
+    // Filler days before current month
     for (let i = startingDay - 1; i >= 0; i--) {
       const date = new Date(year, month - 1, prevMonthLastDay - i);
-      daysArray.push({
-        date,
-        isCurrentMonth: false,
-        isSelectable: false,
-      });
+      daysArray.push({ date, isCurrentMonth: false, isSelectable: false });
     }
 
-    // Current month days
+    // ✅ Current month days (apply cutoff rule)
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
       daysArray.push({
         date,
         isCurrentMonth: true,
-        isSelectable: !isPastOrToday(date),
+        isSelectable: isSelectableDate(date),
       });
     }
 
-    // Next month filler days
-    const TOTAL_CALENDAR_CELLS = 42;
+    // Next month filler
+    const TOTAL_CELLS = 42;
     let nextMonthDay = 1;
-    while (daysArray.length < TOTAL_CALENDAR_CELLS) {
-      const date = new Date(year, month + 1, nextMonthDay);
-      daysArray.push({
-        date,
-        isCurrentMonth: false,
-        isSelectable: false,
-      });
-      nextMonthDay++;
+    while (daysArray.length < TOTAL_CELLS) {
+      const date = new Date(year, month + 1, nextMonthDay++);
+      daysArray.push({ date, isCurrentMonth: false, isSelectable: false });
     }
 
     return daysArray;
@@ -80,7 +71,6 @@ const CalendarPicker = ({ selectedDate, onDateSelect }) => {
 
   const calendarDays = generateCalendarDays();
 
-  // Month navigation
   const navigateMonth = (direction) => {
     const newMonth = new Date(currentMonth);
     newMonth.setMonth(currentMonth.getMonth() + direction);
@@ -88,7 +78,7 @@ const CalendarPicker = ({ selectedDate, onDateSelect }) => {
   };
 
   const handleDateSelection = (date) => {
-    if (date && !isPastOrToday(date)) {
+    if (date && isSelectableDate(date)) {
       onDateSelect(date);
     }
   };
@@ -99,14 +89,16 @@ const CalendarPicker = ({ selectedDate, onDateSelect }) => {
         <h2 className="text-lg font-semibold text-gray-900">
           Select a Date & Time
         </h2>
+        <p className="text-xs text-gray-500 mt-1">
+          Booking closes for the day at <strong>10:00 AM</strong>.
+        </p>
       </header>
 
       {/* Month Navigation */}
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={() => navigateMonth(-1)}
-          className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          aria-label="Previous month"
+          className="p-2 rounded-full hover:bg-gray-100 transition"
         >
           <ChevronLeft className="w-5 h-5 text-gray-600" />
         </button>
@@ -117,8 +109,7 @@ const CalendarPicker = ({ selectedDate, onDateSelect }) => {
 
         <button
           onClick={() => navigateMonth(1)}
-          className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          aria-label="Next month"
+          className="p-2 rounded-full hover:bg-gray-100 transition"
         >
           <ChevronRight className="w-5 h-5 text-gray-600" />
         </button>
@@ -127,21 +118,17 @@ const CalendarPicker = ({ selectedDate, onDateSelect }) => {
       {/* Weekday Headers */}
       <div className="grid grid-cols-7 gap-1 mb-2">
         {WEEKDAYS.map((day) => (
-          <div
-            key={day}
-            className="text-center text-xs font-medium text-gray-500 py-2"
-          >
+          <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
             {day}
           </div>
         ))}
       </div>
 
-      {/* Calendar Grid */}
+      {/* Calendar Dates */}
       <div className="grid grid-cols-7 gap-1">
         {calendarDays.map((day, index) => {
           const dateKey = formatDateKey(day.date);
-          const isSelected =
-            selectedDate && formatDateKey(selectedDate) === dateKey;
+          const isSelected = selectedDate && formatDateKey(selectedDate) === dateKey;
           const isTodayDate = isToday(day.date);
 
           return (
@@ -150,25 +137,11 @@ const CalendarPicker = ({ selectedDate, onDateSelect }) => {
               disabled={!day.isSelectable}
               onClick={() => handleDateSelection(day.date)}
               className={`
-                h-10 text-sm rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                h-10 text-sm rounded-lg transition-all
                 ${day.isCurrentMonth ? "text-gray-900" : "text-gray-400"}
-                ${
-                  isSelected
-                    ? "bg-blue-600 text-white hover:bg-blue-700"
-                    : day.isSelectable
-                    ? "hover:bg-gray-100 hover:text-gray-900"
-                    : ""
-                }
+                ${isSelected ? "bg-blue-600 text-white" : day.isSelectable ? "hover:bg-gray-100" : "opacity-40 cursor-not-allowed"}
                 ${isTodayDate && !isSelected ? "border-2 border-blue-500" : ""}
-                ${
-                  !day.isSelectable
-                    ? "opacity-40 cursor-not-allowed"
-                    : "cursor-pointer"
-                }
               `}
-              aria-label={`Select ${day.date.toDateString()}`}
-              aria-disabled={!day.isSelectable}
-              aria-current={isTodayDate ? "date" : undefined}
             >
               {day.date.getDate()}
             </button>
