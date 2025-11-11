@@ -19,9 +19,7 @@ export default function OnlineDetailsPage() {
   };
 
   if (!state)
-    return (
-      <div className="p-8 text-center">{translations.noDataFound}</div>
-    );
+    return <div className="p-8 text-center">{translations.noDataFound}</div>;
 
   const handleNext = () => {
     if (!isFormComplete) {
@@ -38,36 +36,40 @@ export default function OnlineDetailsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-6 px-4 sm:px-6 lg:px-12">
+    <div className="min-h-screen py-6 px-4 sm:px-6 lg:px-12 relative overflow-hidden
+        bg-linear-to-br from-[#e6e2ff] via-[#d8f0ff] to-[#7ddfff]">
+
+      {/* Subtle background accents */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[300px] h-[300px] bg-blue-200 opacity-30 blur-[120px] rounded-full"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[260px] h-[260px] bg-blue-100 opacity-40 blur-[140px] rounded-full"></div>
+      </div>
+
       {/* Back Button */}
-      <div className="mb-6">
+      <div className="mb-6 relative z-10">
         <BackButton />
       </div>
 
       {/* Main Container */}
-      <div className="max-w-4xl mx-auto bg-white border border-gray-200 rounded-xl shadow-md p-5 sm:p-6 lg:p-8">
+      <div className="relative z-10 max-w-4xl mx-auto bg-white border border-gray-200 rounded-xl shadow-md p-5 sm:p-6 lg:p-8">
 
-        {/* ✅ Online Appointment Info Header */}
+        {/* Header */}
         <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-5 shadow-sm">
           <h2 className="text-lg sm:text-xl font-semibold text-blue-800 text-center mb-3">
             Online Consultation / ऑनलाइन परामर्श
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-
-            {/* Mode */}
             <div className="bg-white border border-blue-200 rounded-md p-3 shadow-sm">
               <p className="text-xs text-gray-500">Mode / तरीका</p>
               <p className="font-semibold text-gray-900">Online</p>
             </div>
 
-            {/* Phone */}
             <div className="bg-white border border-blue-200 rounded-md p-3 shadow-sm">
               <p className="text-xs text-gray-500">Need Assistance?</p>
               <p className="font-semibold text-gray-900">📞 +91 98765 43210</p>
             </div>
 
-            {/* Email */}
             <div className="bg-white border border-blue-200 rounded-md p-3 shadow-sm">
               <p className="text-xs text-gray-500">Support Email</p>
               <p className="font-semibold text-gray-900">
@@ -76,21 +78,20 @@ export default function OnlineDetailsPage() {
             </div>
           </div>
 
-          {/* Info Note */}
           <p className="text-center text-xs sm:text-sm text-blue-800 font-medium mt-4">
             Your appointment date & time will be scheduled by the hospital team.
             You will receive confirmation through sms/email after verification.
           </p>
         </div>
 
-        {/* ✅ Case Form */}
+        {/* Form */}
         <CompleteCaseForm
           onFormComplete={handleFormComplete}
           onFormSubmit={handleFormSubmit}
           isFormComplete={isFormComplete}
         />
 
-        {/* ✅ Continue Button */}
+        {/* Continue Button */}
         <div className="mt-6 flex justify-center">
           <button
             onClick={handleNext}

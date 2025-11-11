@@ -28,7 +28,7 @@ export default function PaymentPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-linear-to-br from-[#e6e2ff] via-[#d8f0ff] to-[#7ddfff] py-12 px-4 sm:px-6 lg:px-8">
       {/* ✅ Back Button */}
       <div className="mb-6 max-w-2xl mx-auto">
         <BackButton />

@@ -44,7 +44,7 @@ const BookingWrapper = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-10 px-4 flex flex-col items-center">
+    <div className="min-h-screen bg-linear-to-br from-[#e6e2ff] via-[#d8f0ff] to-[#7ddfff] py-10 px-4 flex flex-col items-center">
       {/* ✅ Back Button */}
       <div className="w-full max-w-7xl mb-4">
         <BackButton />

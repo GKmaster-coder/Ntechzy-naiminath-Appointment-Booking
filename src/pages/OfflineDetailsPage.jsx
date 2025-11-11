@@ -37,7 +37,7 @@ export default function OfflineDetailsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-6 px-4 sm:px-6 lg:px-12">
+    <div className="min-h-screen bg-linear-to-br from-[#e6e2ff] via-[#d8f0ff] to-[#7ddfff] py-6 px-4 sm:px-6 lg:px-12">
       <div className="mb-6">
         <BackButton />
       </div>

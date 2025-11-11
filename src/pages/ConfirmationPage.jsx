@@ -32,7 +32,7 @@ export default function ConfirmationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-green-50 to-blue-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-linear-to-br from-[#e6e2ff] via-[#d8f0ff] to-[#7ddfff] py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
         {/* Success Header */}
         <div className="text-center mb-8">

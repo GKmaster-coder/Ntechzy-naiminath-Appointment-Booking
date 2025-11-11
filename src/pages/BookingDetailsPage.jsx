@@ -28,7 +28,7 @@ const BookingDetailsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-10">
+    <div className="min-h-screen bg-linear-to-br from-[#e6e2ff] via-[#d8f0ff] to-[#7ddfff] py-8 px-4 sm:px-6 lg:px-10">
       {/* Centered Form */}
       <div className="flex justify-center">
         <BookingDetailsForm
