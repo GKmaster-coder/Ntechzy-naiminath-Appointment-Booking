@@ -149,7 +149,6 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
     updateForm: 'Update Form ✓ / फॉर्म अपडेट करें ✓',
     saveChanges: 'Save Changes / परिवर्तन सहेजें',
     editForm: 'Edit Form / फॉर्म संपादित करें',
-    closeForm: 'Close Form / फॉर्म बंद करें',
     
     // Messages
     formCompleted: 'Case Form Completed! / केस फॉर्म पूरा हो गया!',
@@ -469,22 +468,12 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
             <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
               {translations.formSubmitted}
             </p>
-            <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+            <div className="flex justify-center">
               <button
                 onClick={handleEditForm}
-                className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition text-sm sm:text-base"
+                className="px-6 sm:px-8 py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition text-base sm:text-lg"
               >
                 {translations.editForm}
-              </button>
-              <button
-                onClick={() => {
-                  if (onFormSubmit) {
-                    onFormSubmit(formData);
-                  }
-                }}
-                className="px-4 sm:px-6 py-2 sm:py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md transition text-sm sm:text-base"
-              >
-                {translations.closeForm}
               </button>
             </div>
           </div>
