@@ -1,35 +1,26 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import BackButton from "../components/BackButton";
-import BookingSummaryPanel from "../components/BookingSummaryPanel";
 import EssentialCaseForm from "../components/caseForm/EssentialCaseForm";
 
 export default function OfflineDetailsPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(false);
   const [isFormComplete, setIsFormComplete] = useState(false);
   const [formData, setFormData] = useState(null);
 
-  // Bilingual text configuration
   const translations = {
     noDataFound: "No data found. / कोई डेटा नहीं मिला।",
     completeCaseInfo: "Complete Case Information / पूर्ण केस जानकारी",
-    provideCaseDetails: "Please provide your case details before continuing. / कृपया जारी रखने से पहले अपनी केस जानकारी प्रदान करें।",
-    fillCaseForm: "Fill Case Form / केस फॉर्म भरें",
-    viewEditCaseForm: "View/Edit Case Form / केस फॉर्म देखें/संपादित करें",
-    caseFormCompleted: "✓ Case form completed / ✓ केस फॉर्म पूरा हो गया",
-    caseFormNotCompleted: "Case form not completed / केस फॉर्म पूरा नहीं हुआ",
+    provideCaseDetails:
+      "Please provide your case details before continuing. / कृपया जारी रखने से पहले अपनी केस जानकारी प्रदान करें।",
     continueToPayment: "Continue to Payment / भुगतान पर जारी रखें",
-    completeFormToContinue: "Complete Form to Continue / जारी रखने के लिए फॉर्म पूरा करें",
-    pleaseCompleteForm: "Please complete the case form before proceeding to payment. / कृपया भुगतान के लिए आगे बढ़ने से पहले केस फॉर्म पूरा करें।"
+    pleaseCompleteForm:
+      "Please complete the case form before proceeding to payment. / कृपया भुगतान के लिए आगे बढ़ने से पहले केस फॉर्म पूरा करें।",
   };
 
-  if (!state) return (
-    <div className="p-8 text-center">
-      {translations.noDataFound}
-    </div>
-  );
+  if (!state)
+    return <div className="p-8 text-center">{translations.noDataFound}</div>;
 
   const handleNext = () => {
     if (!isFormComplete) {
@@ -39,96 +30,71 @@ export default function OfflineDetailsPage() {
     navigate("/payment", { state: { ...state, formData } });
   };
 
-  const handleFormComplete = (complete) => {
-    setIsFormComplete(complete);
-  };
-
+  const handleFormComplete = (complete) => setIsFormComplete(complete);
   const handleFormSubmit = (submittedFormData) => {
     setFormData(submittedFormData);
     setIsFormComplete(true);
-    setShowModal(false); // Auto-close modal on submit
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-10">
-      {/* Back Button */}
+    <div className="min-h-screen bg-gray-100 py-6 px-4 sm:px-6 lg:px-12">
       <div className="mb-6">
         <BackButton />
       </div>
 
-      {/* Wrapper Container */}
-      <div className="max-w-6xl mx-auto bg-white border border-gray-200 rounded-xl shadow-sm flex flex-col lg:flex-row overflow-hidden">
-        {/* Left: Summary */}
-        <BookingSummaryPanel
-          collegeName={state.collegeName}
-          selectedSlot={state.selectedSlot}
-          selectedType={state.selectedType}
-        />
+      <div className="max-w-4xl mx-auto bg-white border border-gray-200 rounded-xl shadow-md p-4 sm:p-6 lg:p-8">
+        {/* ✅ Appointment Summary Header */}
+        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-5 shadow-sm">
+          <h2 className="text-lg sm:text-xl font-semibold text-blue-800 mb-3 text-center">
+            Appointment Details / अपॉइंटमेंट विवरण
+          </h2>
 
-        {/* Right: Card with Button */}
-        <div className="lg:w-3/5 p-6 sm:p-8 flex items-center justify-center">
-          <div className="bg-gray-50 border border-gray-200 rounded-lg shadow-sm p-6 text-center max-w-sm w-full">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">
-              {translations.completeCaseInfo}
-            </h2>
-            <p className="text-sm text-gray-600 mb-6">
-              {translations.provideCaseDetails}
-            </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+            <div className="bg-white border border-blue-200 rounded-md p-3 shadow-sm">
+              <p className="text-xs text-gray-500">Mode / तरीका</p>
+              <p className="font-semibold text-gray-900">Offline</p>
+            </div>
 
-            <button
-              onClick={() => setShowModal(true)}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-md transition"
-            >
-              {isFormComplete ? translations.viewEditCaseForm : translations.fillCaseForm}
-            </button>
-
-            {/* Form Completion Status */}
-            <div className="mt-4 p-3 rounded-md bg-gray-100">
-              <p className={`text-sm font-medium ${isFormComplete ? 'text-green-600' : 'text-yellow-600'}`}>
-                {isFormComplete ? translations.caseFormCompleted : translations.caseFormNotCompleted}
+            <div className="bg-white border border-blue-200 rounded-md p-3 shadow-sm">
+              <p className="text-xs text-gray-500">Date / तिथि</p>
+              <p className="font-semibold text-gray-900">
+                {state.selectedSlot?.dateFormatted || "Not Selected"}
               </p>
             </div>
 
-            {/* Continue Button (After Form) */}
-            <button
-              onClick={handleNext}
-              disabled={!isFormComplete}
-              className={`w-full mt-4 font-medium py-3 rounded-md transition ${
-                isFormComplete
-                  ? 'border border-blue-600 text-blue-600 hover:bg-blue-50'
-                  : 'border border-gray-400 text-gray-400 cursor-not-allowed bg-gray-100'
-              }`}
-            >
-              {isFormComplete ? translations.continueToPayment : translations.completeFormToContinue}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* ✅ Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-9999 flex items-center justify-center backdrop-blur-sm bg-black/40">
-          {/* MODAL BOX WITH INTERNAL SCROLL */}
-          <div className="bg-white rounded-lg shadow-lg max-w-3xl w-full mx-4 p-6 relative max-h-[90vh] overflow-y-auto">
-            {/* Close Button */}
-            <button
-              onClick={() => setShowModal(false)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl z-50"
-            >
-              ✕
-            </button>
-
-            {/* Scrollable Case Form */}
-            <div>
-              <EssentialCaseForm 
-                onFormComplete={handleFormComplete}
-                onFormSubmit={handleFormSubmit}
-                isFormComplete={isFormComplete}
-              />
+            {/* Time Slot */}
+            <div className="bg-white border border-blue-200 rounded-md p-3 shadow-sm">
+              <p className="text-xs text-gray-500">Time Slot / समय</p>
+              <p className="font-semibold text-gray-900">
+                {state.selectedSlot?.time || "Not Selected"}
+              </p>
             </div>
           </div>
         </div>
-      )}
+
+        {/* ✅ Case Form */}
+        <EssentialCaseForm
+          onFormComplete={handleFormComplete}
+          onFormSubmit={handleFormSubmit}
+          isFormComplete={isFormComplete}
+        />
+
+        {/* ✅ Continue Button */}
+        <div className="mt-6 flex justify-center">
+          <button
+            onClick={handleNext}
+            disabled={!isFormComplete}
+            className={`w-full max-w-xs py-3 rounded-md font-semibold transition
+              ${
+                isFormComplete
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-gray-300 text-gray-600 cursor-not-allowed"
+              }`}
+          >
+            {translations.continueToPayment}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
