@@ -1,4 +1,3 @@
-// src/components/BookingWrapper.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BackButton from "./BackButton";
@@ -19,7 +18,7 @@ const BookingWrapper = () => {
     const options = { weekday: "long", month: "long", day: "numeric" };
     return date.toLocaleDateString("en-US", options);
   };
-  
+
   const handleTimeSelect = (slot, type) => {
     const formattedDate = dateFormatter(selectedDate);
 
@@ -50,16 +49,26 @@ const BookingWrapper = () => {
         <BackButton />
       </div>
 
-      {/* Main Booking Wrapper */}
-      <div className="w-full max-w-7xl h-[80vh] flex gap-6 p-6 bg-white rounded-2xl shadow-lg overflow-hidden">
-        <div className="w-[28%] min-w-[260px]">
+      {/* ✅ Main Booking Wrapper */}
+      <div
+        className="
+          w-full max-w-7xl h-auto md:h-[80vh]
+          flex flex-col md:flex-row gap-6 p-4 md:p-6
+          bg-white rounded-2xl shadow-lg overflow-hidden
+        "
+      >
+        {/* ✅ Left Side: Service Info */}
+        <div className="w-full md:w-[28%] min-w-[260px]">
           <ServiceInfo />
         </div>
 
+        {/* ✅ Middle: Calendar */}
         <div
-          className={`transition-all duration-300 ${
-            selectedDate ? "w-[60%]" : "flex-1"
-          } flex justify-center`}
+          className={`
+            transition-all duration-300 
+            ${selectedDate ? "md:w-[60%]" : "md:flex-1"} 
+            flex justify-center
+          `}
         >
           <CalendarPicker
             selectedDate={selectedDate}
@@ -67,15 +76,19 @@ const BookingWrapper = () => {
           />
         </div>
 
+        {/* ✅ Right Side: Time Slots */}
         <div
-          className={`transition-all duration-300 ${
-            selectedDate
-              ? "w-[32%] opacity-100 translate-x-0"
-              : "w-0 opacity-0 translate-x-10 pointer-events-none"
-          }`}
+          className={`
+            transition-all duration-300 
+            ${selectedDate
+              ? "md:w-[32%] md:opacity-100 md:translate-x-0"
+              : "md:w-0 md:opacity-0 md:translate-x-10 md:pointer-events-none"
+            }
+            w-full md:w-auto
+          `}
         >
           {selectedDate && (
-            <div className="h-full overflow-y-auto p-1 scrollbar-hide">
+            <div className="h-full overflow-y-auto p-1 scrollbar-hide mt-4 md:mt-0">
               <TimeSlotsPanel
                 selectedDate={selectedDate}
                 timeSlots={getTimeSlotsForSelectedDate()}

@@ -8,10 +8,12 @@ import PaymentPage from "./pages/PaymentPage";
 import ConfirmationPage from "./pages/ConfirmationPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import OnlineConfirmationPage from "./pages/OnlineConfirmationPage";
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   return (
     <BrowserRouter>
+    <ScrollToTop/>
       <Routes>
         <Route path="/" element={<BookingDetailsPage />} />
         <Route path="/booking-wrapper" element={<BookingWrapper />} />

@@ -18,7 +18,7 @@ const ServiceInfo = ({ textData }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 h-full flex flex-col">
+    <div className="bg-white rounded-lg shadow-sm p-6 h-full md:h-[73vh]  flex flex-col overflow-hidden">
       {/* Header Section */}
       <div className="flex items-center gap-4 mb-6">
         <img
