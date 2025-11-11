@@ -3,21 +3,35 @@ import React from "react";
 import hospitalLogo from "/logo2.png";
 
 const ServiceInfo = ({ textData }) => {
+  // Bilingual text configuration
+  const translations = {
+    hospitalName: "Naiminath Homoeopathic Hospital ",
+    tagline: "Healing with the Power of Nature",
+    appointmentBooking: "Appointment Booking / अपॉइंटमेंट बुकिंग",
+    consultation: "Consultation with certified Homoeopathic doctors / प्रमाणित होम्योपैथिक डॉक्टरों के साथ परामर्श",
+    consultationTime: "30 min consultation / 30 मिनट का परामर्श",
+    availableModes: "Available: Online / Offline / उपलब्ध: ऑनलाइन / ऑफलाइन",
+    address: "Naiminath Nagar, Agra, Uttar Pradesh / नैमिनाथ नगर, आगरा, उत्तर प्रदेश",
+    needHelp: "Need help? / सहायता चाहिए?",
+    call: "Call: / कॉल:",
+    email: "Email: / ईमेल:"
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 h-full flex flex-col">
       {/* Header Section */}
       <div className="flex items-center gap-4 mb-6">
         <img
           src={hospitalLogo}
-          alt="Naiminath Hospital Logo"
+          alt="Naiminath Hospital Logo / नैमिनाथ अस्पताल लोगो"
           className="w-12 h-12 object-contain"
         />
         <div>
           <h2 className="text-lg font-semibold text-gray-900 leading-tight">
-            Naiminath Homoeopathic Hospital
+            {translations.hospitalName}
           </h2>
           <p className="text-sm text-gray-600 mt-1">
-            Healing with the Power of Nature
+            {translations.tagline}
           </p>
         </div>
       </div>
@@ -26,10 +40,10 @@ const ServiceInfo = ({ textData }) => {
       <div className="space-y-4 text-sm text-gray-700">
         <div>
           <p className="font-semibold text-gray-900 text-base mb-2">
-            Appointment Booking
+            {translations.appointmentBooking}
           </p>
           <p className="text-gray-600">
-            Consultation with certified Homoeopathic doctors
+            {translations.consultation}
           </p>
         </div>
 
@@ -47,7 +61,7 @@ const ServiceInfo = ({ textData }) => {
               d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <span className="text-gray-600">30 min consultation</span>
+          <span className="text-gray-600">{translations.consultationTime}</span>
         </div>
 
         <div className="flex items-center gap-3">
@@ -70,7 +84,7 @@ const ServiceInfo = ({ textData }) => {
               d="M12 12v.01M16 12v.01M8 12v.01"
             />
           </svg>
-          <span className="text-gray-600">Available: Online / Offline</span>
+          <span className="text-gray-600">{translations.availableModes}</span>
         </div>
 
         <div className="flex items-center gap-3">
@@ -94,18 +108,19 @@ const ServiceInfo = ({ textData }) => {
             />
           </svg>
           <span className="text-gray-600">
-            Naiminath Nagar, Agra, Uttar Pradesh
+            {translations.address}
           </span>
         </div>
+        
         {/* ✅ Added descriptive section */}
         <p className="text-gray-600 mt-3 leading-relaxed">{textData}</p>
       </div>
 
       {/* Footer / Helpline */}
       <div className="border-t border-gray-200 pt-4 mt-5 text-sm">
-        <p className="font-medium text-gray-900 mb-2">Need help?</p>
-        <p className="text-gray-600">Call: +91 98765 43210</p>
-        <p className="text-gray-600">Email: support@naiminathhospital.com</p>
+        <p className="font-medium text-gray-900 mb-2">{translations.needHelp}</p>
+        <p className="text-gray-600">{translations.call} +91 98765 43210</p>
+        <p className="text-gray-600">{translations.email} support@naiminathhospital.com</p>
       </div>
     </div>
   );

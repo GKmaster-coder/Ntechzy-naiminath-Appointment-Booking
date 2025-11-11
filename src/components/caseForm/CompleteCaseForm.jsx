@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: externalIsFormComplete }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isFormComplete, setIsFormComplete] = useState(externalIsFormComplete || false);
   const [isEditing, setIsEditing] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [errors, setErrors] = useState({});
   const totalSteps = 6;
 
-  // Bilingual text configuration (same as before)
+  // Bilingual text configuration
   const translations = {
     // Navigation & Structure
     caseForm: 'Case Form / केस फॉर्म',
     editCaseForm: 'Edit Case Form / केस फॉर्म संपादित करें',
     step: 'Step / चरण',
     of: 'of / का',
-    
+
     // Step Titles
     lifeEvents: 'Life Events / जीवन की घटनाएं',
     earlyDevelopment: 'Early Development / प्रारंभिक विकास',
@@ -21,7 +23,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
     recurringIssues: 'Recurring Issues / आवर्ती समस्याएं',
     symptoms: 'Symptoms / लक्षण',
     familyHistory: 'Family History / पारिवारिक इतिहास',
-    
+
     // Common Terms
     optional: 'Optional / वैकल्पिक',
     yes: 'Yes / हाँ',
@@ -29,16 +31,18 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
     describe: 'Describe / वर्णन करें',
     age: 'Age / उम्र',
     severity: 'Severity / गंभीरता',
-    
+
     // Step 1: Significant Life Events
     significantLifeEvents: 'Significant Life Events / महत्वपूर्ण जीवन घटनाएं',
     timelineLabel: 'Timeline from birth to present / जन्म से वर्तमान तक की समयरेखा',
-    timelineDescription: 'Include: traumas, romantic disappointments, divorces, work/family issues, deaths, humiliations, major illnesses, onset of conditions, medications. / शामिल करें: आघात, रोमांटिक निराशाएं, तलाक, काम/परिवार के मुद्दे, मौतें, अपमान, प्रमुख बीमारियां, स्थितियों की शुरुआत, दवाएं',
+    timelineDescription:
+      'Include: traumas, romantic disappointments, divorces, work/family issues, deaths, humiliations, major illnesses, onset of conditions, medications. / शामिल करें: आघात, रोमांटिक निराशाएं, तलाक, काम/परिवार के मुद्दे, मौतें, अपमान, प्रमुख बीमारियां, स्थितियों की शुरुआत, दवाएं',
     timelinePlaceholder: 'Describe your life timeline... / अपनी जीवन समयरेखा का वर्णन करें...',
     explainChildhood: 'Explain your childhood: / अपने बचपन के बारे में बताएं:',
     pleasant: 'Pleasant / सुखद',
     specificFear: 'Specific Fear during childhood / बचपन के दौरान विशिष्ट भय',
-    natureLabel: 'Nature - Reaction during anger (if expressed, explain how): / स्वभाव - गुस्से के दौरान प्रतिक्रिया (यदि व्यक्त की गई है, तो बताएं कैसे):',
+    natureLabel:
+      'Nature - Reaction during anger (if expressed, explain how): / स्वभाव - गुस्से के दौरान प्रतिक्रिया (यदि व्यक्त की गई है, तो बताएं कैसे):',
     throwingThings: 'Throwing things / चीजें फेंकना',
     shouting: 'Shouting / चिल्लाना',
     sittingAlone: 'Sitting alone / अकेले बैठना',
@@ -56,7 +60,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
     professional: 'Professional / पेशेवर',
     personal: 'Personal / व्यक्तिगत',
     anyOther: 'Any Other / कोई अन्य',
-    
+
     // Step 2: Early Development
     goodBaby: 'Were you a "good" baby? / क्या आप एक "अच्छे" बच्चे थे?',
     goodBabyPlaceholder: 'Describe your behavior as a baby... / बच्चे के रूप में अपने व्यवहार का वर्णन करें...',
@@ -67,11 +71,13 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
     crawl: 'Ability to crawl / रेंगने की क्षमता',
     walk: 'Ability to walk / चलने की क्षमता',
     talk: 'Ability to talk / बोलने की क्षमता',
-    standardAgeFrames: 'If you are unsure, do you know if these events occurred within the standard age frames? / यदि आप अनिश्चित हैं, तो क्या आप जानते हैं कि क्या ये घटनाएं मानक आयु सीमा के भीतर हुई थीं?',
+    standardAgeFrames:
+      'If you are unsure, do you know if these events occurred within the standard age frames? / यदि आप अनिश्चित हैं, तो क्या आप जानते हैं कि क्या ये घटनाएं मानक आयु सीमा के भीतर हुई थीं?',
     standardAgeFramesPlaceholder: 'Yes/No/Unsure... / हाँ/नहीं/अनिश्चित...',
-    
+
     // Step 3: Illness History
-    illnessNote: 'If affected by any illness, indicate age and severity (severe/mild/long-lasting) / यदि किसी बीमारी से प्रभावित हैं, तो उम्र और गंभीरता (गंभीर/हल्की/लंबे समय तक चलने वाली) बताएं',
+    illnessNote:
+      'If affected by any illness, indicate age and severity (severe/mild/long-lasting) / यदि किसी बीमारी से प्रभावित हैं, तो उम्र और गंभीरता (गंभीर/हल्की/लंबे समय तक चलने वाली) बताएं',
     chickenPox: 'Chicken Pox / चिकन पॉक्स',
     mumps: 'Mumps / कनफेड़',
     germanMeasles: 'German Measles / जर्मन खसरा',
@@ -88,7 +94,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
     surgicalHistory: 'Surgical History / सर्जिकल इतिहास',
     otherIllnesses: 'Other Illnesses / अन्य बीमारियां',
     illnessPlaceholder: 'Age and severity... / उम्र और गंभीरता...',
-    
+
     // Step 4: Recurring Issues & Vaccinations
     recurringIssuesDesc: 'Have you suffered from recurring: / क्या आप आवर्ती से पीड़ित हैं:',
     boils: 'Boils / फोड़े',
@@ -107,25 +113,30 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
     vaccinationReaction: 'Have you had reactions to any vaccinations? / क्या आपको किसी टीकाकरण की प्रतिक्रिया हुई है?',
     healthDecline: 'Did your health decline after a vaccination? / क्या टीकाकरण के बाद आपका स्वास्थ्य खराब हुआ?',
     allergyInjections: 'Have you had allergy desensitization injections? / क्या आपने एलर्जी डिसेंसिटाइजेशन इंजेक्शन लिए हैं?',
-    
+
     // Step 5: Symptoms
     symptomsPain: 'Symptoms & Pain / लक्षण और दर्द',
-    symptomsDescription: 'Check all boxes that describe the symptoms/pain: / उन सभी बॉक्सों को चेक करें जो लक्षणों/दर्द का वर्णन करते हैं:',
+    symptomsDescription:
+      'Check all boxes that describe the symptoms/pain: / उन सभी बॉक्सों को चेक करें जो लक्षणों/दर्द का वर्णन करते हैं:',
     symptomsBetter: 'What makes the pain/symptom better? / दर्द/लक्षण को क्या बेहतर बनाता है?',
-    symptomsBetterDesc: 'Heat, cold, motion, being still, menstrual cycle, sitting, lying, etc. / गर्मी, ठंड, गति, स्थिर रहना, मासिक धर्म चक्र, बैठना, लेटना, आदि',
+    symptomsBetterDesc:
+      'Heat, cold, motion, being still, menstrual cycle, sitting, lying, etc. / गर्मी, ठंड, गति, स्थिर रहना, मासिक धर्म चक्र, बैठना, लेटना, आदि',
     symptomsBetterPlaceholder: 'What helps... / क्या मदद करता है...',
     symptomsWorse: 'What makes symptoms worse? / लक्षणों को क्या बदतर बनाता है?',
     symptomsWorsePlaceholder: 'What worsens... / क्या बदतर बनाता है...',
-    symptomsTimeOfDay: 'Is there a specific time of day that your symptoms are worse? / क्या दिन का कोई विशिष्ट समय है जब आपके लक्षण बदतर होते हैं?',
+    symptomsTimeOfDay:
+      'Is there a specific time of day that your symptoms are worse? / क्या दिन का कोई विशिष्ट समय है जब आपके लक्षण बदतर होते हैं?',
     symptomsTimePlaceholder: 'Time of day... / दिन का समय...',
     dailyBasis: 'Do you have pain/symptoms on a daily basis? / क्या आपको रोजाना दर्द/लक्षण होते हैं?',
     painLocation: 'Where do you feel it? (location) / आप इसे कहाँ महसूस करते हैं? (स्थान)',
     painLocationPlaceholder: 'Pain location... / दर्द का स्थान...',
-    painExtends: 'Does the pain extend to another location? If so, where? / क्या दर्द किसी अन्य स्थान तक फैलता है? यदि हां, तो कहाँ?',
+    painExtends:
+      'Does the pain extend to another location? If so, where? / क्या दर्द किसी अन्य स्थान तक फैलता है? यदि हां, तो कहाँ?',
     painExtendsPlaceholder: 'Extension location... / विस्तार स्थान...',
-    
+
     // Step 6: Family Health History
-    familyHealthNote: 'Indicate which ailments have affected your relatives, including their ages, to the best of your ability. / बताएं कि कौन सी बीमारियों ने आपके रिश्तेदारों को प्रभावित किया है, उनकी उम्र सहित, अपनी पूरी क्षमता के अनुसार',
+    familyHealthNote:
+      'Indicate which ailments have affected your relatives, including their ages, to the best of your ability. / बताएं कि कौन सी बीमारियों ने आपके रिश्तेदारों को प्रभावित किया है, उनकी उम्र सहित, अपनी पूरी क्षमता के अनुसार',
     relation: 'Relation / संबंध',
     ageAlive: 'Age if alive / यदि जीवित हैं तो उम्र',
     agePassing: 'Age at passing / मृत्यु के समय उम्र',
@@ -141,7 +152,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
     paternalAuntsUncles: 'Paternal Aunts/Uncles / चाची/चाचा',
     agePlaceholder: 'Age / उम्र',
     ailmentsPlaceholder: 'List ailments... / बीमारियों की सूची बनाएं...',
-    
+
     // Buttons & Actions
     previous: '← Previous / पिछला',
     next: 'Next → / अगला',
@@ -149,13 +160,14 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
     updateForm: 'Update Form ✓ / फॉर्म अपडेट करें ✓',
     saveChanges: 'Save Changes / परिवर्तन सहेजें',
     editForm: 'Edit Form / फॉर्म संपादित करें',
-    
+
     // Messages
     formCompleted: 'Case Form Completed! / केस फॉर्म पूरा हो गया!',
-    formSubmitted: 'Your case form has been successfully submitted. You can now proceed to payment. / आपका केस फॉर्म सफलतापूर्वक सबमिट हो गया है। अब आप भुगतान के लिए आगे बढ़ सकते हैं।',
+    formSubmitted:
+      'Your case form has been successfully submitted. You can now proceed to payment. / आपका केस फॉर्म सफलतापूर्वक सबमिट हो गया है। अब आप भुगतान के लिए आगे बढ़ सकते हैं।',
     confidential: 'Your information is confidential and secure. / आपकी जानकारी गोपनीय और सुरक्षित है।',
     formComplete: '✓ Form is complete. You can proceed to payment. / ✓ फॉर्म पूरा हो गया है। आप भुगतान के लिए आगे बढ़ सकते हैं।',
-    
+
     // Symptom Descriptions
     aching: 'Aching / दर्द',
     drawing: 'Drawing / खिंचाव',
@@ -186,9 +198,8 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
     tearing: 'Tearing / फाड़ने वाला',
     digging: 'Digging / खोदने वाला',
     pinching: 'Pinching / चुटकी काटने वाला',
-    throbbing: 'Throbbing / धड़कने वाला'
+    throbbing: 'Throbbing / धड़कने वाला',
   };
-
 
   const [formData, setFormData] = useState({
     // Significant Life Events
@@ -214,7 +225,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
       personal: false,
       anyOther: false,
     },
-    
+
     // Baby Development
     goodBaby: '',
     cryingReason: '',
@@ -225,7 +236,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
       talk: '',
     },
     standardAgeFrames: '',
-    
+
     // Illness History
     illnessHistory: {
       chickenPox: '',
@@ -244,7 +255,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
       surgicalHistory: '',
       otherIllnesses: '',
     },
-    
+
     // Recurring Issues
     recurring: {
       boils: false,
@@ -261,12 +272,12 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
       warts: false,
       yeastInfections: false,
     },
-    
+
     // Vaccinations
     vaccinationReaction: '',
     healthDecline: '',
     allergyInjections: '',
-    
+
     // Symptoms
     symptoms: {
       aching: false,
@@ -306,7 +317,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
     dailyBasis: '',
     painLocation: '',
     painExtends: '',
-    
+
     // Family Health History
     familyHealth: {
       mother: { ageAlive: '', agePassing: '', ailments: '' },
@@ -321,112 +332,153 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
     },
   });
 
-  // Check if form is complete (same as before)
-  const checkFormCompletion = () => {
-    const requiredFields = [
-      formData.timeline,
-      formData.childhood,
-      formData.goodBaby,
-      formData.standardAgeFrames,
-      formData.vaccinationReaction,
-      formData.healthDecline,
-      formData.allergyInjections,
-      formData.symptomsBetter,
-      formData.symptomsWorse,
-      formData.dailyBasis,
-      formData.painLocation,
-    ];
+  // Simple validators
+  const isNonEmpty = (v) => typeof v === 'string' && v.trim() !== '';
+  const isYesNo = (v) => v === 'yes' || v === 'no';
 
-    const isComplete = requiredFields.every(field => field && field.trim() !== '');
-    
-    if (isComplete !== isFormComplete) {
-      setIsFormComplete(isComplete);
-      if (onFormComplete) {
-        onFormComplete(isComplete);
-      }
+  // Per-step validation rules
+  const validateStep = (step, data = formData) => {
+    const e = {};
+    if (step === 1) {
+      if (!isNonEmpty(data.timeline)) e.timeline = 'Required';
+      if (!isNonEmpty(data.childhood)) e.childhood = 'Required';
     }
-    
-    return isComplete;
+    if (step === 2) {
+      if (!isNonEmpty(data.goodBaby)) e.goodBaby = 'Required';
+      if (!isNonEmpty(data.standardAgeFrames)) e.standardAgeFrames = 'Required';
+    }
+    if (step === 3) {
+      // Optional by design
+    }
+    if (step === 4) {
+      if (!isYesNo(data.vaccinationReaction)) e.vaccinationReaction = 'Select yes/no';
+      if (!isYesNo(data.healthDecline)) e.healthDecline = 'Select yes/no';
+      if (!isYesNo(data.allergyInjections)) e.allergyInjections = 'Select yes/no';
+    }
+    if (step === 5) {
+      if (!isNonEmpty(data.symptomsBetter)) e.symptomsBetter = 'Required';
+      if (!isNonEmpty(data.symptomsWorse)) e.symptomsWorse = 'Required';
+      if (!isYesNo(data.dailyBasis)) e.dailyBasis = 'Select yes/no';
+      if (!isNonEmpty(data.painLocation)) e.painLocation = 'Required';
+    }
+    if (step === 6) {
+      // Optional table
+    }
+    return e;
   };
 
-  useEffect(() => {
-    checkFormCompletion();
-  }, [formData]);
+  const validateAll = (data = formData) => {
+    return [1, 2, 3, 4, 5, 6].reduce((acc, s) => ({ ...acc, ...validateStep(s, data) }), {});
+  };
 
+  // Sync external control only
   useEffect(() => {
     if (externalIsFormComplete !== undefined) {
       setIsFormComplete(externalIsFormComplete);
     }
   }, [externalIsFormComplete]);
 
+  // Memoized validity flags
+  const currentStepErrors = useMemo(() => validateStep(currentStep, formData), [currentStep, formData]);
+  const isCurrentStepValid = useMemo(() => Object.keys(currentStepErrors).length === 0, [currentStepErrors]);
+  const allErrors = useMemo(() => validateAll(formData), [formData]);
+  const isAllValid = useMemo(() => Object.keys(allErrors).length === 0, [allErrors]);
+
+  // Handlers
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => {
+      const next = { ...prev };
+      if (
+        [
+          'timeline',
+          'childhood',
+          'goodBaby',
+          'standardAgeFrames',
+          'symptomsBetter',
+          'symptomsWorse',
+          'dailyBasis',
+          'painLocation',
+          'vaccinationReaction',
+          'healthDecline',
+          'allergyInjections',
+        ].includes(name)
+      ) {
+        if (name === 'dailyBasis' || name === 'vaccinationReaction' || name === 'healthDecline' || name === 'allergyInjections') {
+          if (isYesNo(value)) delete next[name];
+        } else if (isNonEmpty(value)) {
+          delete next[name];
+        }
+      }
+      return next;
+    });
   };
 
   const handleCheckboxChange = (section, field) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [section]: {
         ...prev[section],
-        [field]: !prev[section][field]
-      }
+        [field]: !prev[section][field],
+      },
     }));
   };
 
   const handleNestedInputChange = (section, field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [section]: {
         ...prev[section],
-        [field]: value
-      }
+        [field]: value,
+      },
     }));
   };
 
   const handleFamilyHealthChange = (relation, field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       familyHealth: {
         ...prev.familyHealth,
         [relation]: {
           ...prev.familyHealth[relation],
-          [field]: value
-        }
-      }
+          [field]: value,
+        },
+      },
     }));
   };
 
   const nextStep = () => {
+    const stepErrors = validateStep(currentStep);
+    setErrors(stepErrors);
+    if (Object.keys(stepErrors).length > 0) return;
     if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
+      setCurrentStep((s) => s + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+      setCurrentStep((s) => s - 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const errs = validateAll(formData);
+    setErrors(errs);
+    if (Object.keys(errs).length > 0) {
+      const firstInvalidStep = [1, 2, 3, 4, 5, 6].find((s) => Object.keys(validateStep(s, formData)).length > 0);
+      if (firstInvalidStep && firstInvalidStep !== currentStep) setCurrentStep(firstInvalidStep);
+      return;
+    }
     console.log('Form Data:', formData);
-    
     setIsFormComplete(true);
-    if (onFormComplete) {
-      onFormComplete(true);
-    }
-    
-    if (onFormSubmit) {
-      onFormSubmit(formData);
-    }
-    
+    setSubmitted(true);
+    onFormComplete && onFormComplete(true);
+    onFormSubmit && onFormSubmit(formData);
     alert('Form submitted successfully! Check console for data. / फॉर्म सफलतापूर्वक सबमिट हो गया! डेटा के लिए कंसोल जांचें।');
   };
 
@@ -437,9 +489,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
   const handleSaveEdit = () => {
     setIsEditing(false);
     setIsFormComplete(true);
-    if (onFormComplete) {
-      onFormComplete(true);
-    }
+    onFormComplete && onFormComplete(true);
   };
 
   const progressPercentage = (currentStep / totalSteps) * 100;
@@ -450,11 +500,11 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
     { number: 3, title: translations.illnessHistory },
     { number: 4, title: translations.recurringIssues },
     { number: 5, title: translations.symptoms },
-    { number: 6, title: translations.familyHistory }
+    { number: 6, title: translations.familyHistory },
   ];
 
-  // If form is complete and not in edit mode, show completion message
-  if (isFormComplete && !isEditing) {
+  // Show completion screen only after a successful submit
+  if (submitted && isFormComplete && !isEditing) {
     return (
       <div className="min-h-screen bg-gray-50 py-4 px-3 sm:px-4 lg:px-6">
         <div className="max-w-5xl mx-auto">
@@ -496,28 +546,32 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 mb-4 sm:mb-6">
-            <div 
+            <div
               className="bg-blue-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${progressPercentage}%` }}
             ></div>
           </div>
 
-          {/* Step Indicators - Mobile Optimized */}
+          {/* Step Indicators */}
           <div className="flex justify-between items-center overflow-x-auto pb-2 -mx-2 px-2">
             {steps.map((step) => (
               <div key={step.number} className="flex flex-col items-center shrink-0 px-1 sm:px-2">
-                <div 
+                <div
                   className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-semibold mb-1 sm:mb-2 text-xs sm:text-sm transition-all duration-300 ${
-                    step.number === currentStep 
-                      ? 'bg-blue-600 shadow-md scale-110' 
-                      : step.number < currentStep 
-                      ? 'bg-green-500' 
+                    step.number === currentStep
+                      ? 'bg-blue-600 shadow-md scale-110'
+                      : step.number < currentStep
+                      ? 'bg-green-500'
                       : 'bg-gray-300'
                   }`}
                 >
                   {step.number < currentStep ? '✓' : step.number}
                 </div>
-                <span className={`text-xs text-center max-w-16 sm:max-w-none ${step.number === currentStep ? 'font-semibold text-blue-600' : 'text-gray-600'}`}>
+                <span
+                  className={`text-xs text-center max-w-16 sm:max-w-none ${
+                    step.number === currentStep ? 'font-semibold text-blue-600' : 'text-gray-600'
+                  }`}
+                >
                   {step.title.split(' / ')[0]}
                 </span>
               </div>
@@ -527,14 +581,13 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
 
         <div className="bg-white shadow-lg rounded-lg p-4 sm:p-6 md:p-8">
           <form onSubmit={handleSubmit}>
-            
-            {/* Step 1: Significant Life Events */}
+            {/* Step 1 */}
             {currentStep === 1 && (
               <div className="space-y-4 sm:space-y-6">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4 border-b pb-2 sm:pb-3">
                   {translations.significantLifeEvents}
                 </h2>
-                
+
                 <div className="bg-blue-50 border-l-4 border-blue-600 p-3 sm:p-4 mb-4 sm:mb-6 rounded text-sm">
                   <p className="text-gray-700">
                     <strong>{translations.optional}:</strong> Traumatic events can impact your health. It's helpful to know the effects and how they left you feeling. You can discuss details in person if preferred.
@@ -554,9 +607,12 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                     value={formData.timeline}
                     onChange={handleInputChange}
                     rows="4"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-sm sm:text-base"
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${
+                      errors.timeline ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
+                    }`}
                     placeholder={translations.timelinePlaceholder}
                   />
+                  {errors.timeline && <p className="mt-1 text-xs text-red-600">{errors.timeline}</p>}
                 </div>
 
                 <div>
@@ -564,7 +620,9 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                     {translations.explainChildhood}
                   </label>
                   <div className="space-y-2">
-                    <label className="flex items-center p-2 sm:p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition text-sm">
+                    <label className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition text-sm ${
+                      errors.childhood ? 'border-red-500' : 'border-gray-300'
+                    }`}>
                       <input
                         type="radio"
                         name="childhood"
@@ -575,7 +633,9 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                       />
                       <span className="ml-2 sm:ml-3 text-gray-700">{translations.pleasant}</span>
                     </label>
-                    <label className="flex items-center p-2 sm:p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition text-sm">
+                    <label className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition text-sm ${
+                      errors.childhood ? 'border-red-500' : 'border-gray-300'
+                    }`}>
                       <input
                         type="radio"
                         name="childhood"
@@ -587,6 +647,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                       <span className="ml-2 sm:ml-3 text-gray-700">{translations.specificFear}</span>
                     </label>
                   </div>
+                  {errors.childhood && <p className="mt-1 text-xs text-red-600">{errors.childhood}</p>}
                 </div>
 
                 <div>
@@ -688,13 +749,13 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
               </div>
             )}
 
-            {/* Step 2: Early Development */}
+            {/* Step 2 */}
             {currentStep === 2 && (
               <div className="space-y-4 sm:space-y-6">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4 border-b pb-2 sm:pb-3">
                   {translations.earlyDevelopment}
                 </h2>
-                
+
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     {translations.goodBaby}
@@ -704,9 +765,12 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                     name="goodBaby"
                     value={formData.goodBaby}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base"
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${
+                      errors.goodBaby ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
+                    }`}
                     placeholder={translations.goodBabyPlaceholder}
                   />
+                  {errors.goodBaby && <p className="mt-1 text-xs text-red-600">{errors.goodBaby}</p>}
                 </div>
 
                 <div>
@@ -780,14 +844,17 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                     name="standardAgeFrames"
                     value={formData.standardAgeFrames}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base"
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${
+                      errors.standardAgeFrames ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
+                    }`}
                     placeholder={translations.standardAgeFramesPlaceholder}
                   />
+                  {errors.standardAgeFrames && <p className="mt-1 text-xs text-red-600">{errors.standardAgeFrames}</p>}
                 </div>
               </div>
             )}
 
-            {/* Step 3: Illness History */}
+            {/* Step 3 */}
             {currentStep === 3 && (
               <div className="space-y-4 sm:space-y-6">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4 border-b pb-2 sm:pb-3">
@@ -796,7 +863,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                 <p className="text-xs sm:text-sm text-gray-600 mb-4 bg-gray-100 p-3 rounded-md border">
                   {translations.illnessNote}
                 </p>
-                
+
                 <div className="grid grid-cols-1 gap-3 sm:gap-4">
                   {Object.keys(formData.illnessHistory).map((illness) => (
                     <div key={illness}>
@@ -816,7 +883,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
               </div>
             )}
 
-            {/* Step 4: Recurring Issues & Vaccinations */}
+            {/* Step 4 */}
             {currentStep === 4 && (
               <div className="space-y-6 sm:space-y-8">
                 <div>
@@ -826,7 +893,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                   <p className="text-xs sm:text-sm text-gray-600 mb-4">
                     {translations.recurringIssuesDesc}
                   </p>
-                  
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                     {Object.keys(formData.recurring).map((issue) => (
                       <label key={issue} className="flex items-center p-2 sm:p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition text-sm">
@@ -848,36 +915,37 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                   <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6 border-b pb-2 sm:pb-3">
                     Vaccinations / टीकाकरण
                   </h2>
-                  
+
                   <div className="space-y-4 sm:space-y-6">
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-3">
                         {translations.vaccinationReaction}
                       </label>
                       <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-                        <label className="flex items-center p-2 sm:p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm">
-                          <input
-                            type="radio"
-                            name="vaccinationReaction"
-                            value="yes"
-                            checked={formData.vaccinationReaction === 'yes'}
-                            onChange={handleInputChange}
-                            className="form-radio text-blue-600 w-4 h-4"
-                          />
-                          <span className="ml-2 sm:ml-3 text-gray-700 font-medium">{translations.yes}</span>
-                        </label>
-                        <label className="flex items-center p-2 sm:p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm">
-                          <input
-                            type="radio"
-                            name="vaccinationReaction"
-                            value="no"
-                            checked={formData.vaccinationReaction === 'no'}
-                            onChange={handleInputChange}
-                            className="form-radio text-blue-600 w-4 h-4"
-                          />
-                          <span className="ml-2 sm:ml-3 text-gray-700 font-medium">{translations.no}</span>
-                        </label>
+                        {['yes', 'no'].map((val) => (
+                          <label
+                            key={val}
+                            className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm ${
+                              errors.vaccinationReaction ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="vaccinationReaction"
+                              value={val}
+                              checked={formData.vaccinationReaction === val}
+                              onChange={handleInputChange}
+                              className="form-radio text-blue-600 w-4 h-4"
+                            />
+                            <span className="ml-2 sm:ml-3 text-gray-700 font-medium">
+                              {val === 'yes' ? translations.yes : translations.no}
+                            </span>
+                          </label>
+                        ))}
                       </div>
+                      {errors.vaccinationReaction && (
+                        <p className="mt-1 text-xs text-red-600">{errors.vaccinationReaction}</p>
+                      )}
                     </div>
 
                     <div>
@@ -885,29 +953,28 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                         {translations.healthDecline}
                       </label>
                       <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-                        <label className="flex items-center p-2 sm:p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm">
-                          <input
-                            type="radio"
-                            name="healthDecline"
-                            value="yes"
-                            checked={formData.healthDecline === 'yes'}
-                            onChange={handleInputChange}
-                            className="form-radio text-blue-600 w-4 h-4"
-                          />
-                          <span className="ml-2 sm:ml-3 text-gray-700 font-medium">{translations.yes}</span>
-                        </label>
-                        <label className="flex items-center p-2 sm:p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm">
-                          <input
-                            type="radio"
-                            name="healthDecline"
-                            value="no"
-                            checked={formData.healthDecline === 'no'}
-                            onChange={handleInputChange}
-                            className="form-radio text-blue-600 w-4 h-4"
-                          />
-                          <span className="ml-2 sm:ml-3 text-gray-700 font-medium">{translations.no}</span>
-                        </label>
+                        {['yes', 'no'].map((val) => (
+                          <label
+                            key={val}
+                            className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm ${
+                              errors.healthDecline ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="healthDecline"
+                              value={val}
+                              checked={formData.healthDecline === val}
+                              onChange={handleInputChange}
+                              className="form-radio text-blue-600 w-4 h-4"
+                            />
+                            <span className="ml-2 sm:ml-3 text-gray-700 font-medium">
+                              {val === 'yes' ? translations.yes : translations.no}
+                            </span>
+                          </label>
+                        ))}
                       </div>
+                      {errors.healthDecline && <p className="mt-1 text-xs text-red-600">{errors.healthDecline}</p>}
                     </div>
 
                     <div>
@@ -915,42 +982,43 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                         {translations.allergyInjections}
                       </label>
                       <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-                        <label className="flex items-center p-2 sm:p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm">
-                          <input
-                            type="radio"
-                            name="allergyInjections"
-                            value="yes"
-                            checked={formData.allergyInjections === 'yes'}
-                            onChange={handleInputChange}
-                            className="form-radio text-blue-600 w-4 h-4"
-                          />
-                          <span className="ml-2 sm:ml-3 text-gray-700 font-medium">{translations.yes}</span>
-                        </label>
-                        <label className="flex items-center p-2 sm:p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm">
-                          <input
-                            type="radio"
-                            name="allergyInjections"
-                            value="no"
-                            checked={formData.allergyInjections === 'no'}
-                            onChange={handleInputChange}
-                            className="form-radio text-blue-600 w-4 h-4"
-                          />
-                          <span className="ml-2 sm:ml-3 text-gray-700 font-medium">{translations.no}</span>
-                        </label>
+                        {['yes', 'no'].map((val) => (
+                          <label
+                            key={val}
+                            className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm ${
+                              errors.allergyInjections ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="allergyInjections"
+                              value={val}
+                              checked={formData.allergyInjections === val}
+                              onChange={handleInputChange}
+                              className="form-radio text-blue-600 w-4 h-4"
+                            />
+                            <span className="ml-2 sm:ml-3 text-gray-700 font-medium">
+                              {val === 'yes' ? translations.yes : translations.no}
+                            </span>
+                          </label>
+                        ))}
                       </div>
+                      {errors.allergyInjections && (
+                        <p className="mt-1 text-xs text-red-600">{errors.allergyInjections}</p>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Step 5: Symptoms */}
+            {/* Step 5 */}
             {currentStep === 5 && (
               <div className="space-y-4 sm:space-y-6">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4 border-b pb-2 sm:pb-3">
                   {translations.symptomsPain}
                 </h2>
-                
+
                 <div>
                   <p className="text-sm font-semibold text-gray-700 mb-3">
                     {translations.symptomsDescription}
@@ -985,9 +1053,12 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                       name="symptomsBetter"
                       value={formData.symptomsBetter}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base"
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${
+                        errors.symptomsBetter ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
+                      }`}
                       placeholder={translations.symptomsBetterPlaceholder}
                     />
+                    {errors.symptomsBetter && <p className="mt-1 text-xs text-red-600">{errors.symptomsBetter}</p>}
                   </div>
 
                   <div>
@@ -999,9 +1070,12 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                       name="symptomsWorse"
                       value={formData.symptomsWorse}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base"
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${
+                        errors.symptomsWorse ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
+                      }`}
                       placeholder={translations.symptomsWorsePlaceholder}
                     />
+                    {errors.symptomsWorse && <p className="mt-1 text-xs text-red-600">{errors.symptomsWorse}</p>}
                   </div>
 
                   <div>
@@ -1023,29 +1097,28 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                       {translations.dailyBasis}
                     </label>
                     <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-                      <label className="flex items-center p-2 sm:p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm">
-                        <input
-                          type="radio"
-                          name="dailyBasis"
-                          value="yes"
-                          checked={formData.dailyBasis === 'yes'}
-                          onChange={handleInputChange}
-                          className="form-radio text-blue-600 w-4 h-4"
-                        />
-                        <span className="ml-2 sm:ml-3 text-gray-700 font-medium">{translations.yes}</span>
-                      </label>
-                      <label className="flex items-center p-2 sm:p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm">
-                        <input
-                          type="radio"
-                          name="dailyBasis"
-                          value="no"
-                          checked={formData.dailyBasis === 'no'}
-                          onChange={handleInputChange}
-                          className="form-radio text-blue-600 w-4 h-4"
-                        />
-                        <span className="ml-2 sm:ml-3 text-gray-700 font-medium">{translations.no}</span>
-                      </label>
+                      {['yes', 'no'].map((val) => (
+                        <label
+                          key={val}
+                          className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm ${
+                            errors.dailyBasis ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="dailyBasis"
+                            value={val}
+                            checked={formData.dailyBasis === val}
+                            onChange={handleInputChange}
+                            className="form-radio text-blue-600 w-4 h-4"
+                          />
+                          <span className="ml-2 sm:ml-3 text-gray-700 font-medium">
+                            {val === 'yes' ? translations.yes : translations.no}
+                          </span>
+                        </label>
+                      ))}
                     </div>
+                    {errors.dailyBasis && <p className="mt-1 text-xs text-red-600">{errors.dailyBasis}</p>}
                   </div>
 
                   <div>
@@ -1057,9 +1130,12 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                       name="painLocation"
                       value={formData.painLocation}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base"
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${
+                        errors.painLocation ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
+                      }`}
                       placeholder={translations.painLocationPlaceholder}
                     />
+                    {errors.painLocation && <p className="mt-1 text-xs text-red-600">{errors.painLocation}</p>}
                   </div>
 
                   <div>
@@ -1079,7 +1155,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
               </div>
             )}
 
-            {/* Step 6: Family Health History */}
+            {/* Step 6 */}
             {currentStep === 6 && (
               <div className="space-y-4 sm:space-y-6">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4 border-b pb-2 sm:pb-3">
@@ -1088,7 +1164,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                 <p className="text-xs sm:text-sm text-gray-600 mb-4 bg-gray-100 p-3 rounded-md border">
                   {translations.familyHealthNote}
                 </p>
-                
+
                 <div className="overflow-x-auto -mx-2 sm:mx-0">
                   <div className="min-w-full inline-block align-middle">
                     <div className="overflow-hidden border border-gray-300 rounded-md">
@@ -1171,7 +1247,12 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                 <button
                   type="button"
                   onClick={nextStep}
-                  className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition text-sm sm:text-base"
+                  disabled={!isCurrentStepValid}
+                  className={`px-4 sm:px-6 py-2 sm:py-3 rounded-md text-sm sm:text-base font-semibold transition ${
+                    isCurrentStepValid
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  }`}
                 >
                   {translations.next}
                 </button>
@@ -1188,7 +1269,12 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                   )}
                   <button
                     type="submit"
-                    className="px-4 sm:px-8 py-2 sm:py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-md transition text-sm sm:text-base"
+                    disabled={!isAllValid}
+                    className={`px-4 sm:px-8 py-2 sm:py-3 font-bold rounded-md transition text-sm sm:text-base ${
+                      !isAllValid
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-green-600 hover:bg-green-700 text-white'
+                    }`}
                   >
                     {isEditing ? translations.updateForm : translations.submitForm}
                   </button>

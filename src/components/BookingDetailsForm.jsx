@@ -46,7 +46,7 @@ const BookingDetailsForm = ({
     chooseConsultation: "Please choose Online or Offline consultation / कृपया ऑनलाइन या ऑफलाइन परामर्श चुनें",
     
     // Service Info Text (you can replace this with actual bilingual content)
-    serviceText: "Naiminath Homoeopathic Medical Hospital provides holistic healthcare through classical homeopathy, emphasizing natural healing and patient-centered treatment. Our expert physicians blend traditional principles with modern care to address acute and chronic diseases. The hospital promotes safe, gentle, and effective remedies that restore health, harmony, and balance across body, mind, and spirit."
+    serviceText: "Naiminath Homoeopathic Hospital provides natural healing through classical homeopathy. Expert physicians offer personalized treatments for acute and chronic conditions using safe, gentle remedies. / नैमिनाथ होम्योपैथिक अस्पताल शास्त्रीय होम्योपैथी के माध्यम से प्राकृतिक उपचार प्रदान करता है। विशेषज्ञ चिकित्सक सुरक्षित, सौम्य उपचारों का उपयोग करके तीव्र और पुरानी स्थितियों के लिए व्यक्तिगत उपचार प्रदान करते हैं।"
   };
 
   const formik = useFormik({
