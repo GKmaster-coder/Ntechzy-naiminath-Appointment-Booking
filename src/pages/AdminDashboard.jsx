@@ -6,9 +6,11 @@ import {
   HiOfficeBuilding,
   HiBan,
 } from "react-icons/hi";
+import { MdOutlineDownloadDone } from "react-icons/md";
 import OnlineAppointments from "../components/AdminDashboard/OnlineAppointments";
 import OfflineAppointments from "../components/AdminDashboard/OfflineAppointments";
 import DisableSlot from "../components/AdminDashboard/DisableSlot";
+import CompletedAppointments from "../components/AdminDashboard/CompletedAppointments";
 
 const AdminDashboard = () => {
   const [activeComponent, setActiveComponent] = useState("online");
@@ -35,6 +37,8 @@ const AdminDashboard = () => {
         return <OfflineAppointments />;
       case "disable":
         return <DisableSlot />;
+         case "completed":
+        return <CompletedAppointments />;
       default:
         return <OnlineAppointments />;
     }
@@ -44,6 +48,7 @@ const AdminDashboard = () => {
     { key: "online", label: "Online Appointments", icon: HiCalendar },
     { key: "offline", label: "Offline Appointments", icon: HiOfficeBuilding },
     { key: "disable", label: "Disable Slot/Off Day", icon: HiBan },
+    { key: "completed", label: "Completed", icon: MdOutlineDownloadDone },
   ];
 
   const handleNavigation = (key) => {
