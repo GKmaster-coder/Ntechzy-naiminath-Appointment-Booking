@@ -93,7 +93,7 @@ const BookingDetailsForm = ({ collegeName, selectedSlot, selectedType, onSubmit 
       <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-gray-200 shadow-lg flex flex-col lg:flex-row overflow-hidden">
         {/* Left Section */}
         <div className="w-full lg:w-[45%] border-b lg:border-b-0 lg:border-r border-gray-200 bg-white">
-          <ServiceInfo textData={translations.serviceText} height="md:h-[75vh]" />
+          <ServiceInfo textData={translations.serviceText} height="md:h-[80vh]" />
         </div>
 
         {/* Right Section - Service Selection */}
@@ -163,7 +163,7 @@ const BookingDetailsForm = ({ collegeName, selectedSlot, selectedType, onSubmit 
       <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-gray-200 shadow-lg flex flex-col lg:flex-row overflow-hidden">
         {/* Left Section */}
         <div className="w-full lg:w-[40%] border-b lg:border-b-0 lg:border-r border-gray-200 bg-white">
-          <ServiceInfo textData={translations.serviceText} height="md:h-[79vh]" />
+          <ServiceInfo textData={translations.serviceText} height="md:h-full" />
         </div>
 
         {/* Right Section */}
