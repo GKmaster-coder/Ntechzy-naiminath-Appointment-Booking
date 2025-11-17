@@ -8,7 +8,7 @@ const ServiceInfo = ({ textData ,height="h-full" }) => {
     hospitalName: "Naiminath Homoeopathic Hospital ",
     tagline: "Healing with the Power of Nature",
     appointmentBooking: "Appointment Booking / अपॉइंटमेंट बुकिंग",
-    consultation: "Consultation with certified Homoeopathic doctors / प्रमाणित होम्योपैथिक डॉक्टरों के साथ परामर्श",
+    consultation: " ",
     consultationTime: "30 min consultation / 30 मिनट का परामर्श",
     availableModes: "Available: Online / Offline / उपलब्ध: ऑनलाइन / ऑफलाइन",
     address: "Naiminath Nagar, Agra, Uttar Pradesh / नैमिनाथ नगर, आगरा, उत्तर प्रदेश",
