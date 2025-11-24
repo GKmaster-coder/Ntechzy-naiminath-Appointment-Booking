@@ -5,7 +5,12 @@ import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
 import ServiceInfo from "../components/ServiceInfo";
 import { useCreateUserMutation, useUpdateUserMutation, useGetUserQuery } from "../store/api/userApi";
-import { storeUserIdForFuture, getStoredUserId, setUserData } from "../store/slices/userSlice";
+import { 
+  storeUserIdForFuture, 
+  getStoredUserId, 
+  storeUserData,
+  getStoredUserData 
+} from "../store/slices/userSlice";
 
 const BookingDetailsForm = ({ collegeName, selectedSlot, selectedType, onSubmit }) => {
   const [selectedMode, setSelectedMode] = useState(selectedType || "");
@@ -54,9 +59,10 @@ const BookingDetailsForm = ({ collegeName, selectedSlot, selectedType, onSubmit 
     updateAppointment: "Update Appointment / अपॉइंटमेंट अपडेट करें",
   };
 
-  // Check for stored user ID on component mount
+  // Check for stored user ID and data on component mount
   useEffect(() => {
     dispatch(getStoredUserId());
+    dispatch(getStoredUserData());
   }, [dispatch]);
 
   // Pre-fill form when user data is loaded
@@ -69,9 +75,17 @@ const BookingDetailsForm = ({ collegeName, selectedSlot, selectedType, onSubmit 
         email: user.email || "",
       });
       setSelectedMode(user.mode || "");
-      dispatch(setUserData(user));
+      dispatch(storeUserData(user));
+    } else if (userData) {
+      // Use stored user data if available
+      formik.setValues({
+        name: userData.fullName || "",
+        phone: userData.mobile || "",
+        email: userData.email || "",
+      });
+      setSelectedMode(userData.mode || "");
     }
-  }, [fetchedUserData, dispatch]);
+  }, [fetchedUserData, userData, dispatch]);
 
   const formik = useFormik({
     initialValues: { 
@@ -103,7 +117,7 @@ const BookingDetailsForm = ({ collegeName, selectedSlot, selectedType, onSubmit 
         const userPayload = {
           fullName: values.name.trim(),
           mobile: values.phone,
-          mode: selectedMode.toLowerCase(), // Convert to lowercase for backend validation
+          mode: selectedMode.toLowerCase(),
           isBookingDone: false
         };
 
@@ -117,9 +131,9 @@ const BookingDetailsForm = ({ collegeName, selectedSlot, selectedType, onSubmit 
         let result;
 
         if (userId) {
-          // Update existing user
+          // Update existing user using the decrypted ID
           result = await updateUser({ 
-            id: userId, 
+            id: userId, // This is the decrypted ID
             ...userPayload 
           }).unwrap();
         } else {
@@ -129,13 +143,13 @@ const BookingDetailsForm = ({ collegeName, selectedSlot, selectedType, onSubmit 
           if (result.success && result.data?.user?._id) {
             const newUserId = result.data.user._id;
             
-            // Store the user ID for future use using the separate function
+            // Store the user ID with encryption for future use
             dispatch(storeUserIdForFuture(newUserId));
             
-            // Also store the complete user data
-            dispatch(setUserData(result.data.user));
+            // Also store the complete user data with encryption
+            dispatch(storeUserData(result.data.user));
             
-            console.log('User created and ID stored:', newUserId);
+            console.log('User created and encrypted ID stored:', newUserId);
           }
         }
 
@@ -178,6 +192,27 @@ const BookingDetailsForm = ({ collegeName, selectedSlot, selectedType, onSubmit 
     let val = e.target.value.replace(/\D/g, "");
     if (val.length > 10) val = val.slice(0, 10);
     formik.setFieldValue("phone", val);
+    
+    // Clear server errors when user starts typing
+    if (serverErrors.length > 0) {
+      setServerErrors([]);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    formik.handleChange(e);
+    // Clear server errors when user starts typing
+    if (serverErrors.length > 0) {
+      setServerErrors([]);
+    }
+  };
+
+  const handleModeSelection = (mode) => {
+    setSelectedMode(mode);
+    // Clear server errors when user selects mode
+    if (serverErrors.length > 0) {
+      setServerErrors([]);
+    }
   };
 
   const isLoading = isCreating || isUpdating || formik.isSubmitting || isUserLoading;
@@ -242,13 +277,7 @@ const BookingDetailsForm = ({ collegeName, selectedSlot, selectedType, onSubmit 
               <input
                 name="name"
                 value={formik.values.name}
-                onChange={(e) => {
-                  formik.handleChange(e);
-                  // Clear server errors when user starts typing
-                  if (serverErrors.length > 0) {
-                    setServerErrors([]);
-                  }
-                }}
+                onChange={handleInputChange}
                 onBlur={formik.handleBlur}
                 disabled={isLoading}
                 className={`mt-1 w-full rounded-lg border px-4 py-3 text-sm focus:ring-2 transition ${
@@ -277,13 +306,7 @@ const BookingDetailsForm = ({ collegeName, selectedSlot, selectedType, onSubmit 
                 <input
                   name="phone"
                   value={formik.values.phone}
-                  onChange={(e) => {
-                    handlePhoneChange(e);
-                    // Clear server errors when user starts typing
-                    if (serverErrors.length > 0) {
-                      setServerErrors([]);
-                    }
-                  }}
+                  onChange={handlePhoneChange}
                   onBlur={formik.handleBlur}
                   maxLength="10"
                   disabled={isLoading}
@@ -305,13 +328,7 @@ const BookingDetailsForm = ({ collegeName, selectedSlot, selectedType, onSubmit 
                 name="email"
                 type="email"
                 value={formik.values.email}
-                onChange={(e) => {
-                  formik.handleChange(e);
-                  // Clear server errors when user starts typing
-                  if (serverErrors.length > 0) {
-                    setServerErrors([]);
-                  }
-                }}
+                onChange={handleInputChange}
                 onBlur={formik.handleBlur}
                 disabled={isLoading}
                 className={`mt-1 w-full rounded-lg border px-4 py-3 text-sm focus:ring-2 transition ${
@@ -334,13 +351,7 @@ const BookingDetailsForm = ({ collegeName, selectedSlot, selectedType, onSubmit 
               <div className="flex flex-col sm:flex-row rounded-lg border border-gray-300 overflow-hidden">
                 <button
                   type="button"
-                  onClick={() => {
-                    setSelectedMode("Online");
-                    // Clear server errors when user selects mode
-                    if (serverErrors.length > 0) {
-                      setServerErrors([]);
-                    }
-                  }}
+                  onClick={() => handleModeSelection("Online")}
                   disabled={isLoading}
                   className={`w-full sm:w-1/2 py-3 text-sm font-semibold transition border-b sm:border-b-0 sm:border-r border-gray-300 ${
                     selectedMode === "Online"
@@ -352,13 +363,7 @@ const BookingDetailsForm = ({ collegeName, selectedSlot, selectedType, onSubmit 
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setSelectedMode("Offline");
-                    // Clear server errors when user selects mode
-                    if (serverErrors.length > 0) {
-                      setServerErrors([]);
-                    }
-                  }}
+                  onClick={() => handleModeSelection("Offline")}
                   disabled={isLoading}
                   className={`w-full sm:w-1/2 py-3 text-sm font-semibold transition ${
                     selectedMode === "Offline"
@@ -393,6 +398,18 @@ const BookingDetailsForm = ({ collegeName, selectedSlot, selectedType, onSubmit 
               )}
             </button>
           </form>
+
+          {/* Debug Info - Remove in production */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mt-6 p-3 bg-gray-100 rounded-lg">
+              <h4 className="text-sm font-medium text-gray-800 mb-2">Debug Info:</h4>
+              <p className="text-xs text-gray-600">
+                User ID: {userId || 'Not set'}<br />
+                Stored Data: {userData ? 'Available' : 'Not available'}<br />
+                Loading: {isLoading ? 'Yes' : 'No'}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -400,3 +417,65 @@ const BookingDetailsForm = ({ collegeName, selectedSlot, selectedType, onSubmit 
 };
 
 export default BookingDetailsForm;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// USe of the id
+
+
+
+// // Example: In another component where you need to use the encrypted ID
+// import React, { useEffect } from 'react';
+// import { useSelector, useDispatch } from 'react-redux';
+// import { getStoredUserId } from '../store/slices/userSlice';
+// import { useSomeOtherApiMutation } from '../store/api/someOtherApi';
+
+// const AnotherComponent = () => {
+//   const dispatch = useDispatch();
+//   const { userId } = useSelector((state) => state.user);
+//   const [callOtherApi] = useSomeOtherApiMutation();
+
+//   useEffect(() => {
+//     // Get the decrypted user ID automatically
+//     dispatch(getStoredUserId());
+//   }, [dispatch]);
+
+//   const handleApiCall = async () => {
+//     if (!userId) {
+//       console.log('No user ID found');
+//       return;
+//     }
+
+//     try {
+//       // Use the decrypted ID directly in API calls
+//       const result = await callOtherApi({ 
+//         userId: userId, // This is already decrypted
+//         otherData: 'some data'
+//       }).unwrap();
+      
+//       console.log('API call successful with decrypted ID');
+//     } catch (error) {
+//       console.error('API call failed:', error);
+//     }
+//   };
+
+//   return (
+//     <div>
+//       <p>User ID (decrypted): {userId}</p>
+//       <button onClick={handleApiCall}>Call API with Decrypted ID</button>
+//     </div>
+//   );
+// };
+
+// export default AnotherComponent;

@@ -1,5 +1,11 @@
 // src/store/slices/userSlice.js
 import { createSlice } from '@reduxjs/toolkit';
+import { 
+  setEncryptedItem, 
+  getDecryptedItem, 
+  removeEncryptedItem,
+  STORAGE_KEYS 
+} from '../../utils/storage';
 
 const initialState = {
   userId: null,
@@ -34,33 +40,74 @@ const userSlice = createSlice({
 
 export const { setUserId, setUserData, clearUser, setLoading, setError } = userSlice.actions;
 
-// Separate function to store user ID for future use
+// Separate function to store user ID with encryption
 export const storeUserIdForFuture = (userId) => (dispatch) => {
   try {
     // Store in Redux
     dispatch(setUserId(userId));
     
-    // Also store in localStorage for persistence
-    localStorage.setItem('userId', userId);
+    // Store encrypted version in localStorage
+    setEncryptedItem(STORAGE_KEYS.USER_ID, userId);
     
-    console.log('User ID stored for future use:', userId);
+    console.log('User ID encrypted and stored:', userId);
   } catch (error) {
-    console.error('Error storing user ID:', error);
+    console.error('Error storing encrypted user ID:', error);
+    dispatch(setError('Failed to store user ID securely'));
   }
 };
 
-// Function to retrieve stored user ID
+// Function to retrieve and decrypt stored user ID
 export const getStoredUserId = () => (dispatch) => {
   try {
-    const storedUserId = localStorage.getItem('userId');
+    const storedUserId = getDecryptedItem(STORAGE_KEYS.USER_ID);
     if (storedUserId) {
       dispatch(setUserId(storedUserId));
+      console.log('Decrypted user ID retrieved:', storedUserId);
       return storedUserId;
     }
     return null;
   } catch (error) {
     console.error('Error retrieving stored user ID:', error);
+    dispatch(setError('Failed to retrieve user ID'));
     return null;
+  }
+};
+
+// Store complete user data with encryption
+export const storeUserData = (userData) => (dispatch) => {
+  try {
+    dispatch(setUserData(userData));
+    setEncryptedItem(STORAGE_KEYS.USER_DATA, userData);
+    console.log('User data encrypted and stored');
+  } catch (error) {
+    console.error('Error storing user data:', error);
+  }
+};
+
+// Retrieve complete user data
+export const getStoredUserData = () => (dispatch) => {
+  try {
+    const userData = getDecryptedItem(STORAGE_KEYS.USER_DATA);
+    if (userData) {
+      dispatch(setUserData(userData));
+      return userData;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error retrieving user data:', error);
+    return null;
+  }
+};
+
+// Clear all encrypted user data
+export const clearStoredUserData = () => (dispatch) => {
+  try {
+    dispatch(clearUser());
+    removeEncryptedItem(STORAGE_KEYS.USER_ID);
+    removeEncryptedItem(STORAGE_KEYS.USER_DATA);
+    console.log('All encrypted user data cleared');
+  } catch (error) {
+    console.error('Error clearing user data:', error);
   }
 };
 
