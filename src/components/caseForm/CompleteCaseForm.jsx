@@ -17,10 +17,10 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
   const totalSteps = 6;
 
   const dispatch = useDispatch();
-  const { userId } = useSelector((state) => state.user);
-  const Id = sessionStorage.getItem("userId")
-  
-
+  // const { userId } = useSelector((state) => state.user);
+  // const Id = sessionStorage.getItem("userId")
+  const userId =sessionStorage.getItem("userId")
+ 
   const { isLoading, error, isSubmitted } = useSelector((state) => state.onlineAppointment);
 
   // Bilingual text configuration
@@ -578,8 +578,10 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
     }
 
     try {
+      console.log(userId)
       // Check if userId is available
-      if (!userId) {
+      if (!userId) { 
+        
         throw new Error('User ID not found. Please complete user registration first.');
       }
 
@@ -588,7 +590,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
       console.log('Submitting appointment data:', backendData);
 
       // Submit via Redux thunk action
-      const result = await dispatch(submitOnlineAppointment(backendData)).unwrap();
+      const result = await dispatch(submitOnlineAppointment(backendData));
 
       if (result.success) {
         setIsFormComplete(true);

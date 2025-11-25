@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { 
-  setEncryptedItem, 
-  getDecryptedItem, 
+import {
+  setEncryptedItem,
+  getDecryptedItem,
   removeEncryptedItem,
-  STORAGE_KEYS 
+  STORAGE_KEYS
 } from '../../utils/storage';
 import { onlineAppointmentApi } from '../api/onlineAppointmentApi';
 
@@ -123,13 +123,16 @@ export const submitOnlineAppointment = (appointmentData) => async (dispatch, get
 
     const { user } = getState();
     const userId = user.userId;
+    const id = sessionStorage.getItem("userId") 
 
-    if (!userId) {
+    if (!id) {
+      console.log("lets check");
+
       throw new Error('User ID not found. Please complete user registration first.');
     }
 
     const submissionData = {
-      userId,
+      userId: id,
       formData: appointmentData,
     };
 
