@@ -10,6 +10,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import OnlineConfirmationPage from "./pages/OnlineConfirmationPage";
 import ScrollToTop from "./components/ScrollToTop";
 import OrderDetailsPage from "./pages/OrderDetailsPage";
+import AdminLogin from "./pages/AdminLogin";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/" element={<BookingDetailsPage />} />
         <Route path="/booking-wrapper" element={<BookingWrapper />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/online-details" element={<OnlineDetailsPage />} />
         <Route path="/offline-details" element={<OfflineDetailsPage />} />
         <Route path="/payment" element={<PaymentPage />} />

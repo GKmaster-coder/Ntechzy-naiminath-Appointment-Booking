@@ -12,12 +12,25 @@ import OfflineAppointments from "../components/AdminDashboard/OfflineAppointment
 import DisableSlot from "../components/AdminDashboard/DisableSlot";
 import CompletedAppointments from "../components/AdminDashboard/CompletedAppointments";
 
+import { useDispatch } from "react-redux";
+import { clearAdminAuth } from "../store/slices/adminSlice";
+import { useNavigate } from "react-router-dom";
+
 const AdminDashboard = () => {
   const [activeComponent, setActiveComponent] = useState("online");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  // Close mobile sidebar on window resize
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(clearAdminAuth());
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminData");
+    navigate("/admin-login");
+  };
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
@@ -37,7 +50,7 @@ const AdminDashboard = () => {
         return <OfflineAppointments />;
       case "disable":
         return <DisableSlot />;
-         case "completed":
+      case "completed":
         return <CompletedAppointments />;
       default:
         return <OnlineAppointments />;
@@ -64,19 +77,17 @@ const AdminDashboard = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  // Desktop Sidebar component
   const DesktopSidebar = () => (
     <div
-      className={`
-      hidden md:flex flex-col bg-white shadow-lg transition-all duration-300
-      ${sidebarOpen ? "w-64" : "w-20"}
-    `}
+      className={`hidden md:flex flex-col bg-white shadow-lg transition-all duration-300
+      ${sidebarOpen ? "w-64" : "w-20"}`}
     >
-      {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
           {sidebarOpen && (
-            <h1 className="text-xl font-bold text-gray-800">Admin Dashboard</h1>
+            <h1 className="text-xl font-bold text-gray-800">
+              Admin Dashboard
+            </h1>
           )}
           <button
             onClick={toggleDesktopSidebar}
@@ -91,7 +102,6 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2">
         {navItems.map((item) => {
           const IconComponent = item.icon;
@@ -114,12 +124,12 @@ const AdminDashboard = () => {
         })}
       </nav>
 
-      {/* User Profile */}
       <div className="p-4 border-t border-gray-200">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
             <span className="text-white text-sm font-bold">A</span>
           </div>
+
           {sidebarOpen && (
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-800">Admin User</p>
@@ -131,15 +141,11 @@ const AdminDashboard = () => {
     </div>
   );
 
-  // Mobile Sidebar component
   const MobileSidebar = () => (
     <div
-      className={`
-      fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out md:hidden
-      ${mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-    `}
+      className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out md:hidden
+      ${mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
     >
-      {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-gray-800">Admin Dashboard</h1>
@@ -152,7 +158,6 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2">
         {navItems.map((item) => {
           const IconComponent = item.icon;
@@ -173,10 +178,9 @@ const AdminDashboard = () => {
         })}
       </nav>
 
-      {/* User Profile */}
       <div className="p-4 border-t border-gray-200">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center ">
+          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
             <span className="text-white text-sm font-bold">A</span>
           </div>
           <div className="flex-1 min-w-0">
@@ -188,35 +192,24 @@ const AdminDashboard = () => {
     </div>
   );
 
-  // Mobile overlay
   const MobileOverlay = () => (
     <div
-      className={`
-        fixed inset-0 z-40 transition-opacity duration-300 md:hidden
-        ${mobileSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"}
-      `}
+      className={`fixed inset-0 z-40 transition-opacity duration-300 md:hidden
+      ${mobileSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
       onClick={() => setMobileSidebarOpen(false)}
     />
   );
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Mobile Overlay */}
       <MobileOverlay />
-
-      {/* Desktop Sidebar */}
       <DesktopSidebar />
-
-      {/* Mobile Sidebar */}
       <MobileSidebar />
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-        {/* Top Bar */}
         <header className="bg-white shadow-sm border-b border-gray-200 z-10">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center space-x-4">
-              {/* Mobile menu button */}
               <button
                 onClick={toggleMobileSidebar}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 md:hidden"
@@ -230,14 +223,20 @@ const AdminDashboard = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center ">
+              <button
+                onClick={handleLogout}
+                className="px-3 py-1 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600 transition"
+              >
+                Logout
+              </button>
+
+              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                 <span className="text-white text-sm font-bold">A</span>
               </div>
             </div>
           </div>
         </header>
 
-        {/* Content Area */}
         <main className="flex-1 overflow-auto p-4 md:p-6 bg-gray-50">
           <div className="max-w-7xl mx-auto w-full">{renderMainContent()}</div>
         </main>

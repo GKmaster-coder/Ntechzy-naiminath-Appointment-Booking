@@ -70,7 +70,7 @@ export default function OnlineDetailsPage() {
               <p className="font-semibold text-gray-900">📞 +91 98765 43210</p>
             </div>
 
-            <div className="bg-white border border-blue-200 rounded-md p-3 shadow-sm">
+            <div className="bg-white border border-blue-200 rounded-md p-2 shadow-sm">
               <p className="text-xs text-gray-500">Support Email</p>
               <p className="font-semibold text-gray-900">
                 ✉️ support@naiminathhospital.com
