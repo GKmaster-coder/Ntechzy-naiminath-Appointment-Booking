@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   useGetOnlineAppointmentsQuery,
   useCancelOnlineAppointmentMutation,
-} from "../../store/api/appointmentsApi";
+} from "../../store/api/onlineAppointmentApi";
 
 const OnlineAppointments = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -10,13 +10,8 @@ const OnlineAppointments = () => {
   const [dateFilter, setDateFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // 🔥 Fetch from backend API
-  const {
-    data,
-    isLoading,
-    isError,
-    refetch,
-  } = useGetOnlineAppointmentsQuery({
+  // FETCH APPOINTMENTS
+  const { data, isLoading, isError, refetch } = useGetOnlineAppointmentsQuery({
     page: currentPage,
     limit: 12,
     status: statusFilter !== "all" ? statusFilter : "",
@@ -25,12 +20,9 @@ const OnlineAppointments = () => {
   const appointments = data?.data?.appointments || [];
   const totalPages = data?.data?.pagination?.pages || 1;
 
-  // 🔥 Cancel API
+  // CANCEL API
   const [cancelAppointment] = useCancelOnlineAppointmentMutation();
 
-  // ===============================
-  //   CANCEL BUTTON HANDLER
-  // ===============================
   const handleCancel = async (appointmentId) => {
     if (!window.confirm("Are you sure you want to cancel this appointment?"))
       return;
@@ -38,35 +30,13 @@ const OnlineAppointments = () => {
     try {
       const res = await cancelAppointment(appointmentId).unwrap();
       alert(res.message);
-      refetch(); // Auto refresh list
+      refetch();
     } catch (err) {
       alert(err?.data?.message || "Failed to cancel appointment");
     }
   };
 
-  // ===============================
-  //   LOCAL MODAL (still dummy)
-  // ===============================
-  const [showModal, setShowModal] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
-  const [selectedDate, setSelectedDate] = useState("");
-  const [selectedTime, setSelectedTime] = useState("");
-
-  const openConfirmModal = (appt) => {
-    setSelectedAppointment(appt);
-    setSelectedDate(appt.date || "");
-    setSelectedTime(appt.timeSlot || "");
-    setShowModal(true);
-  };
-
-  const handleConfirmSlot = () => {
-    alert("This feature is still dummy (no backend API provided).");
-    setShowModal(false);
-  };
-
-  // ===============================
-  //   FILTERS
-  // ===============================
+  // FILTERS
   const filteredAppointments = appointments.filter((appt) => {
     const matchesSearch =
       appt.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -86,9 +56,6 @@ const OnlineAppointments = () => {
 
   const currentAppointments = filteredAppointments;
 
-  // ===============================
-  //   STATUS UI
-  // ===============================
   const getStatusColor = (status) => {
     switch (status) {
       case "confirmed":
@@ -113,9 +80,6 @@ const OnlineAppointments = () => {
     });
   };
 
-  // ===============================
-  //   UI LOADING / ERROR
-  // ===============================
   if (isLoading)
     return <p className="text-center py-10 text-gray-600">Loading...</p>;
 
@@ -126,12 +90,9 @@ const OnlineAppointments = () => {
       </p>
     );
 
-  // ===============================
-  //   MAIN RENDER
-  // ===============================
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* HEADER */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h3 className="text-xl font-bold text-gray-900">
           Manage and track patient appointments
@@ -152,7 +113,7 @@ const OnlineAppointments = () => {
         </div>
       </div>
 
-      {/* Filters */}
+      {/* FILTERS */}
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <input
@@ -183,7 +144,7 @@ const OnlineAppointments = () => {
         </div>
       </div>
 
-      {/* Appointments Grid */}
+      {/* APPOINTMENTS GRID */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
           {currentAppointments.map((appointment) => (
@@ -191,7 +152,7 @@ const OnlineAppointments = () => {
               key={appointment.id}
               className="border border-gray-200 rounded-lg hover:shadow-md transition-shadow duration-200"
             >
-              {/* Header */}
+              {/* CARD HEADER */}
               <div className="p-4 border-b border-gray-200">
                 <div className="flex justify-between items-start mb-2">
                   <div>
@@ -213,7 +174,7 @@ const OnlineAppointments = () => {
                 </div>
               </div>
 
-              {/* Body */}
+              {/* CARD BODY */}
               <div className="p-4 space-y-3">
                 <p className="text-sm text-gray-700">
                   <strong>Mobile:</strong> {appointment.mobile}
@@ -225,28 +186,20 @@ const OnlineAppointments = () => {
                 </p>
 
                 <p className="text-sm text-gray-700">
-                  <strong>User Joined:</strong> {formatDate(appointment.userCreatedDate)}
+                  <strong>User Joined:</strong>{" "}
+                  {formatDate(appointment.userCreatedDate)}
                 </p>
               </div>
 
-              {/* Footer */}
+              {/* CARD FOOTER */}
               <div className="p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg flex space-x-2">
                 {appointment.bookingStatus === "pending" && (
-                  <>
-                    <button
-                      onClick={() => openConfirmModal(appointment)}
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded text-sm"
-                    >
-                      Confirm Slot
-                    </button>
-
-                    <button
-                      onClick={() => handleCancel(appointment.id)}
-                      className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-3 rounded text-sm"
-                    >
-                      Cancel
-                    </button>
-                  </>
+                  <button
+                    onClick={() => handleCancel(appointment.id)}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-3 rounded text-sm"
+                  >
+                    Cancel
+                  </button>
                 )}
 
                 {appointment.bookingStatus === "confirmed" && (
@@ -271,8 +224,8 @@ const OnlineAppointments = () => {
           ))}
         </div>
 
-        {/* Pagination */}
-        <div className="flex justify-center border-t border-gray-200 px-4 py-3 sm:px-6">
+        {/* PAGINATION */}
+        <div className="flex justify-center border-t border-gray-200 px-4 py-3">
           <div className="flex space-x-2">
             {Array.from({ length: totalPages }, (_, i) => (
               <button
@@ -291,78 +244,13 @@ const OnlineAppointments = () => {
         </div>
       </div>
 
-      {/* No Results */}
+      {/* NO RESULTS */}
       {currentAppointments.length === 0 && (
         <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
           <h3 className="text-lg font-medium text-gray-900 mb-2">
             No appointments found
           </h3>
-          <p className="text-gray-600">Try adjusting your search or filters</p>
-        </div>
-      )}
-
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-black/40 flex justify-center items-center z-50">
-          <div className="relative bg-white p-6 rounded-lg w-full max-w-md space-y-4 shadow-xl">
-            <h2 className="text-lg font-semibold">
-              Confirm Slot for {selectedAppointment?.name}
-            </h2>
-
-            <div>
-              <label className="text-sm font-medium">Select Date</label>
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                className="w-full border px-3 py-2 rounded mt-1"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium">Select Time Slot</label>
-              <select
-                value={selectedTime}
-                onChange={(e) => setSelectedTime(e.target.value)}
-                className="w-full border px-3 py-2 rounded mt-1"
-              >
-                <option value="">Select Slot</option>
-                {[
-                  "10:00 AM - 10:30 AM",
-                  "10:30 AM - 11:00 AM",
-                  "11:00 AM - 11:30 AM",
-                  "11:30 AM - 12:00 PM",
-                  "12:00 PM - 12:30 PM",
-                  "12:30 PM - 1:00 PM",
-                  "1:00 PM - 1:30 PM",
-                  "1:30 PM - 2:00 PM",
-                  "2:00 PM - 2:30 PM",
-                  "2:30 PM - 3:00 PM",
-                  "3:00 PM - 3:30 PM",
-                  "3:30 PM - 4:00 PM",
-                ].map((slot) => (
-                  <option key={slot} value={slot}>
-                    {slot}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex space-x-2 pt-2">
-              <button
-                onClick={handleConfirmSlot}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"
-              >
-                Confirm
-              </button>
-              <button
-                onClick={() => setShowModal(false)}
-                className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 py-2 rounded"
-              >
-                Close
-              </button>
-            </div>
-          </div>
+          <p className="text-gray-600">Try adjusting your filters</p>
         </div>
       )}
     </div>
