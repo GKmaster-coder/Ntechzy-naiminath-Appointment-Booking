@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { 
-  setEncryptedItem, 
-  getDecryptedItem, 
+import {
+  setEncryptedItem,
+  getDecryptedItem,
   removeEncryptedItem,
-  STORAGE_KEYS 
+  STORAGE_KEYS
 } from '../../utils/storage';
 
 const initialState = {
@@ -18,6 +18,7 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUserId: (state, action) => {
+      console.log(action.payload);
       state.userId = action.payload;
     },
     setUserData: (state, action) => {

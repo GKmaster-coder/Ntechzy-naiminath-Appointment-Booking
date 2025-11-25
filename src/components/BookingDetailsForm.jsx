@@ -4,12 +4,13 @@ import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
 import ServiceInfo from "../components/ServiceInfo";
 import { useCreateUserMutation, useUpdateUserMutation, useGetUserQuery } from "../store/api/userApi";
-import { 
-  storeUserIdForFuture, 
-  getStoredUserId, 
+import {
+  storeUserIdForFuture,
+  getStoredUserId,
   storeUserData,
   getStoredUserData,
-  clearStoredUserData
+  clearStoredUserData,
+  setUserId
 } from "../store/slices/userSlice";
 
 const BookingDetailsForm = ({ selectedType, onSubmit }) => {
@@ -80,10 +81,10 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
   }, [fetchedUserData, userData, dispatch]);
 
   const formik = useFormik({
-    initialValues: { 
-      name: "", 
-      phone: "", 
-      email: "" 
+    initialValues: {
+      name: "",
+      phone: "",
+      email: ""
     },
     validationSchema: Yup.object({
       name: Yup.string()
@@ -116,10 +117,15 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
         let result;
         if (userId) {
           result = await updateUser({ id: userId, ...userPayload }).unwrap();
+          console.log(result);
+
+
         } else {
           result = await createUser(userPayload).unwrap();
           if (result.success && result.data?.user?._id) {
             const newUserId = result.data.user._id;
+            sessionStorage.setItem('userId', newUserId);
+            // dispatch(setUserId(newUserId))
             dispatch(storeUserIdForFuture(newUserId));
             dispatch(storeUserData(result.data.user));
           }
@@ -127,8 +133,8 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
 
         if (result.success) {
           dispatch(clearStoredUserData()); // clear to generate new ID on next form
-          onSubmit({ 
-            ...values, 
+          onSubmit({
+            ...values,
             selectedType: selectedMode,
             user: result.data.user,
             userId: result.data.user._id,
@@ -217,9 +223,8 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
                 onChange={handleInputChange}
                 onBlur={formik.handleBlur}
                 disabled={isLoading}
-                className={`mt-1 w-full rounded-lg border px-4 py-3 text-sm focus:ring-2 transition ${
-                  formik.touched.name && formik.errors.name ? "border-red-400 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
-                } ${isLoading ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                className={`mt-1 w-full rounded-lg border px-4 py-3 text-sm focus:ring-2 transition ${formik.touched.name && formik.errors.name ? "border-red-400 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+                  } ${isLoading ? "bg-gray-100 cursor-not-allowed" : ""}`}
                 placeholder={translations.enterFullName}
               />
               {formik.touched.name && formik.errors.name && (
@@ -258,9 +263,8 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
                 onChange={handleInputChange}
                 onBlur={formik.handleBlur}
                 disabled={isLoading}
-                className={`mt-1 w-full rounded-lg border px-4 py-3 text-sm focus:ring-2 transition ${
-                  formik.touched.email && formik.errors.email ? "border-red-400 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
-                } ${isLoading ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                className={`mt-1 w-full rounded-lg border px-4 py-3 text-sm focus:ring-2 transition ${formik.touched.email && formik.errors.email ? "border-red-400 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+                  } ${isLoading ? "bg-gray-100 cursor-not-allowed" : ""}`}
                 placeholder={translations.emailPlaceholder}
               />
               {formik.touched.email && formik.errors.email && (
@@ -276,9 +280,8 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
                   type="button"
                   onClick={() => handleModeSelection("Online")}
                   disabled={isLoading}
-                  className={`w-full sm:w-1/2 py-3 text-sm font-semibold transition border-b sm:border-b-0 sm:border-r border-gray-300 ${
-                    selectedMode === "Online" ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50"
-                  } ${isLoading ? "cursor-not-allowed opacity-50" : ""}`}
+                  className={`w-full sm:w-1/2 py-3 text-sm font-semibold transition border-b sm:border-b-0 sm:border-r border-gray-300 ${selectedMode === "Online" ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50"
+                    } ${isLoading ? "cursor-not-allowed opacity-50" : ""}`}
                 >
                   {translations.online}
                 </button>
@@ -286,9 +289,8 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
                   type="button"
                   onClick={() => handleModeSelection("Offline")}
                   disabled={isLoading}
-                  className={`w-full sm:w-1/2 py-3 text-sm font-semibold transition ${
-                    selectedMode === "Offline" ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50"
-                  } ${isLoading ? "cursor-not-allowed opacity-50" : ""}`}
+                  className={`w-full sm:w-1/2 py-3 text-sm font-semibold transition ${selectedMode === "Offline" ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50"
+                    } ${isLoading ? "cursor-not-allowed opacity-50" : ""}`}
                 >
                   {translations.offline}
                 </button>
@@ -301,9 +303,8 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
             <button
               type="submit"
               disabled={!selectedMode || isLoading}
-              className={`w-full py-3 rounded-lg text-white font-medium transition shadow-md mt-4 ${
-                !selectedMode || isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-              }`}
+              className={`w-full py-3 rounded-lg text-white font-medium transition shadow-md mt-4 ${!selectedMode || isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                }`}
             >
               {isLoading ? (userId ? translations.updatingUser : translations.creatingUser) : translations.continue}
             </button>

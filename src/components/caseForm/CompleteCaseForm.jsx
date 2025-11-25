@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { 
+import {
   submitOnlineAppointment,
   setAppointmentSubmitted,
-  getStoredAppointmentData 
+  getStoredAppointmentData
 } from '../../store/slices/onlineAppointmentSlice';
+import { setUserId } from '../../store/slices/userSlice';
+
 
 const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: externalIsFormComplete }) => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -16,6 +18,9 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
 
   const dispatch = useDispatch();
   const { userId } = useSelector((state) => state.user);
+  const Id = sessionStorage.getItem("userId")
+  
+
   const { isLoading, error, isSubmitted } = useSelector((state) => state.onlineAppointment);
 
   // Bilingual text configuration
@@ -168,7 +173,6 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
     confidential: 'Your information is confidential and secure. / आपकी जानकारी गोपनीय और सुरक्षित है।',
     formComplete: '✓ Form is complete. You can proceed to payment. / ✓ फॉर्म पूरा हो गया है। आप भुगतान के लिए आगे बढ़ सकते हैं。',
 
-    // Symptom Descriptions
     aching: 'Aching / दर्द',
     drawing: 'Drawing / खिंचाव',
     pressureInwards: 'Pressure inwards / अंदर की ओर दबाव',
@@ -290,6 +294,8 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
     familyHealth: {}
   });
 
+  console.log("testing line no:- 292", formData)
+
   // Helper function to convert frontend data to backend format
   const transformToBackendFormat = (frontendData) => {
     // Transform anger reaction checkboxes to array
@@ -318,7 +324,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
       'cramping', 'likePlugStuck', 'stinging', 'crushing', 'likeRock', 'stupefying',
       'cutting', 'likeSplinter', 'tearing', 'digging', 'pinching', 'throbbing'
     ];
-    
+
     symptomTypes.forEach(symptom => {
       if (frontendData.symptoms?.types?.[symptom]) {
         symptomsArray.push(symptom);
@@ -331,7 +337,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
     // Transform family history to array
     const familyHistoryArray = [];
     const familyRelations = [
-      'mother', 'father', 'siblings', 'maternalGrandmother', 'maternalGrandfather', 
+      'mother', 'father', 'siblings', 'maternalGrandmother', 'maternalGrandfather',
       'maternalAuntsUncles', 'paternalGrandmother', 'paternalGrandfather', 'paternalAuntsUncles'
     ];
 
@@ -445,7 +451,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
         console.log('No stored appointment data found');
       }
     };
-    
+
     loadStoredData();
   }, [dispatch]);
 
@@ -471,11 +477,15 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
   const allErrors = useMemo(() => validateAll(formData), [formData]);
   const isAllValid = useMemo(() => Object.keys(allErrors).length === 0, [allErrors]);
 
+
   const progressPercentage = (currentStep / totalSteps) * 100;
 
   // Handlers
   const handleInputChange = (e) => {
+
+
     const { name, value } = e.target;
+
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => {
       const next = { ...prev };
@@ -500,10 +510,26 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
   };
 
   const handleCheckboxChange = (section, field) => {
+
+
+    if (section === "symptoms.types") {
+      setFormData((prev) => ({
+        ...prev,
+        symptoms: {
+          ...prev.symptoms,
+          types: {
+            ...prev.symptoms.types,
+            [field]: !prev.symptoms.types?.[field]
+          }
+        }
+      }));
+      return;
+    }
     setFormData((prev) => ({
       ...prev,
       [section]: {
         ...prev[section],
+
         [field]: !prev[section][field],
       },
     }));
@@ -544,7 +570,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
     e.preventDefault();
     const errs = validateAll(formData);
     setErrors(errs);
-    
+
     if (Object.keys(errs).length > 0) {
       const firstInvalidStep = [1, 2, 3, 4, 5, 6].find((s) => Object.keys(validateStep(s, formData)).length > 0);
       if (firstInvalidStep && firstInvalidStep !== currentStep) setCurrentStep(firstInvalidStep);
@@ -560,16 +586,16 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
       // Transform data to backend format before submitting
       const backendData = transformToBackendFormat(formData);
       console.log('Submitting appointment data:', backendData);
-      
+
       // Submit via Redux thunk action
       const result = await dispatch(submitOnlineAppointment(backendData)).unwrap();
-      
+
       if (result.success) {
         setIsFormComplete(true);
         setSubmitted(true);
         onFormComplete && onFormComplete(true);
         onFormSubmit && onFormSubmit(backendData);
-        
+
         console.log('Appointment submitted successfully:', result);
         alert(translations.submissionSuccess);
       } else {
@@ -590,7 +616,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
   const handleSaveEdit = async () => {
     const errs = validateAll(formData);
     setErrors(errs);
-    
+
     if (Object.keys(errs).length > 0) {
       const firstInvalidStep = [1, 2, 3, 4, 5, 6].find((s) => Object.keys(validateStep(s, formData)).length > 0);
       if (firstInvalidStep && firstInvalidStep !== currentStep) setCurrentStep(firstInvalidStep);
@@ -604,7 +630,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
 
       const backendData = transformToBackendFormat(formData);
       const result = await dispatch(submitOnlineAppointment(backendData)).unwrap();
-      
+
       if (result.success) {
         setIsEditing(false);
         setIsFormComplete(true);
@@ -643,7 +669,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
             <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
               {translations.formSubmitted}
             </p>
-            
+
             {/* Payment Button */}
             <div className="mb-6">
               <button
@@ -657,7 +683,7 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                 {translations.completePayment}
               </button>
             </div>
-            
+
             <div className="flex justify-center space-x-4">
               <button
                 onClick={handleEditForm}
@@ -704,20 +730,18 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
             {steps.map((step) => (
               <div key={step.number} className="flex flex-col items-center shrink-0 px-1 sm:px-2">
                 <div
-                  className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-semibold mb-1 sm:mb-2 text-xs sm:text-sm transition-all duration-300 ${
-                    step.number === currentStep
-                      ? 'bg-blue-600 shadow-md scale-110'
-                      : step.number < currentStep
+                  className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-semibold mb-1 sm:mb-2 text-xs sm:text-sm transition-all duration-300 ${step.number === currentStep
+                    ? 'bg-blue-600 shadow-md scale-110'
+                    : step.number < currentStep
                       ? 'bg-green-500'
                       : 'bg-gray-300'
-                  }`}
+                    }`}
                 >
                   {step.number < currentStep ? '✓' : step.number}
                 </div>
                 <span
-                  className={`text-xs text-center max-w-16 sm:max-w-none ${
-                    step.number === currentStep ? 'font-semibold text-blue-600' : 'text-gray-600'
-                  }`}
+                  className={`text-xs text-center max-w-16 sm:max-w-none ${step.number === currentStep ? 'font-semibold text-blue-600' : 'text-gray-600'
+                    }`}
                 >
                   {step.title.split(' / ')[0]}
                 </span>
@@ -754,9 +778,8 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                     value={formData.lifeTimeline}
                     onChange={handleInputChange}
                     rows="4"
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${
-                      errors.lifeTimeline ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
-                    }`}
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${errors.lifeTimeline ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
+                      }`}
                     placeholder={translations.timelinePlaceholder}
                   />
                   {errors.lifeTimeline && <p className="mt-1 text-xs text-red-600">{errors.lifeTimeline}</p>}
@@ -767,9 +790,8 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                     {translations.explainChildhood}
                   </label>
                   <div className="space-y-2">
-                    <label className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition text-sm ${
-                      errors.childhoodDescription ? 'border-red-500' : 'border-gray-300'
-                    }`}>
+                    <label className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition text-sm ${errors.childhoodDescription ? 'border-red-500' : 'border-gray-300'
+                      }`}>
                       <input
                         type="radio"
                         name="childhoodDescription"
@@ -780,9 +802,8 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                       />
                       <span className="ml-2 sm:ml-3 text-gray-700">{translations.pleasant}</span>
                     </label>
-                    <label className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition text-sm ${
-                      errors.childhoodDescription ? 'border-red-500' : 'border-gray-300'
-                    }`}>
+                    <label className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition text-sm ${errors.childhoodDescription ? 'border-red-500' : 'border-gray-300'
+                      }`}>
                       <input
                         type="radio"
                         name="childhoodDescription"
@@ -911,9 +932,8 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                     type="text"
                     value={formData.earlyDevelopment.babyBehaviorDescription}
                     onChange={(e) => handleNestedInputChange('earlyDevelopment', 'babyBehaviorDescription', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${
-                      errors.babyBehaviorDescription ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
-                    }`}
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${errors.babyBehaviorDescription ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
+                      }`}
                     placeholder={translations.goodBabyPlaceholder}
                   />
                   {errors.babyBehaviorDescription && <p className="mt-1 text-xs text-red-600">{errors.babyBehaviorDescription}</p>}
@@ -988,9 +1008,8 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                     type="text"
                     value={formData.earlyDevelopment.developmentWithinNormalRange}
                     onChange={(e) => handleNestedInputChange('earlyDevelopment', 'developmentWithinNormalRange', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${
-                      errors.developmentWithinNormalRange ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
-                    }`}
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${errors.developmentWithinNormalRange ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
+                      }`}
                     placeholder={translations.standardAgeFramesPlaceholder}
                   />
                   {errors.developmentWithinNormalRange && <p className="mt-1 text-xs text-red-600">{errors.developmentWithinNormalRange}</p>}
@@ -1069,9 +1088,8 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                         {['yes', 'no'].map((val) => (
                           <label
                             key={val}
-                            className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm ${
-                              errors.hadReaction ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                            className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm ${errors.hadReaction ? 'border-red-500' : 'border-gray-300'
+                              }`}
                           >
                             <input
                               type="radio"
@@ -1100,9 +1118,8 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                         {['yes', 'no'].map((val) => (
                           <label
                             key={val}
-                            className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm ${
-                              errors.healthDeclined ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                            className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm ${errors.healthDeclined ? 'border-red-500' : 'border-gray-300'
+                              }`}
                           >
                             <input
                               type="radio"
@@ -1129,9 +1146,8 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                         {['yes', 'no'].map((val) => (
                           <label
                             key={val}
-                            className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm ${
-                              errors.allergyDesensitization ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                            className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm ${errors.allergyDesensitization ? 'border-red-500' : 'border-gray-300'
+                              }`}
                           >
                             <input
                               type="radio"
@@ -1202,9 +1218,8 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                       type="text"
                       value={formData.symptoms.symptomBetterWith}
                       onChange={(e) => handleNestedInputChange('symptoms', 'symptomBetterWith', e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${
-                        errors.symptomBetterWith ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${errors.symptomBetterWith ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
+                        }`}
                       placeholder={translations.symptomsBetterPlaceholder}
                     />
                     {errors.symptomBetterWith && <p className="mt-1 text-xs text-red-600">{errors.symptomBetterWith}</p>}
@@ -1218,9 +1233,8 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                       type="text"
                       value={formData.symptoms.symptomWorseWith}
                       onChange={(e) => handleNestedInputChange('symptoms', 'symptomWorseWith', e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${
-                        errors.symptomWorseWith ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${errors.symptomWorseWith ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
+                        }`}
                       placeholder={translations.symptomsWorsePlaceholder}
                     />
                     {errors.symptomWorseWith && <p className="mt-1 text-xs text-red-600">{errors.symptomWorseWith}</p>}
@@ -1247,9 +1261,8 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                       {['yes', 'no'].map((val) => (
                         <label
                           key={val}
-                          className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm ${
-                            errors.symptomDaily ? 'border-red-500' : 'border-gray-300'
-                          }`}
+                          className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm ${errors.symptomDaily ? 'border-red-500' : 'border-gray-300'
+                            }`}
                         >
                           <input
                             type="radio"
@@ -1276,9 +1289,8 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                       type="text"
                       value={formData.symptoms.symptomLocation}
                       onChange={(e) => handleNestedInputChange('symptoms', 'symptomLocation', e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${
-                        errors.symptomLocation ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${errors.symptomLocation ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
+                        }`}
                       placeholder={translations.painLocationPlaceholder}
                     />
                     {errors.symptomLocation && <p className="mt-1 text-xs text-red-600">{errors.symptomLocation}</p>}
@@ -1379,11 +1391,10 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                 type="button"
                 onClick={prevStep}
                 disabled={currentStep === 1 || isLoading}
-                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-md font-semibold transition text-sm sm:text-base ${
-                  currentStep === 1 || isLoading
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-600 hover:bg-gray-700 text-white'
-                }`}
+                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-md font-semibold transition text-sm sm:text-base ${currentStep === 1 || isLoading
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-gray-600 hover:bg-gray-700 text-white'
+                  }`}
               >
                 {translations.previous}
               </button>
@@ -1393,11 +1404,10 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                   type="button"
                   onClick={nextStep}
                   disabled={!isCurrentStepValid || isLoading}
-                  className={`px-4 sm:px-6 py-2 sm:py-3 rounded-md text-sm sm:text-base font-semibold transition ${
-                    isCurrentStepValid && !isLoading
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  }`}
+                  className={`px-4 sm:px-6 py-2 sm:py-3 rounded-md text-sm sm:text-base font-semibold transition ${isCurrentStepValid && !isLoading
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    }`}
                 >
                   {translations.next}
                 </button>
@@ -1408,11 +1418,10 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                       type="button"
                       onClick={handleSaveEdit}
                       disabled={isLoading}
-                      className={`px-4 sm:px-6 py-2 sm:py-3 font-semibold rounded-md transition text-sm sm:text-base ${
-                        isLoading
-                          ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                          : 'bg-green-600 hover:bg-green-700 text-white'
-                      }`}
+                      className={`px-4 sm:px-6 py-2 sm:py-3 font-semibold rounded-md transition text-sm sm:text-base ${isLoading
+                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                        : 'bg-green-600 hover:bg-green-700 text-white'
+                        }`}
                     >
                       {isLoading ? translations.submittingForm : translations.saveChanges}
                     </button>
@@ -1420,11 +1429,10 @@ const CompleteCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: extern
                   <button
                     type="submit"
                     disabled={!isAllValid || isLoading}
-                    className={`px-4 sm:px-8 py-2 sm:py-3 font-bold rounded-md transition text-sm sm:text-base ${
-                      !isAllValid || isLoading
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-green-600 hover:bg-green-700 text-white'
-                    }`}
+                    className={`px-4 sm:px-8 py-2 sm:py-3 font-bold rounded-md transition text-sm sm:text-base ${!isAllValid || isLoading
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-green-600 hover:bg-green-700 text-white'
+                      }`}
                   >
                     {isLoading ? translations.submittingForm : (isEditing ? translations.updateForm : translations.submitForm)}
                   </button>

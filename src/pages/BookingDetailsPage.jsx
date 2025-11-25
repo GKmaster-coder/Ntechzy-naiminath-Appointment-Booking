@@ -16,10 +16,9 @@ const BookingDetailsPage = () => {
     selectedType: "",
   };
 
-  const handleSubmit = (formData) => {
+  const handleSubmit = (formData) => { 
     const payload = { ...bookingState, userDetails: formData };
-
-    // ✅ Use the mode selected in the form
+ 
     if (formData.selectedType === "Online") {
       navigate("/online-details", { state: payload });
     } else {
