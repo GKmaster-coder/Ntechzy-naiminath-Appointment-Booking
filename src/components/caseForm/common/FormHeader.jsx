@@ -5,7 +5,7 @@ import { TOTAL_STEPS, STEP_TITLES } from '../constants/formConfig';
 const FormHeader = ({ currentStep, progressPercentage, isEditing, error }) => {
   const steps = Array.from({ length: TOTAL_STEPS }, (_, i) => ({
     number: i + 1,
-    title: translations[STEP_TITLES[i + 1]]
+    title: translations[STEP_TITLES[i + 1]] || `Step ${i + 1}`
   }));
 
   return (
@@ -51,7 +51,7 @@ const FormHeader = ({ currentStep, progressPercentage, isEditing, error }) => {
                 step.number === currentStep ? 'font-semibold text-blue-600' : 'text-gray-600'
               }`}
             >
-              {step.title.split(' / ')[0]}
+              {step.title?.split(' / ')[0] || step.title}
             </span>
           </div>
         ))}
