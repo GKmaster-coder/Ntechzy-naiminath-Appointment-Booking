@@ -1,6 +1,8 @@
 import React from 'react';
+import { translations } from '../constants/translations';
 
-const Step2EarlyDevelopment = ({ formData, errors, onNestedInputChange, translations }) => {
+const Step2EarlyDevelopment = ({ formData = {}, errors = {}, onNestedInputChange }) => {
+  const earlyDevelopment = formData.earlyDevelopment || {};
   return (
     <div className="space-y-4 sm:space-y-6">
       <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4 border-b pb-2 sm:pb-3">
@@ -13,7 +15,7 @@ const Step2EarlyDevelopment = ({ formData, errors, onNestedInputChange, translat
         </label>
         <input
           type="text"
-          value={formData.earlyDevelopment.babyBehaviorDescription}
+          value={earlyDevelopment.babyBehaviorDescription || ''}
           onChange={(e) => onNestedInputChange('earlyDevelopment', 'babyBehaviorDescription', e.target.value)}
           className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${
             errors.babyBehaviorDescription ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'
@@ -29,7 +31,7 @@ const Step2EarlyDevelopment = ({ formData, errors, onNestedInputChange, translat
         </label>
         <input
           type="text"
-          value={formData.earlyDevelopment.cryingReason}
+          value={earlyDevelopment.cryingReason || ''}
           onChange={(e) => onNestedInputChange('earlyDevelopment', 'cryingReason', e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base"
           placeholder={translations.cryingReasonPlaceholder}
@@ -45,7 +47,7 @@ const Step2EarlyDevelopment = ({ formData, errors, onNestedInputChange, translat
             <label className="block text-xs font-medium text-gray-600 mb-1">{translations.teeth}</label>
             <input
               type="text"
-              value={formData.earlyDevelopment.developmentTeethAge}
+              value={earlyDevelopment.developmentTeethAge || ''}
               onChange={(e) => onNestedInputChange('earlyDevelopment', 'developmentTeethAge', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base"
               placeholder={translations.age}
@@ -55,7 +57,7 @@ const Step2EarlyDevelopment = ({ formData, errors, onNestedInputChange, translat
             <label className="block text-xs font-medium text-gray-600 mb-1">{translations.crawl}</label>
             <input
               type="text"
-              value={formData.earlyDevelopment.developmentCrawlAge}
+              value={earlyDevelopment.developmentCrawlAge || ''}
               onChange={(e) => onNestedInputChange('earlyDevelopment', 'developmentCrawlAge', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base"
               placeholder={translations.age}
@@ -65,7 +67,7 @@ const Step2EarlyDevelopment = ({ formData, errors, onNestedInputChange, translat
             <label className="block text-xs font-medium text-gray-600 mb-1">{translations.walk}</label>
             <input
               type="text"
-              value={formData.earlyDevelopment.developmentWalkAge}
+              value={earlyDevelopment.developmentWalkAge || ''}
               onChange={(e) => onNestedInputChange('earlyDevelopment', 'developmentWalkAge', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base"
               placeholder={translations.age}
@@ -75,7 +77,7 @@ const Step2EarlyDevelopment = ({ formData, errors, onNestedInputChange, translat
             <label className="block text-xs font-medium text-gray-600 mb-1">{translations.talk}</label>
             <input
               type="text"
-              value={formData.earlyDevelopment.developmentTalkAge}
+              value={earlyDevelopment.developmentTalkAge || ''}
               onChange={(e) => onNestedInputChange('earlyDevelopment', 'developmentTalkAge', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base"
               placeholder={translations.age}
@@ -90,7 +92,7 @@ const Step2EarlyDevelopment = ({ formData, errors, onNestedInputChange, translat
         </label>
         <input
           type="text"
-          value={formData.earlyDevelopment.developmentWithinNormalRange}
+          value={earlyDevelopment.developmentWithinNormalRange || ''}
           onChange={(e) => onNestedInputChange('earlyDevelopment', 'developmentWithinNormalRange', e.target.value)}
           className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm sm:text-base ${
             errors.developmentWithinNormalRange ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-600'

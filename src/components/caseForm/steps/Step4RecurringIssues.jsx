@@ -1,6 +1,9 @@
 import React from 'react';
+import { translations } from '../constants/translations';
 
-const Step4RecurringIssues = ({ formData, errors, onCheckboxChange, onNestedInputChange, translations }) => {
+const Step4RecurringIssues = ({ formData = {}, errors = {}, onCheckboxChange, onNestedInputChange }) => {
+  const recurringIssues = formData.recurringIssues || {};
+  const vaccinationReactions = formData.vaccinationReactions || {};
   return (
     <div className="space-y-6 sm:space-y-8">
       <div>
@@ -12,11 +15,11 @@ const Step4RecurringIssues = ({ formData, errors, onCheckboxChange, onNestedInpu
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-          {Object.keys(formData.recurringIssues).map((issue) => (
+          {Object.keys(recurringIssues).map((issue) => (
             <label key={issue} className="flex items-center p-2 sm:p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition text-sm">
               <input
                 type="checkbox"
-                checked={formData.recurringIssues[issue]}
+                checked={recurringIssues[issue] || false}
                 onChange={() => onCheckboxChange('recurringIssues', issue)}
                 className="form-checkbox text-blue-600 rounded w-4 h-4"
               />
@@ -50,7 +53,7 @@ const Step4RecurringIssues = ({ formData, errors, onCheckboxChange, onNestedInpu
                     type="radio"
                     name="hadReaction"
                     value={val}
-                    checked={formData.vaccinationReactions.hadReaction === val}
+                    checked={vaccinationReactions.hadReaction === val}
                     onChange={(e) => onNestedInputChange('vaccinationReactions', 'hadReaction', e.target.value)}
                     className="form-radio text-blue-600 w-4 h-4"
                   />
@@ -81,7 +84,7 @@ const Step4RecurringIssues = ({ formData, errors, onCheckboxChange, onNestedInpu
                     type="radio"
                     name="healthDeclined"
                     value={val}
-                    checked={formData.vaccinationReactions.healthDeclined === val}
+                    checked={vaccinationReactions.healthDeclined === val}
                     onChange={(e) => onNestedInputChange('vaccinationReactions', 'healthDeclined', e.target.value)}
                     className="form-radio text-blue-600 w-4 h-4"
                   />
@@ -110,7 +113,7 @@ const Step4RecurringIssues = ({ formData, errors, onCheckboxChange, onNestedInpu
                     type="radio"
                     name="allergyDesensitization"
                     value={val}
-                    checked={formData.vaccinationReactions.allergyDesensitization === val}
+                    checked={vaccinationReactions.allergyDesensitization === val}
                     onChange={(e) => onNestedInputChange('vaccinationReactions', 'allergyDesensitization', e.target.value)}
                     className="form-radio text-blue-600 w-4 h-4"
                   />
