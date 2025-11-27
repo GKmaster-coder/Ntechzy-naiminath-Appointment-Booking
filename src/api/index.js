@@ -8,12 +8,13 @@ const baseQuery = fetchBaseQuery({
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
     headers.set("Content-Type", "application/json");
-    
-    const adminToken = getState()?.admin?.token || localStorage.getItem("adminToken");
+
+    const adminToken =
+      getState()?.admin?.token || localStorage.getItem("adminToken");
     if (adminToken) {
       headers.set("Authorization", `Bearer ${adminToken}`);
     }
-    
+
     return headers;
   },
 });

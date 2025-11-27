@@ -2,7 +2,7 @@
 import React from "react";
 import hospitalLogo from "/logo2.png";
 
-const ServiceInfo = ({ textData ,height="h-full" }) => {
+const ServiceInfo = ({ textData, height = "h-full" }) => {
   // Bilingual text configuration
   const translations = {
     hospitalName: "Naiminath Homoeopathic Hospital ",
@@ -11,14 +11,17 @@ const ServiceInfo = ({ textData ,height="h-full" }) => {
     consultation: " ",
     consultationTime: "30 min consultation / 30 मिनट का परामर्श",
     availableModes: "Available: Online / Offline / उपलब्ध: ऑनलाइन / ऑफलाइन",
-    address: "Naiminath Nagar, Agra, Uttar Pradesh / नैमिनाथ नगर, आगरा, उत्तर प्रदेश",
+    address:
+      "Naiminath Nagar, Agra, Uttar Pradesh / नैमिनाथ नगर, आगरा, उत्तर प्रदेश",
     needHelp: "Need help? / सहायता चाहिए?",
     call: "Call: / कॉल:",
-    email: "Email: / ईमेल:"
+    email: "Email: / ईमेल:",
   };
 
   return (
-    <div className={`bg-white rounded-lg p-6 h-full flex flex-col ${height} overflow-hidden`}>
+    <div
+      className={`bg-white rounded-lg p-6 h-full flex flex-col ${height} overflow-hidden`}
+    >
       {/* Header Section */}
       <div className="flex items-center gap-4 mb-2">
         <img
@@ -30,9 +33,7 @@ const ServiceInfo = ({ textData ,height="h-full" }) => {
           <h2 className="text-lg font-semibold text-gray-900 leading-tight">
             {translations.hospitalName}
           </h2>
-          <p className="text-sm text-gray-600 mt-1">
-            {translations.tagline}
-          </p>
+          <p className="text-sm text-gray-600 mt-1">{translations.tagline}</p>
         </div>
       </div>
 
@@ -42,9 +43,7 @@ const ServiceInfo = ({ textData ,height="h-full" }) => {
           <p className="font-semibold text-gray-900 text-base mb-2">
             {translations.appointmentBooking}
           </p>
-          <p className="text-gray-600">
-            {translations.consultation}
-          </p>
+          <p className="text-gray-600">{translations.consultation}</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -107,20 +106,22 @@ const ServiceInfo = ({ textData ,height="h-full" }) => {
               d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
             />
           </svg>
-          <span className="text-gray-600">
-            {translations.address}
-          </span>
+          <span className="text-gray-600">{translations.address}</span>
         </div>
-        
+
         {/* ✅ Added descriptive section */}
         <p className="text-gray-600 mt-3 leading-relaxed">{textData}</p>
       </div>
 
       {/* Footer / Helpline */}
       <div className="border-t border-gray-200 pt-4 mt-5 text-sm">
-        <p className="font-medium text-gray-900 mb-2">{translations.needHelp}</p>
+        <p className="font-medium text-gray-900 mb-2">
+          {translations.needHelp}
+        </p>
         <p className="text-gray-600">{translations.call} +91 98765 43210</p>
-        <p className="text-gray-600 mt-1">{translations.email} support@naiminathhospital.com</p>
+        <p className="text-gray-600 mt-1">
+          {translations.email} support@naiminathhospital.com
+        </p>
       </div>
     </div>
   );

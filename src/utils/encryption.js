@@ -9,14 +9,14 @@
  */
 export const encryptData = (data) => {
   try {
-    if (!data) return '';
+    if (!data) return "";
     // Convert to base64
     const encoded = btoa(unescape(encodeURIComponent(data)));
     // Add a simple prefix to identify encrypted data
     return `enc_${encoded}`;
   } catch (error) {
-    console.error('Encryption error:', error);
-    return '';
+    console.error("Encryption error:", error);
+    return "";
   }
 };
 
@@ -27,17 +27,17 @@ export const encryptData = (data) => {
  */
 export const decryptData = (encryptedData) => {
   try {
-    if (!encryptedData || !encryptedData.startsWith('enc_')) {
+    if (!encryptedData || !encryptedData.startsWith("enc_")) {
       return encryptedData; // Return as is if not encrypted
     }
-    
+
     // Remove prefix and decode
     const encoded = encryptedData.substring(4);
     const decoded = decodeURIComponent(escape(atob(encoded)));
     return decoded;
   } catch (error) {
-    console.error('Decryption error:', error);
-    return '';
+    console.error("Decryption error:", error);
+    return "";
   }
 };
 

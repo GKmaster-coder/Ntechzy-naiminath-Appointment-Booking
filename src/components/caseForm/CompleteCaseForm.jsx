@@ -1,2 +1,2 @@
 // Redirect to optimized version
-export { default } from './CompleteCaseFormOptimized';
+export { default } from "./CompleteCaseFormOptimized";

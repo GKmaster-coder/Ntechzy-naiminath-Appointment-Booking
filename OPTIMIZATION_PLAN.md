@@ -1,6 +1,7 @@
 # Folder Structure Optimization Plan
 
 ## Current Issues
+
 1. **Duplicate Components**: 3 case form versions (CompleteCaseForm, CompleteCaseFormOptimized, EssentialCaseForm)
 2. **Static Mock Data**: Unused mock data files in `/data` folder
 3. **API Inconsistency**: Mixed API structure and naming
@@ -80,18 +81,21 @@ src/
 ```
 
 ## Files to Remove
+
 - `src/data/` (entire folder - mock data)
 - `src/components/caseForm/CompleteCaseForm.jsx` (keep optimized version)
 - `src/components/caseForm/EssentialCaseForm.jsx` (merge into main)
 - Duplicate API files with similar functionality
 
 ## Files to Consolidate
+
 - Merge all appointment APIs into single file
 - Combine similar Redux slices
 - Consolidate validation utilities
 - Merge duplicate form components
 
 ## Benefits
+
 1. **Single Responsibility**: Each folder has clear purpose
 2. **Feature-Based**: Related code grouped together
 3. **Scalable**: Easy to add new features

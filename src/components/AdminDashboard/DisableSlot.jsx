@@ -1,6 +1,9 @@
 // src/components/OfflineAppointments.jsx
 import React, { useState } from "react";
-import { useDisableSlotMutation, useAddSlotMutation } from "../../api/endpoints/slots";
+import {
+  useDisableSlotMutation,
+  useAddSlotMutation,
+} from "../../api/endpoints/slots";
 
 const OfflineAppointments = () => {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -12,10 +15,11 @@ const OfflineAppointments = () => {
   const [disabledSlots, setDisabledSlots] = useState({});
   const [showSlotMode, setShowSlotMode] = useState(null);
   const [capacity, setCapacity] = useState(1);
-  const [customTime, setCustomTime] = useState('');
+  const [customTime, setCustomTime] = useState("");
 
   // RTK Query APIs
-  const [disableSlotApi, { isLoading: isDisableLoading }] = useDisableSlotMutation();
+  const [disableSlotApi, { isLoading: isDisableLoading }] =
+    useDisableSlotMutation();
   const [addSlotApi, { isLoading: isAddLoading }] = useAddSlotMutation();
 
   const SLOT_LIST = [
@@ -104,21 +108,21 @@ const OfflineAppointments = () => {
     try {
       const timeToUse = slot || customTime;
       if (!timeToUse) {
-        alert('Please enter a time or select a slot');
+        alert("Please enter a time or select a slot");
         return;
       }
 
       const res = await addSlotApi({
         date: selectedDate,
         time: timeToUse,
-        capacity: capacity
+        capacity: capacity,
       }).unwrap();
 
-      alert(res.message || 'Slot added successfully!');
-      setCustomTime('');
+      alert(res.message || "Slot added successfully!");
+      setCustomTime("");
     } catch (error) {
-      console.error('Failed to add slot:', error);
-      alert(error?.data?.message || 'Failed to add slot');
+      console.error("Failed to add slot:", error);
+      alert(error?.data?.message || "Failed to add slot");
     }
   };
 
@@ -151,7 +155,7 @@ const OfflineAppointments = () => {
 
       const res = await disableSlotApi({
         date: selectedDate,
-        time: convertedTime
+        time: convertedTime,
       }).unwrap();
 
       setDisabledSlots((prev) => {
@@ -162,10 +166,10 @@ const OfflineAppointments = () => {
         return { ...prev, [selectedDate]: updated };
       });
 
-      alert(res.message || 'Slot disabled successfully!');
+      alert(res.message || "Slot disabled successfully!");
     } catch (error) {
-      console.error('Failed to disable slot:', error);
-      alert(error?.data?.message || 'Failed to disable slot');
+      console.error("Failed to disable slot:", error);
+      alert(error?.data?.message || "Failed to disable slot");
     }
   };
 
@@ -253,14 +257,14 @@ const OfflineAppointments = () => {
 
               <div className="flex gap-3 mb-4">
                 <button
-                  onClick={() => setShowSlotMode('disable')}
+                  onClick={() => setShowSlotMode("disable")}
                   className="flex-1 bg-red-600 text-white py-2 rounded-lg"
                 >
                   Disable Slots
                 </button>
 
                 <button
-                  onClick={() => setShowSlotMode('add')}
+                  onClick={() => setShowSlotMode("add")}
                   className="flex-1 bg-green-600 text-white py-2 rounded-lg"
                 >
                   Add Slot
@@ -268,10 +272,11 @@ const OfflineAppointments = () => {
               </div>
 
               {/* Slot Selection */}
-              {showSlotMode === 'disable' && (
+              {showSlotMode === "disable" && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                   {SLOT_LIST.map((slot) => {
-                    const isDisabled = disabledSlots[selectedDate]?.includes(slot);
+                    const isDisabled =
+                      disabledSlots[selectedDate]?.includes(slot);
                     return (
                       <button
                         key={slot}
@@ -297,7 +302,7 @@ const OfflineAppointments = () => {
               )}
 
               {/* Add Slot Mode */}
-              {showSlotMode === 'add' && (
+              {showSlotMode === "add" && (
                 <div>
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
@@ -325,7 +330,7 @@ const OfflineAppointments = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <button
                     onClick={handleAddCustomSlot}
                     disabled={!customTime}
@@ -333,9 +338,11 @@ const OfflineAppointments = () => {
                   >
                     Add Custom Time Slot
                   </button>
-                  
+
                   <div className="border-t pt-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Or select from preset times:</h4>
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">
+                      Or select from preset times:
+                    </h4>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                       {SLOT_LIST.map((slot) => (
                         <button

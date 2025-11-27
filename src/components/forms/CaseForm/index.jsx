@@ -1,17 +1,21 @@
-import React from 'react';
-import { useCaseForm } from './hooks/useCaseForm';
-import { translations } from './config/translations';
-import FormHeader from './components/FormHeader';
-import FormNavigation from './components/FormNavigation';
-import FormSuccess from './components/FormSuccess';
-import Step1LifeEvents from './steps/Step1LifeEvents';
-import Step2EarlyDevelopment from './steps/Step2EarlyDevelopment';
-import Step3IllnessHistory from './steps/Step3IllnessHistory';
-import Step4RecurringIssues from './steps/Step4RecurringIssues';
-import Step5Symptoms from './steps/Step5Symptoms';
-import Step6FamilyHistory from './steps/Step6FamilyHistory';
+import React from "react";
+import { useCaseForm } from "./hooks/useCaseForm";
+import { translations } from "./config/translations";
+import FormHeader from "./components/FormHeader";
+import FormNavigation from "./components/FormNavigation";
+import FormSuccess from "./components/FormSuccess";
+import Step1LifeEvents from "./steps/Step1LifeEvents";
+import Step2EarlyDevelopment from "./steps/Step2EarlyDevelopment";
+import Step3IllnessHistory from "./steps/Step3IllnessHistory";
+import Step4RecurringIssues from "./steps/Step4RecurringIssues";
+import Step5Symptoms from "./steps/Step5Symptoms";
+import Step6FamilyHistory from "./steps/Step6FamilyHistory";
 
-const CaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: externalIsFormComplete }) => {
+const CaseForm = ({
+  onFormComplete,
+  onFormSubmit,
+  isFormComplete: externalIsFormComplete,
+}) => {
   const {
     currentStep,
     isFormComplete,
@@ -32,8 +36,12 @@ const CaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: externalIsForm
     handleEditForm,
     handleSaveEdit,
     nextStep,
-    prevStep
-  } = useCaseForm({ onFormComplete, onFormSubmit, isFormComplete: externalIsFormComplete });
+    prevStep,
+  } = useCaseForm({
+    onFormComplete,
+    onFormSubmit,
+    isFormComplete: externalIsFormComplete,
+  });
 
   if (submitted && isFormComplete && !isEditing) {
     return <FormSuccess onEditForm={handleEditForm} />;
@@ -46,17 +54,24 @@ const CaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: externalIsForm
       onInputChange: handleInputChange,
       onNestedInputChange: handleNestedInputChange,
       onCheckboxChange: handleCheckboxChange,
-      onFamilyHealthChange: handleFamilyHealthChange
+      onFamilyHealthChange: handleFamilyHealthChange,
     };
 
     switch (currentStep) {
-      case 1: return <Step1LifeEvents {...stepProps} />;
-      case 2: return <Step2EarlyDevelopment {...stepProps} />;
-      case 3: return <Step3IllnessHistory {...stepProps} />;
-      case 4: return <Step4RecurringIssues {...stepProps} />;
-      case 5: return <Step5Symptoms {...stepProps} />;
-      case 6: return <Step6FamilyHistory {...stepProps} />;
-      default: return null;
+      case 1:
+        return <Step1LifeEvents {...stepProps} />;
+      case 2:
+        return <Step2EarlyDevelopment {...stepProps} />;
+      case 3:
+        return <Step3IllnessHistory {...stepProps} />;
+      case 4:
+        return <Step4RecurringIssues {...stepProps} />;
+      case 5:
+        return <Step5Symptoms {...stepProps} />;
+      case 6:
+        return <Step6FamilyHistory {...stepProps} />;
+      default:
+        return null;
     }
   };
 

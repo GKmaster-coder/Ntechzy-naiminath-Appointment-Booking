@@ -1,11 +1,11 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 import {
   setEncryptedItem,
   getDecryptedItem,
   removeEncryptedItem,
-  STORAGE_KEYS
-} from '../../utils/storage';
-import { appointmentsApi } from '../../api/endpoints/appointments';
+  STORAGE_KEYS,
+} from "../../utils/storage";
+import { appointmentsApi } from "../../api/endpoints/appointments";
 
 const initialState = {
   currentAppointment: null,
@@ -18,7 +18,7 @@ const initialState = {
 };
 
 const onlineAppointmentSlice = createSlice({
-  name: 'onlineAppointment',
+  name: "onlineAppointment",
   initialState,
   reducers: {
     setCurrentAppointment: (state, action) => {
@@ -66,7 +66,7 @@ export const storeAppointmentIdForFuture = (appointmentId) => (dispatch) => {
     dispatch(setAppointmentId(appointmentId));
     setEncryptedItem(STORAGE_KEYS.APPOINTMENT_ID, appointmentId);
   } catch (error) {
-    dispatch(setAppointmentError('Failed to store appointment ID securely'));
+    dispatch(setAppointmentError("Failed to store appointment ID securely"));
   }
 };
 
@@ -79,7 +79,7 @@ export const getStoredAppointmentId = () => (dispatch) => {
     }
     return null;
   } catch (error) {
-    dispatch(setAppointmentError('Failed to retrieve appointment ID'));
+    dispatch(setAppointmentError("Failed to retrieve appointment ID"));
     return null;
   }
 };
@@ -116,43 +116,52 @@ export const clearStoredAppointmentData = () => (dispatch) => {
   }
 };
 
-export const submitOnlineAppointment = (appointmentData) => async (dispatch, getState) => {
-  try {
-    dispatch(setAppointmentLoading(true));
-    dispatch(setAppointmentError(null));
+export const submitOnlineAppointment =
+  (appointmentData) => async (dispatch, getState) => {
+    try {
+      dispatch(setAppointmentLoading(true));
+      dispatch(setAppointmentError(null));
 
-    const { user } = getState();
-    const userId = user.userId;
+      const { user } = getState();
+      const userId = user.userId;
 
-    if (!userId) {
-      throw new Error('User ID not found. Please complete user registration first.');
-    }
-
-    const submissionData = {
-      userId: userId,
-      formData: appointmentData,
-    };
-
-    const result = await dispatch(
-      appointmentsApi.endpoints.createOnlineAppointment.initiate(submissionData)
-    ).unwrap();
-
-    if (result.success) {
-      dispatch(setAppointmentSubmitted(true));
-      if (result.appointmentId) {
-        dispatch(storeAppointmentIdForFuture(result.appointmentId));
+      if (!userId) {
+        throw new Error(
+          "User ID not found. Please complete user registration first."
+        );
       }
-      dispatch(storeAppointmentData(appointmentData));
-      return result;
-    } else {
-      throw new Error(result.message || 'Failed to submit appointment');
+
+      const submissionData = {
+        userId: userId,
+        formData: appointmentData,
+      };
+
+      const result = await dispatch(
+        appointmentsApi.endpoints.createOnlineAppointment.initiate(
+          submissionData
+        )
+      ).unwrap();
+
+      if (result.success) {
+        dispatch(setAppointmentSubmitted(true));
+        if (result.appointmentId) {
+          dispatch(storeAppointmentIdForFuture(result.appointmentId));
+        }
+        dispatch(storeAppointmentData(appointmentData));
+        return result;
+      } else {
+        throw new Error(result.message || "Failed to submit appointment");
+      }
+    } catch (error) {
+      dispatch(
+        setAppointmentError(
+          error.message || "Failed to submit online appointment"
+        )
+      );
+      throw error;
+    } finally {
+      dispatch(setAppointmentLoading(false));
     }
-  } catch (error) {
-    dispatch(setAppointmentError(error.message || 'Failed to submit online appointment'));
-    throw error;
-  } finally {
-    dispatch(setAppointmentLoading(false));
-  }
-};
+  };
 
 export default onlineAppointmentSlice.reducer;

@@ -1,14 +1,14 @@
 // src/utils/storage.js
-import { encryptData, decryptData } from './encryption';
+import { encryptData, decryptData } from "./encryption";
 
 // Storage keys
 export const STORAGE_KEYS = {
-  USER_ID: 'encrypted_user_id',
-  USER_DATA: 'encrypted_user_data',
-  BOOKING_ID: 'encrypted_booking_id',
-  BOOKING_DATA: 'encrypted_booking_data',
-  APPOINTMENT_ID: 'encrypted_appointment_id',
-  APPOINTMENT_DATA: 'encrypted_appointment_data',
+  USER_ID: "encrypted_user_id",
+  USER_DATA: "encrypted_user_data",
+  BOOKING_ID: "encrypted_booking_id",
+  BOOKING_DATA: "encrypted_booking_data",
+  APPOINTMENT_ID: "encrypted_appointment_id",
+  APPOINTMENT_DATA: "encrypted_appointment_data",
 };
 
 /**
@@ -18,13 +18,13 @@ export const STORAGE_KEYS = {
  */
 export const setEncryptedItem = (key, data) => {
   try {
-    if (typeof data === 'object') {
+    if (typeof data === "object") {
       data = JSON.stringify(data);
     }
     const encryptedData = encryptData(data);
     localStorage.setItem(key, encryptedData);
   } catch (error) {
-    console.error('Error setting encrypted item:', error);
+    console.error("Error setting encrypted item:", error);
   }
 };
 
@@ -37,9 +37,9 @@ export const getDecryptedItem = (key) => {
   try {
     const encryptedData = localStorage.getItem(key);
     if (!encryptedData) return null;
-    
+
     const decryptedData = decryptData(encryptedData);
-    
+
     // Try to parse as JSON, return as string if it fails
     try {
       return JSON.parse(decryptedData);
@@ -47,7 +47,7 @@ export const getDecryptedItem = (key) => {
       return decryptedData;
     }
   } catch (error) {
-    console.error('Error getting decrypted item:', error);
+    console.error("Error getting decrypted item:", error);
     return null;
   }
 };
@@ -60,7 +60,7 @@ export const removeEncryptedItem = (key) => {
   try {
     localStorage.removeItem(key);
   } catch (error) {
-    console.error('Error removing encrypted item:', error);
+    console.error("Error removing encrypted item:", error);
   }
 };
 
@@ -69,10 +69,10 @@ export const removeEncryptedItem = (key) => {
  */
 export const clearEncryptedStorage = () => {
   try {
-    Object.values(STORAGE_KEYS).forEach(key => {
+    Object.values(STORAGE_KEYS).forEach((key) => {
       localStorage.removeItem(key);
     });
   } catch (error) {
-    console.error('Error clearing encrypted storage:', error);
+    console.error("Error clearing encrypted storage:", error);
   }
 };

@@ -1,48 +1,46 @@
 // src/store/api/userApi.js
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const BACKEND_API = import.meta.env.VITE_BACKEND_API;
 
 export const userApi = createApi({
-  reducerPath: 'userApi',
+  reducerPath: "userApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: `${BACKEND_API}/users/`,   // <-- using env variable
+    baseUrl: `${BACKEND_API}/users/`, // <-- using env variable
     prepareHeaders: (headers) => {
-      headers.set('Content-Type', 'application/json');
+      headers.set("Content-Type", "application/json");
       return headers;
     },
   }),
 
-  tagTypes: ['User'],
+  tagTypes: ["User"],
 
   endpoints: (builder) => ({
-
     // CREATE USER — POST /api/users
     createUser: builder.mutation({
       query: (userData) => ({
-        url: '',
-        method: 'POST',
+        url: "",
+        method: "POST",
         body: userData,
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ["User"],
     }),
 
     // GET USER — GET /api/users/:id
     getUser: builder.query({
       query: (id) => `${id}`,
-      providesTags: (result, error, id) => [{ type: 'User', id }],
+      providesTags: (result, error, id) => [{ type: "User", id }],
     }),
 
     // UPDATE USER — PATCH /api/users/:id
     updateUser: builder.mutation({
       query: ({ id, ...userData }) => ({
         url: `${id}`,
-        method: 'PATCH',
+        method: "PATCH",
         body: userData,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'User', id }],
+      invalidatesTags: (result, error, { id }) => [{ type: "User", id }],
     }),
-
   }),
 });
 

@@ -36,9 +36,10 @@ export default function OnlineDetailsPage() {
   };
 
   return (
-    <div className="min-h-screen py-6 px-4 sm:px-6 lg:px-12 relative overflow-hidden
-        bg-linear-to-br from-[#e6e2ff] via-[#d8f0ff] to-[#7ddfff]">
-
+    <div
+      className="min-h-screen py-6 px-4 sm:px-6 lg:px-12 relative overflow-hidden
+        bg-linear-to-br from-[#e6e2ff] via-[#d8f0ff] to-[#7ddfff]"
+    >
       {/* Subtle background accents */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[300px] h-[300px] bg-blue-200 opacity-30 blur-[120px] rounded-full"></div>
@@ -52,7 +53,6 @@ export default function OnlineDetailsPage() {
 
       {/* Main Container */}
       <div className="relative z-10 max-w-4xl mx-auto bg-white border border-gray-200 rounded-xl shadow-md p-5 sm:p-6 lg:p-8">
-
         {/* Header */}
         <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-5 shadow-sm">
           <h2 className="text-lg sm:text-xl font-semibold text-blue-800 text-center mb-3">

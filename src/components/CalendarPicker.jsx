@@ -5,8 +5,18 @@ const CalendarPicker = ({ selectedDate, onDateSelect }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const MONTHS = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -118,7 +128,10 @@ const CalendarPicker = ({ selectedDate, onDateSelect }) => {
       {/* Weekday Headers */}
       <div className="grid grid-cols-7 gap-1 mb-2">
         {WEEKDAYS.map((day) => (
-          <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
+          <div
+            key={day}
+            className="text-center text-xs font-medium text-gray-500 py-2"
+          >
             {day}
           </div>
         ))}
@@ -128,7 +141,8 @@ const CalendarPicker = ({ selectedDate, onDateSelect }) => {
       <div className="grid grid-cols-7 gap-1">
         {calendarDays.map((day, index) => {
           const dateKey = formatDateKey(day.date);
-          const isSelected = selectedDate && formatDateKey(selectedDate) === dateKey;
+          const isSelected =
+            selectedDate && formatDateKey(selectedDate) === dateKey;
           const isTodayDate = isToday(day.date);
 
           return (
@@ -139,7 +153,13 @@ const CalendarPicker = ({ selectedDate, onDateSelect }) => {
               className={`
                 h-10 text-sm rounded-lg transition-all
                 ${day.isCurrentMonth ? "text-gray-900" : "text-gray-400"}
-                ${isSelected ? "bg-blue-600 text-white" : day.isSelectable ? "hover:bg-gray-100" : "opacity-40 cursor-not-allowed"}
+                ${
+                  isSelected
+                    ? "bg-blue-600 text-white"
+                    : day.isSelectable
+                    ? "hover:bg-gray-100"
+                    : "opacity-40 cursor-not-allowed"
+                }
                 ${isTodayDate && !isSelected ? "border-2 border-blue-500" : ""}
               `}
             >
