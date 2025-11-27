@@ -14,6 +14,7 @@ const OnlineAppointments = () => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [confirmDate, setConfirmDate] = useState("");
   const [confirmTime, setConfirmTime] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // FETCH APPOINTMENTS
   const { data, isLoading, isError, refetch } = useGetOnlineAppointmentsQuery({
@@ -378,7 +379,14 @@ const OnlineAppointments = () => {
       {/* CONFIRM SLOT MODAL */}
       {showConfirmModal && (
         <div className="fixed inset-0 bg-[#0000007d] flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 relative">
+            {/* Loader Overlay */}
+            {loading && (
+              <div className="absolute inset-0 bg-white/70 flex justify-center items-center rounded-lg z-10">
+                <div className="animate-spin h-8 w-8 border-4 border-green-600 border-t-transparent rounded-full"></div>
+              </div>
+            )}
+
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Confirm Appointment Slot
             </h3>
@@ -400,6 +408,7 @@ const OnlineAppointments = () => {
                   onChange={(e) => setConfirmDate(e.target.value)}
                   min={new Date().toISOString().split("T")[0]}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  disabled={loading}
                 />
               </div>
 
@@ -411,6 +420,7 @@ const OnlineAppointments = () => {
                   value={confirmTime}
                   onChange={(e) => setConfirmTime(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  disabled={loading}
                 >
                   <option value="">Select time...</option>
                   {timeSlots.map((time) => (
@@ -425,20 +435,33 @@ const OnlineAppointments = () => {
             <div className="flex space-x-3 mt-6">
               <button
                 onClick={() => {
-                  setShowConfirmModal(false);
+                  if (!loading) {
+                    setShowConfirmModal(false);
+                    setConfirmDate("");
+                    setConfirmTime("");
+                    setSelectedAppointment(null);
+                  }
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                disabled={loading}
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={async () => {
+                  setLoading(true);
+                  await handleConfirmSubmit(); // existing API logic
+                  setLoading(false);
+                  setShowConfirmModal(false); // auto-close
                   setConfirmDate("");
                   setConfirmTime("");
                   setSelectedAppointment(null);
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-70"
+                disabled={loading}
               >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmSubmit}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                Confirm Slot
+                {loading ? "Processing..." : "Confirm Slot"}
               </button>
             </div>
           </div>
