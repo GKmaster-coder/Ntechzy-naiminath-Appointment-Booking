@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import BackButton from "../components/BackButton";
-import { CaseForm } from "../components/caseForm";
+import OfflineCaseForm from "../components/offlineCaseForm/OfflineCaseForm";
 
 export default function OfflineDetailsPage() {
   const { state } = useLocation();
@@ -11,16 +11,25 @@ export default function OfflineDetailsPage() {
 
   const translations = {
     noDataFound: "No data found. / कोई डेटा नहीं मिला।",
-    completeCaseInfo: "Complete Case Information / पूर्ण केस जानकारी",
-    provideCaseDetails:
-      "Please provide your case details before continuing. / कृपया जारी रखने से पहले अपनी केस जानकारी प्रदान करें।",
-    continueToPayment: "Continue to Payment / भुगतान पर जारी रखें",
-    pleaseCompleteForm:
-      "Please complete the case form before proceeding to payment. / कृपया भुगतान के लिए आगे बढ़ने से पहले केस फॉर्म पूरा करें।",
+    completeCaseInfo: "Complete Case Information",
+    provideCaseDetails: "Please provide your case details before continuing.",
+    continueToPayment: "Continue to Payment",
+    pleaseCompleteForm: "Please complete the case form before proceeding to payment.",
   };
 
-  if (!state)
-    return <div className="p-8 text-center">{translations.noDataFound}</div>;
+  if (!state) return (
+    <div className="min-h-screen bg-linear-to-br from-[#e6e2ff] via-[#d8f0ff] to-[#7ddfff] flex items-center justify-center p-4">
+      <div className="text-center">
+        <div className="text-gray-500 text-lg mb-2">{translations.noDataFound}</div>
+        <button 
+          onClick={() => navigate(-1)}
+          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+        >
+          Go Back
+        </button>
+      </div>
+    </div>
+  );
 
   const handleNext = () => {
     if (!isFormComplete) {
@@ -30,69 +39,135 @@ export default function OfflineDetailsPage() {
     navigate("/payment", { state: { ...state, formData } });
   };
 
-  const handleFormComplete = (complete) => setIsFormComplete(complete);
+  const handleFormComplete = (complete) => {
+    setIsFormComplete(complete);
+    console.log('Form completion status:', complete);
+  };
+
   const handleFormSubmit = (submittedFormData) => {
+    console.log('Form submitted with data:', submittedFormData);
     setFormData(submittedFormData);
     setIsFormComplete(true);
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-[#e6e2ff] via-[#d8f0ff] to-[#7ddfff] py-6 px-4 sm:px-6 lg:px-12">
-      <div className="mb-6">
-        <BackButton />
+    <div className="min-h-screen bg-linear-to-br from-[#e6e2ff] via-[#d8f0ff] to-[#7ddfff] py-4 px-4 sm:px-6 lg:px-8">
+      {/* Header */}
+      <div className="max-w-4xl mx-auto mb-6">
+        <div className="flex items-center justify-between">
+          <BackButton />
+          <div className="text-sm text-gray-600">
+            Step 2 of 3
+          </div>
+        </div>
       </div>
 
-      <div className="max-w-4xl mx-auto bg-white border border-gray-200 rounded-xl shadow-md p-4 sm:p-6 lg:p-8">
-        {/* ✅ Appointment Summary Header */}
-        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-5 shadow-sm">
-          <h2 className="text-lg sm:text-xl font-semibold text-blue-800 mb-3 text-center">
-            Appointment Details / अपॉइंटमेंट विवरण
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-            <div className="bg-white border border-blue-200 rounded-md p-3 shadow-sm">
-              <p className="text-xs text-gray-500">Mode / तरीका</p>
-              <p className="font-semibold text-gray-900">Offline</p>
+      <div className="max-w-4xl mx-auto">
+        {/* Appointment Card */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+            Appointment Summary
+          </h1>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="text-center p-4 bg-blue-50 rounded-xl">
+              <div className="text-xs font-medium text-blue-600 mb-1">MODE</div>
+              <div className="text-lg font-semibold text-gray-900">Offline</div>
             </div>
-
-            <div className="bg-white border border-blue-200 rounded-md p-3 shadow-sm">
-              <p className="text-xs text-gray-500">Date / तिथि</p>
-              <p className="font-semibold text-gray-900">
+            
+            <div className="text-center p-4 bg-blue-50 rounded-xl">
+              <div className="text-xs font-medium text-blue-600 mb-1">DATE</div>
+              <div className="text-lg font-semibold text-gray-900">
                 {state.selectedSlot?.dateFormatted || "Not Selected"}
-              </p>
+              </div>
             </div>
-
-            {/* Time Slot */}
-            <div className="bg-white border border-blue-200 rounded-md p-3 shadow-sm">
-              <p className="text-xs text-gray-500">Time Slot / समय</p>
-              <p className="font-semibold text-gray-900">
+            
+            <div className="text-center p-4 bg-blue-50 rounded-xl">
+              <div className="text-xs font-medium text-blue-600 mb-1">TIME</div>
+              <div className="text-lg font-semibold text-gray-900">
                 {state.selectedSlot?.time || "Not Selected"}
-              </p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* ✅ Case Form */}
-        <CaseForm
-          onFormComplete={handleFormComplete}
-          onFormSubmit={handleFormSubmit}
-          isFormComplete={isFormComplete}
-        />
+        {/* Case Form Section */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <div className="text-center mb-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-2">
+              {translations.completeCaseInfo}
+            </h2>
+            <p className="text-gray-600 text-sm">
+              {translations.provideCaseDetails}
+            </p>
+          </div>
 
-        {/* ✅ Continue Button */}
-        <div className="mt-6 flex justify-center">
+          {/* Case Form */}
+          <OfflineCaseForm
+            onFormComplete={handleFormComplete}
+            onFormSubmit={handleFormSubmit}
+            isFormComplete={isFormComplete}
+          />
+        </div>
+
+        {/* Action Section */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          {/* Status Indicator */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center">
+              {isFormComplete ? (
+                <>
+                  <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                  <span className="text-green-700 font-medium text-sm">
+                    Form Complete - Ready to proceed
+                  </span>
+                </>
+              ) : (
+                <>
+                  <div className="w-3 h-3 bg-yellow-500 rounded-full mr-3 animate-pulse"></div>
+                  <span className="text-yellow-700 font-medium text-sm">
+                    Please complete the form above
+                  </span>
+                </>
+              )}
+            </div>
+            
+            <div className="text-xs text-gray-500">
+              {isFormComplete ? "✓ All set" : "Required"}
+            </div>
+          </div>
+
+          {/* Continue Button */}
           <button
             onClick={handleNext}
             disabled={!isFormComplete}
-            className={`w-full max-w-xs py-3 rounded-md font-semibold transition
-              ${
-                isFormComplete
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "bg-gray-300 text-gray-600 cursor-not-allowed"
-              }`}
+            className={`
+              w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200
+              flex items-center justify-center
+              ${isFormComplete
+                ? "bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0"
+                : "bg-gray-100 text-gray-400 cursor-not-allowed"
+              }
+            `}
           >
-            {translations.continueToPayment}
+            {isFormComplete ? (
+              <>
+                <span>{translations.continueToPayment}</span>
+                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </>
+            ) : (
+              translations.continueToPayment
+            )}
           </button>
+
+          {/* Help Text */}
+          <div className="text-center mt-4">
+            <p className="text-xs text-gray-500">
+              Your information is secure and confidential
+            </p>
+          </div>
         </div>
       </div>
     </div>

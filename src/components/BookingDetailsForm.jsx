@@ -231,25 +231,6 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
             {translations.pleaseFillDetails}
           </p>
 
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-medium text-blue-800">
-                {userId
-                  ? translations.updateAppointment
-                  : translations.newAppointment}
-              </span>
-              {userId && (
-                <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
-                  User ID: {userId}
-                </span>
-              )}
-              {isUserLoading && (
-                <span className="text-xs text-blue-600">
-                  {translations.loadingUser}
-                </span>
-              )}
-            </div>
-          </div>
 
           {serverErrors.length > 0 && (
             <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
