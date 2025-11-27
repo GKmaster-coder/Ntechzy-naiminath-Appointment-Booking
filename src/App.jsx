@@ -13,6 +13,8 @@ import OnlineConfirmationPage from "./pages/OnlineConfirmationPage";
 import ScrollToTop from "./components/ScrollToTop";
 import OrderDetailsPage from "./pages/OrderDetailsPage";
 import AdminLogin from "./pages/AdminLogin";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ProtectedRoute = ({ children }) => {
   const { token } = useSelector((state) => state.admin);
@@ -32,6 +34,15 @@ function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <ToastContainer
+        position="top-right"
+        autoClose={2500}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        pauseOnHover
+        theme="light"
+      />
 
       <Routes>
         {/* Public Routes */}

@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import {
   useAdminLoginMutation,
 } from "../api/endpoints/auth";
+import { toast } from "react-toastify";
+
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -34,11 +36,18 @@ const AdminLogin = () => {
         })
       );
 
+      toast.success("Login successful...");
+
       navigate("/admin-dashboard");
     } catch (error) {
-      setErrorMsg(error?.data?.message || "Login failed. Please try again.");
+      const msg = error?.data?.message || "Login failed. Please try again.";
+
+      setErrorMsg(msg);
+
+      toast.error(msg);
     }
   };
+
 
 
 
@@ -47,7 +56,7 @@ const AdminLogin = () => {
       {/* MAIN LOGIN PAGE */}
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <div className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8">
-          
+
           {/* Header */}
           <div className="text-center mb-6">
             <div className="w-16 h-16 bg-blue-500 mx-auto rounded-full flex items-center justify-center">

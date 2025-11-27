@@ -1,6 +1,7 @@
 // src/components/OfflineAppointments.jsx
 import React, { useState } from "react";
 import { useDisableSlotMutation, useAddSlotMutation } from "../../api/endpoints/slots";
+import { toast } from "react-toastify";
 
 const OfflineAppointments = () => {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -104,7 +105,7 @@ const OfflineAppointments = () => {
     try {
       const timeToUse = slot || customTime;
       if (!timeToUse) {
-        alert('Please enter a time or select a slot');
+        toast.warn("Please enter a time or select a slot");
         return;
       }
 
@@ -114,11 +115,12 @@ const OfflineAppointments = () => {
         capacity: capacity
       }).unwrap();
 
-      alert(res.message || 'Slot added successfully!');
+     toast.success(res.message || "Slot added successfully!");
       setCustomTime('');
     } catch (error) {
       console.error('Failed to add slot:', error);
-      alert(error?.data?.message || 'Failed to add slot');
+      toast.error(error?.data?.message || "Failed to add slot");
+
     }
   };
 
@@ -162,10 +164,10 @@ const OfflineAppointments = () => {
         return { ...prev, [selectedDate]: updated };
       });
 
-      alert(res.message || 'Slot disabled successfully!');
+     toast.success(res.message || "Slot disabled successfully!");
     } catch (error) {
       console.error('Failed to disable slot:', error);
-      alert(error?.data?.message || 'Failed to disable slot');
+      toast.error(error?.data?.message || "Failed to disable slot");
     }
   };
 

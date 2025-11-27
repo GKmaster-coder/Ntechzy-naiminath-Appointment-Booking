@@ -8,6 +8,7 @@ import {
 import { INITIAL_FORM_DATA, TOTAL_STEPS } from '../constants/formConfig';
 import { validateStep, validateAllSteps } from '../utils/formValidation';
 import { transformToBackendFormat } from '../utils/dataTransform';
+import { toast } from "react-toastify";
 
 export const useCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: externalIsFormComplete }) => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -164,13 +165,13 @@ export const useCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: exte
         setSubmitted(true);
         onFormComplete && onFormComplete(true);
         onFormSubmit && onFormSubmit(backendData);
-        alert('Form submitted successfully!');
+       toast.success("Form submitted successfully!");
       } else {
         throw new Error(result.message || 'Failed to submit appointment');
       }
     } catch (error) {
       console.error('Failed to submit appointment:', error);
-      alert(`Failed to submit form. Please try again.\nError: ${error.message}`);
+     toast.error(`Failed to submit form. Please try again. Error: ${error.message}`);
     }
   };
 
@@ -203,11 +204,12 @@ export const useCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: exte
         setIsFormComplete(true);
         setSubmitted(true);
         onFormComplete && onFormComplete(true);
-        alert('Form updated successfully!');
+        
+toast.success("Form updated successfully!");
       }
     } catch (error) {
       console.error('Failed to update appointment:', error);
-      alert(`Failed to submit form. Please try again.\nError: ${error.message}`);
+      toast.error(`Failed to submit form. Please try again. Error: ${error.message}`);
     }
   };
 

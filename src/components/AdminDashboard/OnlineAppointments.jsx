@@ -4,6 +4,7 @@ import {
   useCancelOnlineAppointmentMutation,
   useConfirmOnlineAppointmentMutation,
 } from "../../api/endpoints/appointments";
+import { toast } from "react-toastify";
 
 const OnlineAppointments = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -35,10 +36,10 @@ const OnlineAppointments = () => {
 
     try {
       const res = await cancelAppointment(appointmentId).unwrap();
-      alert(res.message);
+      toast.success(res.message);
       refetch();
     } catch (err) {
-      alert(err?.data?.message || "Failed to cancel appointment");
+     toast.error(err?.data?.message || "Failed to cancel appointment");
     }
   };
 
@@ -49,7 +50,7 @@ const OnlineAppointments = () => {
 
   const handleConfirmSubmit = async () => {
     if (!confirmDate || !confirmTime) {
-      alert("Please select both date and time");
+      toast.warn("Please select both date and time");
       return;
     }
 
@@ -60,14 +61,14 @@ const OnlineAppointments = () => {
         time: confirmTime
       }).unwrap();
       
-      alert(res.message || "Appointment confirmed successfully!");
+     toast.success(res.message || "Appointment confirmed successfully!");
       setShowConfirmModal(false);
       setConfirmDate("");
       setConfirmTime("");
       setSelectedAppointment(null);
       refetch();
     } catch (err) {
-      alert(err?.data?.message || "Failed to confirm appointment");
+      toast.error(err?.data?.message || "Failed to confirm appointment");
     }
   };
 
