@@ -1,5 +1,5 @@
-import React from 'react';
-import { translations } from '../constants/translations';
+import React from "react";
+import { translations } from "../constants/translations";
 
 const Step3IllnessHistory = ({ formData, onNestedInputChange }) => {
   return (
@@ -20,7 +20,9 @@ const Step3IllnessHistory = ({ formData, onNestedInputChange }) => {
             <input
               type="text"
               value={formData.illnessHistory[illness]}
-              onChange={(e) => onNestedInputChange('illnessHistory', illness, e.target.value)}
+              onChange={(e) =>
+                onNestedInputChange("illnessHistory", illness, e.target.value)
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
               placeholder={translations.illnessPlaceholder}
             />

@@ -1,17 +1,21 @@
-import React from 'react';
-import { useCaseForm } from './hooks/useCaseForm';
-import { translations } from './constants/translations';
-import FormHeader from './common/FormHeader';
-import FormNavigation from './common/FormNavigation';
-import FormSuccess from './common/FormSuccess';
-import Step1LifeEvents from './steps/Step1LifeEvents';
-import Step2EarlyDevelopment from './steps/Step2EarlyDevelopment';
-import Step3IllnessHistory from './steps/Step3IllnessHistory';
-import Step4RecurringIssues from './steps/Step4RecurringIssues';
-import Step5Symptoms from './steps/Step5Symptoms';
-import Step6FamilyHistory from './steps/Step6FamilyHistory';
+import React from "react";
+import { useCaseForm } from "./hooks/useCaseForm";
+import { translations } from "./constants/translations";
+import FormHeader from "./common/FormHeader";
+import FormNavigation from "./common/FormNavigation";
+import FormSuccess from "./common/FormSuccess";
+import Step1LifeEvents from "./steps/Step1LifeEvents";
+import Step2EarlyDevelopment from "./steps/Step2EarlyDevelopment";
+import Step3IllnessHistory from "./steps/Step3IllnessHistory";
+import Step4RecurringIssues from "./steps/Step4RecurringIssues";
+import Step5Symptoms from "./steps/Step5Symptoms";
+import Step6FamilyHistory from "./steps/Step6FamilyHistory";
 
-const CompleteCaseFormOptimized = ({ onFormComplete, onFormSubmit, isFormComplete: externalIsFormComplete }) => {
+const CompleteCaseFormOptimized = ({
+  onFormComplete,
+  onFormSubmit,
+  isFormComplete: externalIsFormComplete,
+}) => {
   const {
     // State
     currentStep,
@@ -22,12 +26,12 @@ const CompleteCaseFormOptimized = ({ onFormComplete, onFormSubmit, isFormComplet
     formData,
     isLoading,
     error,
-    
+
     // Computed values
     isCurrentStepValid,
     isAllValid,
     progressPercentage,
-    
+
     // Handlers
     handleInputChange,
     handleNestedInputChange,
@@ -37,8 +41,12 @@ const CompleteCaseFormOptimized = ({ onFormComplete, onFormSubmit, isFormComplet
     handleEditForm,
     handleSaveEdit,
     nextStep,
-    prevStep
-  } = useCaseForm({ onFormComplete, onFormSubmit, isFormComplete: externalIsFormComplete });
+    prevStep,
+  } = useCaseForm({
+    onFormComplete,
+    onFormSubmit,
+    isFormComplete: externalIsFormComplete,
+  });
 
   // Show completion screen only after a successful submit
   if (submitted && isFormComplete && !isEditing) {
@@ -52,7 +60,7 @@ const CompleteCaseFormOptimized = ({ onFormComplete, onFormSubmit, isFormComplet
       onInputChange: handleInputChange,
       onNestedInputChange: handleNestedInputChange,
       onCheckboxChange: handleCheckboxChange,
-      onFamilyHealthChange: handleFamilyHealthChange
+      onFamilyHealthChange: handleFamilyHealthChange,
     };
 
     switch (currentStep) {

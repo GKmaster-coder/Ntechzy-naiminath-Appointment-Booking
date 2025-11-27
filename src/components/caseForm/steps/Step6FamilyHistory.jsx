@@ -1,6 +1,6 @@
-import React from 'react';
-import { translations } from '../constants/translations';
-import { FAMILY_RELATIONS } from '../constants/formConfig';
+import React from "react";
+import { translations } from "../constants/translations";
+import { FAMILY_RELATIONS } from "../constants/formConfig";
 
 const Step6FamilyHistory = ({ formData = {}, onFamilyHealthChange }) => {
   const familyHealth = formData.familyHealth || {};
@@ -35,15 +35,24 @@ const Step6FamilyHistory = ({ formData = {}, onFamilyHealthChange }) => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {FAMILY_RELATIONS.map((relation, index) => (
-                  <tr key={relation} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                  <tr
+                    key={relation}
+                    className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+                  >
                     <td className="px-2 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900 border-r">
-                      {translations[relation]?.split(' / ')[0] || relation}
+                      {translations[relation]?.split(" / ")[0] || relation}
                     </td>
                     <td className="px-2 sm:px-4 py-2 whitespace-nowrap border-r">
                       <input
                         type="text"
-                        value={familyHealth[relation]?.ageAlive || ''}
-                        onChange={(e) => onFamilyHealthChange(relation, 'ageAlive', e.target.value)}
+                        value={familyHealth[relation]?.ageAlive || ""}
+                        onChange={(e) =>
+                          onFamilyHealthChange(
+                            relation,
+                            "ageAlive",
+                            e.target.value
+                          )
+                        }
                         className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-600 text-xs sm:text-sm"
                         placeholder={translations.agePlaceholder}
                       />
@@ -51,8 +60,14 @@ const Step6FamilyHistory = ({ formData = {}, onFamilyHealthChange }) => {
                     <td className="px-2 sm:px-4 py-2 whitespace-nowrap border-r">
                       <input
                         type="text"
-                        value={familyHealth[relation]?.agePassing || ''}
-                        onChange={(e) => onFamilyHealthChange(relation, 'agePassing', e.target.value)}
+                        value={familyHealth[relation]?.agePassing || ""}
+                        onChange={(e) =>
+                          onFamilyHealthChange(
+                            relation,
+                            "agePassing",
+                            e.target.value
+                          )
+                        }
                         className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-600 text-xs sm:text-sm"
                         placeholder={translations.agePlaceholder}
                       />
@@ -60,8 +75,14 @@ const Step6FamilyHistory = ({ formData = {}, onFamilyHealthChange }) => {
                     <td className="px-2 sm:px-4 py-2">
                       <input
                         type="text"
-                        value={familyHealth[relation]?.ailments || ''}
-                        onChange={(e) => onFamilyHealthChange(relation, 'ailments', e.target.value)}
+                        value={familyHealth[relation]?.ailments || ""}
+                        onChange={(e) =>
+                          onFamilyHealthChange(
+                            relation,
+                            "ailments",
+                            e.target.value
+                          )
+                        }
                         className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-600 text-xs sm:text-sm"
                         placeholder={translations.ailmentsPlaceholder}
                       />

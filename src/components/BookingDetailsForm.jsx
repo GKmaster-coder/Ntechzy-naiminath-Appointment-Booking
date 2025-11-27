@@ -3,7 +3,11 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
 import ServiceInfo from "../components/ServiceInfo";
-import { useCreateUserMutation, useUpdateUserMutation, useGetUserQuery } from "../store/api/userApi";
+import {
+  useCreateUserMutation,
+  useUpdateUserMutation,
+  useGetUserQuery,
+} from "../store/api/userApi";
 import {
   storeUserIdForFuture,
   getStoredUserId,
@@ -11,7 +15,7 @@ import {
   getStoredUserData,
   clearStoredUserData,
   clearUserDataOnly,
-  setUserId
+  setUserId,
 } from "../store/slices/userSlice";
 
 const BookingDetailsForm = ({ selectedType, onSubmit }) => {
@@ -24,13 +28,17 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
   const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
 
-  const { data: fetchedUserData, isLoading: isUserLoading } = useGetUserQuery(userId, {
-    skip: !userId || !!userData, // Skip if no userId or userData already exists
-  });
+  const { data: fetchedUserData, isLoading: isUserLoading } = useGetUserQuery(
+    userId,
+    {
+      skip: !userId || !!userData, // Skip if no userId or userData already exists
+    }
+  );
 
   const translations = {
     yourBasicDetails: "Your Basic Details / आपका बुनियादी विवरण",
-    pleaseFillDetails: "Please fill your details carefully / कृपया अपना विवरण ध्यान से भरें",
+    pleaseFillDetails:
+      "Please fill your details carefully / कृपया अपना विवरण ध्यान से भरें",
     fullName: "Full Name * / पूरा नाम *",
     mobileNumber: "Mobile Number * / मोबाइल नंबर *",
     emailAddress: "Email Address (Optional) / ईमेल पता (वैकल्पिक)",
@@ -41,14 +49,20 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
     online: "Online / ऑनलाइन",
     offline: "Offline / ऑफलाइन",
     continue: "Continue → / जारी रखें →",
-    onlyLettersSpaces: "Only letters and spaces allowed / केवल अक्षर और रिक्त स्थान अनुमत हैं",
-    validFullName: "Full name must be between 2 and 100 characters / पूरा नाम 2 से 100 अक्षरों के बीच होना चाहिए",
+    onlyLettersSpaces:
+      "Only letters and spaces allowed / केवल अक्षर और रिक्त स्थान अनुमत हैं",
+    validFullName:
+      "Full name must be between 2 and 100 characters / पूरा नाम 2 से 100 अक्षरों के बीच होना चाहिए",
     nameRequired: "Name is required / नाम आवश्यक है",
-    validIndianNumber: "Must be a valid 10-digit Indian number / एक वैध 10-अंकीय भारतीय नंबर होना चाहिए",
+    validIndianNumber:
+      "Must be a valid 10-digit Indian number / एक वैध 10-अंकीय भारतीय नंबर होना चाहिए",
     phoneRequired: "Phone number is required / फोन नंबर आवश्यक है",
-    invalidEmail: "Please provide a valid email / कृपया एक वैध ईमेल प्रदान करें",
-    chooseConsultation: "Please choose Online or Offline consultation / कृपया ऑनलाइन या ऑफलाइन परामर्श चुनें",
-    verifyingDetails: "Verifying your details... / आपका विवरण सत्यापित किया जा रहा है...",
+    invalidEmail:
+      "Please provide a valid email / कृपया एक वैध ईमेल प्रदान करें",
+    chooseConsultation:
+      "Please choose Online or Offline consultation / कृपया ऑनलाइन या ऑफलाइन परामर्श चुनें",
+    verifyingDetails:
+      "Verifying your details... / आपका विवरण सत्यापित किया जा रहा है...",
     creatingUser: "Creating booking... / बुकिंग बनाई जा रही है...",
     updatingUser: "Updating booking... / बुकिंग अपडेट की जा रही है...",
     loadingUser: "Loading user data... / उपयोगकर्ता डेटा लोड हो रहा है...",
@@ -91,7 +105,7 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
     initialValues: {
       name: "",
       phone: "",
-      email: ""
+      email: "",
     },
     validationSchema: Yup.object({
       name: Yup.string()
@@ -106,12 +120,12 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
         .email(translations.invalidEmail)
         .notRequired()
         .nullable()
-        .transform((value) => value === '' ? null : value),
+        .transform((value) => (value === "" ? null : value)),
     }),
     onSubmit: async (values, { setSubmitting }) => {
       try {
         setServerErrors([]);
-        
+
         // If we have userId and userData, skip API call and proceed directly
         if (userId && userData) {
           onSubmit({
@@ -136,12 +150,12 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
         let result;
         if (userId) {
           // Only update if data has actually changed
-          const hasChanges = 
+          const hasChanges =
             userData?.fullName !== values.name.trim() ||
             userData?.mobile !== values.phone ||
-            userData?.email !== (values.email?.trim() || '') ||
+            userData?.email !== (values.email?.trim() || "") ||
             userData?.mode !== selectedMode.toLowerCase();
-            
+
           if (hasChanges) {
             result = await updateUser({ id: userId, ...userPayload }).unwrap();
             if (result.success) {
@@ -199,7 +213,8 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
     }
   };
 
-  const isLoading = isCreating || isUpdating || formik.isSubmitting || isUserLoading;
+  const isLoading =
+    isCreating || isUpdating || formik.isSubmitting || isUserLoading;
 
   return (
     <div className="w-full max-w-6xl mx-auto py-6 px-3 sm:px-6 lg:px-8">
@@ -212,12 +227,16 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
             {translations.yourBasicDetails}
           </h1>
-          <p className="text-gray-500 text-sm mt-1">{translations.pleaseFillDetails}</p>
+          <p className="text-gray-500 text-sm mt-1">
+            {translations.pleaseFillDetails}
+          </p>
 
 
           {serverErrors.length > 0 && (
             <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <h3 className="text-sm font-medium text-red-800 mb-2">Please fix the following errors:</h3>
+              <h3 className="text-sm font-medium text-red-800 mb-2">
+                Please fix the following errors:
+              </h3>
               <ul className="text-xs text-red-700 list-disc list-inside">
                 {serverErrors.map((error, index) => (
                   <li key={index}>{error.msg || error.message}</li>
@@ -229,27 +248,42 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
           <form onSubmit={formik.handleSubmit} className="mt-6 space-y-5">
             {/* Full Name */}
             <div>
-              <label className="text-sm font-medium text-gray-800">{translations.fullName}</label>
+              <label className="text-sm font-medium text-gray-800">
+                {translations.fullName}
+              </label>
               <input
                 name="name"
                 value={formik.values.name}
                 onChange={handleInputChange}
                 onBlur={formik.handleBlur}
                 disabled={isLoading}
-                className={`mt-1 w-full rounded-lg border px-4 py-3 text-sm focus:ring-2 transition ${formik.touched.name && formik.errors.name ? "border-red-400 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
-                  } ${isLoading ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                className={`mt-1 w-full rounded-lg border px-4 py-3 text-sm focus:ring-2 transition ${
+                  formik.touched.name && formik.errors.name
+                    ? "border-red-400 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-blue-500"
+                } ${isLoading ? "bg-gray-100 cursor-not-allowed" : ""}`}
                 placeholder={translations.enterFullName}
               />
               {formik.touched.name && formik.errors.name && (
-                <p className="text-xs text-red-500 mt-1">{formik.errors.name}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {formik.errors.name}
+                </p>
               )}
             </div>
 
             {/* Phone */}
             <div>
-              <label className="text-sm font-medium text-gray-800">{translations.mobileNumber}</label>
-              <div className={`mt-1 flex items-center rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 ${isLoading ? "bg-gray-100" : ""}`}>
-                <span className="px-3 sm:px-4 py-3 bg-gray-100 border-r text-gray-700 text-sm font-medium">+91</span>
+              <label className="text-sm font-medium text-gray-800">
+                {translations.mobileNumber}
+              </label>
+              <div
+                className={`mt-1 flex items-center rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 ${
+                  isLoading ? "bg-gray-100" : ""
+                }`}
+              >
+                <span className="px-3 sm:px-4 py-3 bg-gray-100 border-r text-gray-700 text-sm font-medium">
+                  +91
+                </span>
                 <input
                   name="phone"
                   value={formik.values.phone}
@@ -262,13 +296,17 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
                 />
               </div>
               {formik.touched.phone && formik.errors.phone && (
-                <p className="text-xs text-red-500 mt-1">{formik.errors.phone}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {formik.errors.phone}
+                </p>
               )}
             </div>
 
             {/* Email */}
             <div>
-              <label className="text-sm font-medium text-gray-800">{translations.emailAddress}</label>
+              <label className="text-sm font-medium text-gray-800">
+                {translations.emailAddress}
+              </label>
               <input
                 name="email"
                 type="email"
@@ -276,25 +314,35 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
                 onChange={handleInputChange}
                 onBlur={formik.handleBlur}
                 disabled={isLoading}
-                className={`mt-1 w-full rounded-lg border px-4 py-3 text-sm focus:ring-2 transition ${formik.touched.email && formik.errors.email ? "border-red-400 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
-                  } ${isLoading ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                className={`mt-1 w-full rounded-lg border px-4 py-3 text-sm focus:ring-2 transition ${
+                  formik.touched.email && formik.errors.email
+                    ? "border-red-400 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-blue-500"
+                } ${isLoading ? "bg-gray-100 cursor-not-allowed" : ""}`}
                 placeholder={translations.emailPlaceholder}
               />
               {formik.touched.email && formik.errors.email && (
-                <p className="text-xs text-red-500 mt-1">{formik.errors.email}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {formik.errors.email}
+                </p>
               )}
             </div>
 
             {/* Consultation Mode */}
             <div>
-              <p className="text-sm font-medium text-gray-800 mb-2">{translations.consultationMode}</p>
+              <p className="text-sm font-medium text-gray-800 mb-2">
+                {translations.consultationMode}
+              </p>
               <div className="flex flex-col sm:flex-row rounded-lg border border-gray-300 overflow-hidden">
                 <button
                   type="button"
                   onClick={() => handleModeSelection("Online")}
                   disabled={isLoading}
-                  className={`w-full sm:w-1/2 py-3 text-sm font-semibold transition border-b sm:border-b-0 sm:border-r border-gray-300 ${selectedMode === "Online" ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50"
-                    } ${isLoading ? "cursor-not-allowed opacity-50" : ""}`}
+                  className={`w-full sm:w-1/2 py-3 text-sm font-semibold transition border-b sm:border-b-0 sm:border-r border-gray-300 ${
+                    selectedMode === "Online"
+                      ? "bg-blue-600 text-white"
+                      : "bg-white text-gray-700 hover:bg-gray-50"
+                  } ${isLoading ? "cursor-not-allowed opacity-50" : ""}`}
                 >
                   {translations.online}
                 </button>
@@ -302,24 +350,36 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
                   type="button"
                   onClick={() => handleModeSelection("Offline")}
                   disabled={isLoading}
-                  className={`w-full sm:w-1/2 py-3 text-sm font-semibold transition ${selectedMode === "Offline" ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50"
-                    } ${isLoading ? "cursor-not-allowed opacity-50" : ""}`}
+                  className={`w-full sm:w-1/2 py-3 text-sm font-semibold transition ${
+                    selectedMode === "Offline"
+                      ? "bg-blue-600 text-white"
+                      : "bg-white text-gray-700 hover:bg-gray-50"
+                  } ${isLoading ? "cursor-not-allowed opacity-50" : ""}`}
                 >
                   {translations.offline}
                 </button>
               </div>
               {!selectedMode && formik.submitCount > 0 && (
-                <p className="text-xs text-red-500 mt-1">{translations.chooseConsultation}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {translations.chooseConsultation}
+                </p>
               )}
             </div>
 
             <button
               type="submit"
               disabled={!selectedMode || isLoading}
-              className={`w-full py-3 rounded-lg text-white font-medium transition shadow-md mt-4 ${!selectedMode || isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-                }`}
+              className={`w-full py-3 rounded-lg text-white font-medium transition shadow-md mt-4 ${
+                !selectedMode || isLoading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700"
+              }`}
             >
-              {isLoading ? (userId ? translations.updatingUser : translations.creatingUser) : translations.continue}
+              {isLoading
+                ? userId
+                  ? translations.updatingUser
+                  : translations.creatingUser
+                : translations.continue}
             </button>
           </form>
         </div>

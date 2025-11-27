@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useState, useEffect, useMemo } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import {
   submitOnlineAppointment,
   setAppointmentSubmitted,
@@ -10,9 +10,15 @@ import { validateStep, validateAllSteps } from '../utils/formValidation';
 import { transformToBackendFormat } from '../utils/dataTransform';
 import { toast } from "react-toastify";
 
-export const useCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: externalIsFormComplete }) => {
+export const useCaseForm = ({
+  onFormComplete,
+  onFormSubmit,
+  isFormComplete: externalIsFormComplete,
+}) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [isFormComplete, setIsFormComplete] = useState(externalIsFormComplete || false);
+  const [isFormComplete, setIsFormComplete] = useState(
+    externalIsFormComplete || false
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
@@ -20,13 +26,24 @@ export const useCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: exte
 
   const dispatch = useDispatch();
   const userId = useSelector((state) => state.user.userId);
-  const { isLoading, error, isSubmitted } = useSelector((state) => state.onlineAppointment);
+  const { isLoading, error, isSubmitted } = useSelector(
+    (state) => state.onlineAppointment
+  );
 
   // Memoized validity flags
-  const currentStepErrors = useMemo(() => validateStep(currentStep, formData), [currentStep, formData]);
-  const isCurrentStepValid = useMemo(() => Object.keys(currentStepErrors).length === 0, [currentStepErrors]);
+  const currentStepErrors = useMemo(
+    () => validateStep(currentStep, formData),
+    [currentStep, formData]
+  );
+  const isCurrentStepValid = useMemo(
+    () => Object.keys(currentStepErrors).length === 0,
+    [currentStepErrors]
+  );
   const allErrors = useMemo(() => validateAllSteps(formData), [formData]);
-  const isAllValid = useMemo(() => Object.keys(allErrors).length === 0, [allErrors]);
+  const isAllValid = useMemo(
+    () => Object.keys(allErrors).length === 0,
+    [allErrors]
+  );
   const progressPercentage = (currentStep / TOTAL_STEPS) * 100;
 
   // Load stored data on mount
@@ -38,7 +55,7 @@ export const useCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: exte
           setFormData(storedData.payload);
         }
       } catch (error) {
-        console.log('No stored appointment data found');
+        console.log("No stored appointment data found");
       }
     };
     loadStoredData();
@@ -94,9 +111,9 @@ export const useCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: exte
           ...prev.symptoms,
           types: {
             ...prev.symptoms.types,
-            [field]: !prev.symptoms.types?.[field]
-          }
-        }
+            [field]: !prev.symptoms.types?.[field],
+          },
+        },
       }));
       return;
     }
@@ -129,14 +146,14 @@ export const useCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: exte
     if (Object.keys(stepErrors).length > 0) return;
     if (currentStep < TOTAL_STEPS) {
       setCurrentStep((s) => s + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep((s) => s - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -147,14 +164,19 @@ export const useCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: exte
     setErrors(errs);
 
     if (Object.keys(errs).length > 0) {
-      const firstInvalidStep = [1, 2, 3, 4, 5, 6].find((s) => Object.keys(validateStep(s, formData)).length > 0);
-      if (firstInvalidStep && firstInvalidStep !== currentStep) setCurrentStep(firstInvalidStep);
+      const firstInvalidStep = [1, 2, 3, 4, 5, 6].find(
+        (s) => Object.keys(validateStep(s, formData)).length > 0
+      );
+      if (firstInvalidStep && firstInvalidStep !== currentStep)
+        setCurrentStep(firstInvalidStep);
       return;
     }
 
     try {
       if (!userId) {
-        throw new Error('User ID not found. Please complete user registration first.');
+        throw new Error(
+          "User ID not found. Please complete user registration first."
+        );
       }
 
       const backendData = transformToBackendFormat(formData);
@@ -167,7 +189,7 @@ export const useCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: exte
         onFormSubmit && onFormSubmit(backendData);
        toast.success("Form submitted successfully!");
       } else {
-        throw new Error(result.message || 'Failed to submit appointment');
+        throw new Error(result.message || "Failed to submit appointment");
       }
     } catch (error) {
       console.error('Failed to submit appointment:', error);
@@ -186,18 +208,25 @@ export const useCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: exte
     setErrors(errs);
 
     if (Object.keys(errs).length > 0) {
-      const firstInvalidStep = [1, 2, 3, 4, 5, 6].find((s) => Object.keys(validateStep(s, formData)).length > 0);
-      if (firstInvalidStep && firstInvalidStep !== currentStep) setCurrentStep(firstInvalidStep);
+      const firstInvalidStep = [1, 2, 3, 4, 5, 6].find(
+        (s) => Object.keys(validateStep(s, formData)).length > 0
+      );
+      if (firstInvalidStep && firstInvalidStep !== currentStep)
+        setCurrentStep(firstInvalidStep);
       return;
     }
 
     try {
       if (!userId) {
-        throw new Error('User ID not found. Please complete user registration first.');
+        throw new Error(
+          "User ID not found. Please complete user registration first."
+        );
       }
 
       const backendData = transformToBackendFormat(formData);
-      const result = await dispatch(submitOnlineAppointment(backendData)).unwrap();
+      const result = await dispatch(
+        submitOnlineAppointment(backendData)
+      ).unwrap();
 
       if (result.success) {
         setIsEditing(false);
@@ -223,12 +252,12 @@ toast.success("Form updated successfully!");
     formData,
     isLoading,
     error,
-    
+
     // Computed values
     isCurrentStepValid,
     isAllValid,
     progressPercentage,
-    
+
     // Handlers
     handleInputChange,
     handleNestedInputChange,
@@ -238,6 +267,6 @@ toast.success("Form updated successfully!");
     handleEditForm,
     handleSaveEdit,
     nextStep,
-    prevStep
+    prevStep,
   };
 };

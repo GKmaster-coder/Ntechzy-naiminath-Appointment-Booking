@@ -5,13 +5,16 @@ import * as Yup from "yup";
 
 const MedicineOrderForm = () => {
   const [step, setStep] = useState(1);
-  const [medicineItems, setMedicineItems] = useState([{ id: 1, name: "", quantity: 1 }]);
+  const [medicineItems, setMedicineItems] = useState([
+    { id: 1, name: "", quantity: 1 },
+  ]);
 
   const translations = {
     orderMedicine: "Order Medicine / दवाई का ऑर्डर",
     patientDetails: "Patient & Medicine Details / मरीज और दवाई का विवरण",
     deliveryAddress: "Delivery Address / डिलीवरी का पता",
-    pleaseFillDetails: "Please fill the details carefully / कृपया विवरण ध्यानपूर्वक भरें",
+    pleaseFillDetails:
+      "Please fill the details carefully / कृपया विवरण ध्यानपूर्वक भरें",
     patientName: "Patient Name * / मरीज का नाम *",
     mobileNumber: "Mobile Number * / मोबाइल नंबर *",
     emailAddress: "Email Address (Optional) / ईमेल पता (वैकल्पिक)",
@@ -32,10 +35,13 @@ const MedicineOrderForm = () => {
     emailPlaceholder: "example@mail.com / उदाहरण@मेल.कॉम",
     enterMedicineName: "Enter medicine name / दवाई का नाम दर्ज करें",
     addressPlaceholder: "Enter your address / अपना पता दर्ज करें",
-    onlyLettersSpaces: "Only letters and spaces allowed / केवल अक्षर और रिक्त स्थान अनुमत हैं",
-    validFullName: "Please enter a valid full name / कृपया एक वैध पूरा नाम दर्ज करें",
+    onlyLettersSpaces:
+      "Only letters and spaces allowed / केवल अक्षर और रिक्त स्थान अनुमत हैं",
+    validFullName:
+      "Please enter a valid full name / कृपया एक वैध पूरा नाम दर्ज करें",
     nameRequired: "Patient name is required / मरीज का नाम आवश्यक है",
-    validIndianNumber: "Must be a valid 10-digit Indian number / एक वैध 10-अंकीय भारतीय नंबर होना चाहिए",
+    validIndianNumber:
+      "Must be a valid 10-digit Indian number / एक वैध 10-अंकीय भारतीय नंबर होना चाहिए",
     phoneRequired: "Phone number is required / फोन नंबर आवश्यक है",
     invalidEmail: "Invalid Email / अमान्य ईमेल",
     requiredField: "This field is required / यह फ़ील्ड आवश्यक है",
@@ -77,13 +83,18 @@ const MedicineOrderForm = () => {
         is: 2,
         then: (schema) =>
           schema
-            .matches(/^\d{6}$/, "Enter a valid 6-digit pincode / मान्य 6-अंकीय पिनकोड दर्ज करें")
+            .matches(
+              /^\d{6}$/,
+              "Enter a valid 6-digit pincode / मान्य 6-अंकीय पिनकोड दर्ज करें"
+            )
             .required(translations.requiredField),
       }),
     }),
     onSubmit: (values) => {
       if (step === 1) {
-        const hasEmptyMedicine = medicineItems.some((item) => !item.name.trim());
+        const hasEmptyMedicine = medicineItems.some(
+          (item) => !item.name.trim()
+        );
         if (hasEmptyMedicine) {
           alert("Please fill all medicine names / कृपया सभी दवाई के नाम भरें");
           return;
@@ -104,7 +115,10 @@ const MedicineOrderForm = () => {
   };
 
   const addMedicineItem = () => {
-    setMedicineItems([...medicineItems, { id: Date.now(), name: "", quantity: 1 }]);
+    setMedicineItems([
+      ...medicineItems,
+      { id: Date.now(), name: "", quantity: 1 },
+    ]);
   };
 
   const removeMedicineItem = (id) => {
@@ -114,12 +128,18 @@ const MedicineOrderForm = () => {
   };
 
   const updateMedicineName = (id, name) => {
-    setMedicineItems(medicineItems.map((item) => (item.id === id ? { ...item, name } : item)));
+    setMedicineItems(
+      medicineItems.map((item) => (item.id === id ? { ...item, name } : item))
+    );
   };
 
   const updateMedicineQuantity = (id, quantity) => {
     if (quantity < 1) return;
-    setMedicineItems(medicineItems.map((item) => (item.id === id ? { ...item, quantity } : item)));
+    setMedicineItems(
+      medicineItems.map((item) =>
+        item.id === id ? { ...item, quantity } : item
+      )
+    );
   };
 
   return (
@@ -127,7 +147,9 @@ const MedicineOrderForm = () => {
       <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">
         {translations.orderMedicine}
       </h1>
-      <p className="text-gray-500 text-sm text-center mb-6">{translations.pleaseFillDetails}</p>
+      <p className="text-gray-500 text-sm text-center mb-6">
+        {translations.pleaseFillDetails}
+      </p>
 
       <form onSubmit={formik.handleSubmit} className="space-y-6">
         {/* STEP 1: Patient & Medicine Details */}
@@ -151,7 +173,9 @@ const MedicineOrderForm = () => {
                 placeholder={translations.enterFullName}
               />
               {formik.touched.patientName && formik.errors.patientName && (
-                <p className="text-xs text-red-500 mt-1">{formik.errors.patientName}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {formik.errors.patientName}
+                </p>
               )}
             </div>
 
@@ -161,7 +185,9 @@ const MedicineOrderForm = () => {
                 {translations.mobileNumber}
               </label>
               <div className="flex mt-1 rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
-                <span className="px-3 py-3 bg-gray-100 text-gray-700 text-sm font-medium">+91</span>
+                <span className="px-3 py-3 bg-gray-100 text-gray-700 text-sm font-medium">
+                  +91
+                </span>
                 <input
                   name="phone"
                   value={formik.values.phone}
@@ -173,7 +199,9 @@ const MedicineOrderForm = () => {
                 />
               </div>
               {formik.touched.phone && formik.errors.phone && (
-                <p className="text-xs text-red-500 mt-1">{formik.errors.phone}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {formik.errors.phone}
+                </p>
               )}
             </div>
 
@@ -196,14 +224,18 @@ const MedicineOrderForm = () => {
                 placeholder={translations.emailPlaceholder}
               />
               {formik.touched.email && formik.errors.email && (
-                <p className="text-xs text-red-500 mt-1">{formik.errors.email}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {formik.errors.email}
+                </p>
               )}
             </div>
 
             {/* Medicine List */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-medium text-gray-800">{translations.medicineName}</p>
+                <p className="text-sm font-medium text-gray-800">
+                  {translations.medicineName}
+                </p>
                 <button
                   type="button"
                   onClick={addMedicineItem}
@@ -222,25 +254,37 @@ const MedicineOrderForm = () => {
                     <input
                       type="text"
                       value={item.name}
-                      onChange={(e) => updateMedicineName(item.id, e.target.value)}
+                      onChange={(e) =>
+                        updateMedicineName(item.id, e.target.value)
+                      }
                       className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
-                      placeholder={`${translations.enterMedicineName} ${index + 1}`}
+                      placeholder={`${translations.enterMedicineName} ${
+                        index + 1
+                      }`}
                     />
                     <div className="flex items-center gap-2">
-                      <label className="text-xs text-gray-600">{translations.quantity}</label>
+                      <label className="text-xs text-gray-600">
+                        {translations.quantity}
+                      </label>
                       <div className="flex items-center border border-gray-300 rounded-lg">
                         <button
                           type="button"
-                          onClick={() => updateMedicineQuantity(item.id, item.quantity - 1)}
+                          onClick={() =>
+                            updateMedicineQuantity(item.id, item.quantity - 1)
+                          }
                           className="px-3 py-1 text-blue-600 hover:bg-blue-50"
                           disabled={item.quantity <= 1}
                         >
                           -
                         </button>
-                        <span className="px-3 py-1 bg-gray-50 text-sm">{item.quantity}</span>
+                        <span className="px-3 py-1 bg-gray-50 text-sm">
+                          {item.quantity}
+                        </span>
                         <button
                           type="button"
-                          onClick={() => updateMedicineQuantity(item.id, item.quantity + 1)}
+                          onClick={() =>
+                            updateMedicineQuantity(item.id, item.quantity + 1)
+                          }
                           className="px-3 py-1 text-blue-600 hover:bg-blue-50"
                         >
                           +
@@ -291,7 +335,9 @@ const MedicineOrderForm = () => {
                 placeholder={translations.addressPlaceholder}
               />
               {formik.touched.addressLine1 && formik.errors.addressLine1 && (
-                <p className="text-xs text-red-500 mt-1">{formik.errors.addressLine1}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {formik.errors.addressLine1}
+                </p>
               )}
             </div>
 
@@ -326,7 +372,9 @@ const MedicineOrderForm = () => {
                   placeholder="Enter State / राज्य दर्ज करें"
                 />
                 {formik.touched.state && formik.errors.state && (
-                  <p className="text-xs text-red-500 mt-1">{formik.errors.state}</p>
+                  <p className="text-xs text-red-500 mt-1">
+                    {formik.errors.state}
+                  </p>
                 )}
               </div>
 
@@ -347,7 +395,9 @@ const MedicineOrderForm = () => {
                   placeholder="Enter District / जिला दर्ज करें"
                 />
                 {formik.touched.district && formik.errors.district && (
-                  <p className="text-xs text-red-500 mt-1">{formik.errors.district}</p>
+                  <p className="text-xs text-red-500 mt-1">
+                    {formik.errors.district}
+                  </p>
                 )}
               </div>
             </div>
@@ -369,7 +419,9 @@ const MedicineOrderForm = () => {
                 placeholder="Enter Pincode / पिनकोड दर्ज करें"
               />
               {formik.touched.pincode && formik.errors.pincode && (
-                <p className="text-xs text-red-500 mt-1">{formik.errors.pincode}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {formik.errors.pincode}
+                </p>
               )}
             </div>
 

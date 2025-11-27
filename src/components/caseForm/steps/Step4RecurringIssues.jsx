@@ -1,7 +1,12 @@
-import React from 'react';
-import { translations } from '../constants/translations';
+import React from "react";
+import { translations } from "../constants/translations";
 
-const Step4RecurringIssues = ({ formData = {}, errors = {}, onCheckboxChange, onNestedInputChange }) => {
+const Step4RecurringIssues = ({
+  formData = {},
+  errors = {},
+  onCheckboxChange,
+  onNestedInputChange,
+}) => {
   const recurringIssues = formData.recurringIssues || {};
   const vaccinationReactions = formData.vaccinationReactions || {};
   return (
@@ -16,11 +21,14 @@ const Step4RecurringIssues = ({ formData = {}, errors = {}, onCheckboxChange, on
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
           {Object.keys(recurringIssues).map((issue) => (
-            <label key={issue} className="flex items-center p-2 sm:p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition text-sm">
+            <label
+              key={issue}
+              className="flex items-center p-2 sm:p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition text-sm"
+            >
               <input
                 type="checkbox"
                 checked={recurringIssues[issue] || false}
-                onChange={() => onCheckboxChange('recurringIssues', issue)}
+                onChange={() => onCheckboxChange("recurringIssues", issue)}
                 className="form-checkbox text-blue-600 rounded w-4 h-4"
               />
               <span className="ml-2 sm:ml-3 text-gray-700">
@@ -42,11 +50,11 @@ const Step4RecurringIssues = ({ formData = {}, errors = {}, onCheckboxChange, on
               {translations.vaccinationReaction}
             </label>
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-              {['yes', 'no'].map((val) => (
+              {["yes", "no"].map((val) => (
                 <label
                   key={val}
                   className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm ${
-                    errors.hadReaction ? 'border-red-500' : 'border-gray-300'
+                    errors.hadReaction ? "border-red-500" : "border-gray-300"
                   }`}
                 >
                   <input
@@ -54,11 +62,17 @@ const Step4RecurringIssues = ({ formData = {}, errors = {}, onCheckboxChange, on
                     name="hadReaction"
                     value={val}
                     checked={vaccinationReactions.hadReaction === val}
-                    onChange={(e) => onNestedInputChange('vaccinationReactions', 'hadReaction', e.target.value)}
+                    onChange={(e) =>
+                      onNestedInputChange(
+                        "vaccinationReactions",
+                        "hadReaction",
+                        e.target.value
+                      )
+                    }
                     className="form-radio text-blue-600 w-4 h-4"
                   />
                   <span className="ml-2 sm:ml-3 text-gray-700 font-medium">
-                    {val === 'yes' ? translations.yes : translations.no}
+                    {val === "yes" ? translations.yes : translations.no}
                   </span>
                 </label>
               ))}
@@ -73,11 +87,11 @@ const Step4RecurringIssues = ({ formData = {}, errors = {}, onCheckboxChange, on
               {translations.healthDecline}
             </label>
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-              {['yes', 'no'].map((val) => (
+              {["yes", "no"].map((val) => (
                 <label
                   key={val}
                   className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm ${
-                    errors.healthDeclined ? 'border-red-500' : 'border-gray-300'
+                    errors.healthDeclined ? "border-red-500" : "border-gray-300"
                   }`}
                 >
                   <input
@@ -85,16 +99,26 @@ const Step4RecurringIssues = ({ formData = {}, errors = {}, onCheckboxChange, on
                     name="healthDeclined"
                     value={val}
                     checked={vaccinationReactions.healthDeclined === val}
-                    onChange={(e) => onNestedInputChange('vaccinationReactions', 'healthDeclined', e.target.value)}
+                    onChange={(e) =>
+                      onNestedInputChange(
+                        "vaccinationReactions",
+                        "healthDeclined",
+                        e.target.value
+                      )
+                    }
                     className="form-radio text-blue-600 w-4 h-4"
                   />
                   <span className="ml-2 sm:ml-3 text-gray-700 font-medium">
-                    {val === 'yes' ? translations.yes : translations.no}
+                    {val === "yes" ? translations.yes : translations.no}
                   </span>
                 </label>
               ))}
             </div>
-            {errors.healthDeclined && <p className="mt-1 text-xs text-red-600">{errors.healthDeclined}</p>}
+            {errors.healthDeclined && (
+              <p className="mt-1 text-xs text-red-600">
+                {errors.healthDeclined}
+              </p>
+            )}
           </div>
 
           <div>
@@ -102,29 +126,41 @@ const Step4RecurringIssues = ({ formData = {}, errors = {}, onCheckboxChange, on
               {translations.allergyInjections}
             </label>
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-              {['yes', 'no'].map((val) => (
+              {["yes", "no"].map((val) => (
                 <label
                   key={val}
                   className={`flex items-center p-2 sm:p-3 border rounded-md hover:bg-gray-50 cursor-pointer transition flex-1 text-sm ${
-                    errors.allergyDesensitization ? 'border-red-500' : 'border-gray-300'
+                    errors.allergyDesensitization
+                      ? "border-red-500"
+                      : "border-gray-300"
                   }`}
                 >
                   <input
                     type="radio"
                     name="allergyDesensitization"
                     value={val}
-                    checked={vaccinationReactions.allergyDesensitization === val}
-                    onChange={(e) => onNestedInputChange('vaccinationReactions', 'allergyDesensitization', e.target.value)}
+                    checked={
+                      vaccinationReactions.allergyDesensitization === val
+                    }
+                    onChange={(e) =>
+                      onNestedInputChange(
+                        "vaccinationReactions",
+                        "allergyDesensitization",
+                        e.target.value
+                      )
+                    }
                     className="form-radio text-blue-600 w-4 h-4"
                   />
                   <span className="ml-2 sm:ml-3 text-gray-700 font-medium">
-                    {val === 'yes' ? translations.yes : translations.no}
+                    {val === "yes" ? translations.yes : translations.no}
                   </span>
                 </label>
               ))}
             </div>
             {errors.allergyDesensitization && (
-              <p className="mt-1 text-xs text-red-600">{errors.allergyDesensitization}</p>
+              <p className="mt-1 text-xs text-red-600">
+                {errors.allergyDesensitization}
+              </p>
             )}
           </div>
         </div>

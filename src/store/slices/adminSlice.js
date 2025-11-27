@@ -1,5 +1,5 @@
 // src/store/slices/adminSlice.js
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   adminData: null,
@@ -10,7 +10,7 @@ const initialState = {
 };
 
 const adminSlice = createSlice({
-  name: 'admin',
+  name: "admin",
   initialState,
   reducers: {
     setAdminAuth: (state, action) => {
@@ -44,11 +44,7 @@ const adminSlice = createSlice({
   },
 });
 
-export const {
-  setAdminAuth,
-  clearAdminAuth,
-  setAdminLoading,
-  setAdminError
-} = adminSlice.actions;
+export const { setAdminAuth, clearAdminAuth, setAdminLoading, setAdminError } =
+  adminSlice.actions;
 
 export default adminSlice.reducer;

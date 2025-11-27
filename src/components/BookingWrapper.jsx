@@ -80,9 +80,10 @@ const BookingWrapper = () => {
         <div
           className={`
             transition-all duration-300 
-            ${selectedDate
-              ? "md:w-[32%] md:opacity-100 md:translate-x-0"
-              : "md:w-0 md:opacity-0 md:translate-x-10 md:pointer-events-none"
+            ${
+              selectedDate
+                ? "md:w-[32%] md:opacity-100 md:translate-x-0"
+                : "md:w-0 md:opacity-0 md:translate-x-10 md:pointer-events-none"
             }
             w-full md:w-auto
           `}

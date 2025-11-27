@@ -1,11 +1,11 @@
-import React from 'react';
-import { translations } from '../constants/translations';
-import { TOTAL_STEPS, STEP_TITLES } from '../constants/formConfig';
+import React from "react";
+import { translations } from "../constants/translations";
+import { TOTAL_STEPS, STEP_TITLES } from "../constants/formConfig";
 
 const FormHeader = ({ currentStep, progressPercentage, isEditing, error }) => {
   const steps = Array.from({ length: TOTAL_STEPS }, (_, i) => ({
     number: i + 1,
-    title: translations[STEP_TITLES[i + 1]] || `Step ${i + 1}`
+    title: translations[STEP_TITLES[i + 1]] || `Step ${i + 1}`,
   }));
 
   return (
@@ -18,7 +18,7 @@ const FormHeader = ({ currentStep, progressPercentage, isEditing, error }) => {
           {translations.step} {currentStep} {translations.of} {TOTAL_STEPS}
         </span>
       </div>
-      
+
       <div className="w-full bg-gray-200 rounded-full h-2 mb-4 sm:mb-6">
         <div
           className="bg-blue-600 h-2 rounded-full transition-all duration-300"
@@ -34,24 +34,29 @@ const FormHeader = ({ currentStep, progressPercentage, isEditing, error }) => {
 
       <div className="flex justify-between items-center overflow-x-auto pb-2 -mx-2 px-2">
         {steps.map((step) => (
-          <div key={step.number} className="flex flex-col items-center shrink-0 px-1 sm:px-2">
+          <div
+            key={step.number}
+            className="flex flex-col items-center shrink-0 px-1 sm:px-2"
+          >
             <div
               className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-semibold mb-1 sm:mb-2 text-xs sm:text-sm transition-all duration-300 ${
                 step.number === currentStep
-                  ? 'bg-blue-600 shadow-md scale-110'
+                  ? "bg-blue-600 shadow-md scale-110"
                   : step.number < currentStep
-                  ? 'bg-green-500'
-                  : 'bg-gray-300'
+                  ? "bg-green-500"
+                  : "bg-gray-300"
               }`}
             >
-              {step.number < currentStep ? '✓' : step.number}
+              {step.number < currentStep ? "✓" : step.number}
             </div>
             <span
               className={`text-xs text-center max-w-16 sm:max-w-none ${
-                step.number === currentStep ? 'font-semibold text-blue-600' : 'text-gray-600'
+                step.number === currentStep
+                  ? "font-semibold text-blue-600"
+                  : "text-gray-600"
               }`}
             >
-              {step.title?.split(' / ')[0] || step.title}
+              {step.title?.split(" / ")[0] || step.title}
             </span>
           </div>
         ))}

@@ -1,18 +1,18 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 import {
   setEncryptedItem,
   getDecryptedItem,
   removeEncryptedItem,
-  STORAGE_KEYS
-} from '../../utils/storage';
+  STORAGE_KEYS,
+} from "../../utils/storage";
 
 // Initialize state from storage if available
 const getInitialUserId = () => {
   try {
     // Check sessionStorage first (temporary storage)
-    const sessionUserId = sessionStorage.getItem('userId');
+    const sessionUserId = sessionStorage.getItem("userId");
     if (sessionUserId) return sessionUserId;
-    
+
     // Then check encrypted localStorage (persistent storage)
     const storedUserId = getDecryptedItem(STORAGE_KEYS.USER_ID);
     return storedUserId || null;
@@ -38,17 +38,17 @@ const initialState = {
 };
 
 const userSlice = createSlice({
-  name: 'user',
+  name: "user",
   initialState,
   reducers: {
     setUserId: (state, action) => {
-      console.log('Setting userId:', action.payload);
+      console.log("Setting userId:", action.payload);
       state.userId = action.payload;
       // Also store in sessionStorage for immediate access
       if (action.payload) {
-        sessionStorage.setItem('userId', action.payload);
+        sessionStorage.setItem("userId", action.payload);
       } else {
-        sessionStorage.removeItem('userId');
+        sessionStorage.removeItem("userId");
       }
     },
     setUserData: (state, action) => {
@@ -65,7 +65,7 @@ const userSlice = createSlice({
       state.userData = null;
       state.error = null;
       // Clear sessionStorage as well
-      sessionStorage.removeItem('userId');
+      sessionStorage.removeItem("userId");
     },
     setLoading: (state, action) => {
       state.isLoading = action.payload;
@@ -76,16 +76,23 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUserId, setUserData, updateUserDataLocally, clearUser, setLoading, setError } = userSlice.actions;
+export const {
+  setUserId,
+  setUserData,
+  updateUserDataLocally,
+  clearUser,
+  setLoading,
+  setError,
+} = userSlice.actions;
 
 export const storeUserIdForFuture = (userId) => (dispatch) => {
   try {
     dispatch(setUserId(userId));
     setEncryptedItem(STORAGE_KEYS.USER_ID, userId);
     // Also store in sessionStorage for immediate access
-    sessionStorage.setItem('userId', userId);
+    sessionStorage.setItem("userId", userId);
   } catch (error) {
-    dispatch(setError('Failed to store user ID securely'));
+    dispatch(setError("Failed to store user ID securely"));
   }
 };
 
@@ -98,7 +105,7 @@ export const getStoredUserId = () => (dispatch, getState) => {
     }
 
     // Check sessionStorage first
-    const sessionUserId = sessionStorage.getItem('userId');
+    const sessionUserId = sessionStorage.getItem("userId");
     if (sessionUserId) {
       dispatch(setUserId(sessionUserId));
       return sessionUserId;
@@ -110,10 +117,10 @@ export const getStoredUserId = () => (dispatch, getState) => {
       dispatch(setUserId(storedUserId));
       return storedUserId;
     }
-    
+
     return null;
   } catch (error) {
-    dispatch(setError('Failed to retrieve user ID'));
+    dispatch(setError("Failed to retrieve user ID"));
     return null;
   }
 };
@@ -145,7 +152,7 @@ export const clearStoredUserData = () => (dispatch) => {
     dispatch(clearUser());
     removeEncryptedItem(STORAGE_KEYS.USER_ID);
     removeEncryptedItem(STORAGE_KEYS.USER_DATA);
-    sessionStorage.removeItem('userId');
+    sessionStorage.removeItem("userId");
   } catch (error) {
     // handle error
   }

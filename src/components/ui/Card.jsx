@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 
-const Card = ({ children, className = '', ...props }) => {
+const Card = ({ children, className = "", ...props }) => {
   return (
-    <div 
+    <div
       className={`bg-white shadow-lg rounded-lg p-6 ${className}`}
       {...props}
     >

@@ -80,7 +80,6 @@ const completedAppointments = [
   },
 ];
 
-
 const CompletedAppointments = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
@@ -90,13 +89,15 @@ const CompletedAppointments = () => {
     timeSlot: "",
     patientName: "",
     consultationType: "",
-    doctor: ""
+    doctor: "",
   });
 
   const rowsPerPage = 10;
 
   // Get unique values for filter dropdowns
-  const uniqueDates = [...new Set(completedAppointments.map((apt) => apt.date))].sort();
+  const uniqueDates = [
+    ...new Set(completedAppointments.map((apt) => apt.date)),
+  ].sort();
   const uniqueOpdNumbers = [
     ...new Set(completedAppointments.map((apt) => apt.opdNumber)),
   ].sort();
@@ -115,9 +116,12 @@ const CompletedAppointments = () => {
     return completedAppointments.filter((appointment) => {
       return (
         (filters.date === "" || appointment.date === filters.date) &&
-        (filters.opdNumber === "" || appointment.opdNumber === filters.opdNumber) &&
-        (filters.timeSlot === "" || appointment.timeSlot === filters.timeSlot) &&
-        (filters.consultationType === "" || appointment.consultationType === filters.consultationType) &&
+        (filters.opdNumber === "" ||
+          appointment.opdNumber === filters.opdNumber) &&
+        (filters.timeSlot === "" ||
+          appointment.timeSlot === filters.timeSlot) &&
+        (filters.consultationType === "" ||
+          appointment.consultationType === filters.consultationType) &&
         (filters.doctor === "" || appointment.doctor === filters.doctor) &&
         (filters.patientName === "" ||
           appointment.name
@@ -162,7 +166,7 @@ const CompletedAppointments = () => {
       timeSlot: "",
       patientName: "",
       consultationType: "",
-      doctor: ""
+      doctor: "",
     });
     setCurrentPage(1);
   };
@@ -172,8 +176,12 @@ const CompletedAppointments = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Completed Appointments</h1>
-          <p className="text-gray-600 mt-1">View all completed consultations and treatments</p>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Completed Appointments
+          </h1>
+          <p className="text-gray-600 mt-1">
+            View all completed consultations and treatments
+          </p>
         </div>
 
         {/* Filters Section */}
@@ -255,7 +263,9 @@ const CompletedAppointments = () => {
               </label>
               <select
                 value={filters.consultationType}
-                onChange={(e) => handleFilterChange("consultationType", e.target.value)}
+                onChange={(e) =>
+                  handleFilterChange("consultationType", e.target.value)
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Types</option>
@@ -357,7 +367,9 @@ const CompletedAppointments = () => {
                       <td className="py-4 px-6 whitespace-nowrap">
                         <div className="text-sm text-gray-700">
                           <div>{appointment.date}</div>
-                          <div className="text-gray-500 text-xs">{appointment.timeSlot}</div>
+                          <div className="text-gray-500 text-xs">
+                            {appointment.timeSlot}
+                          </div>
                         </div>
                       </td>
                       <td className="py-4 px-6 whitespace-nowrap">
@@ -371,11 +383,13 @@ const CompletedAppointments = () => {
                         </div>
                       </td>
                       <td className="py-4 px-6 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          appointment.consultationType === 'Online' 
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-blue-100 text-blue-800'
-                        }`}>
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            appointment.consultationType === "Online"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-blue-100 text-blue-800"
+                          }`}
+                        >
                           {appointment.consultationType}
                         </span>
                       </td>
