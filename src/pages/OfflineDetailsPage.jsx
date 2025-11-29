@@ -2,6 +2,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import BackButton from "../components/BackButton";
 import OfflineCaseForm from "../components/offlineCaseForm/OfflineCaseForm";
+import { toast } from "react-toastify";
+import ConfirmToast from "../utils/ConfirmToast";
 
 export default function OfflineDetailsPage() {
   const { state } = useLocation();
@@ -15,6 +17,8 @@ export default function OfflineDetailsPage() {
     provideCaseDetails: "Please provide your case details before continuing.",
     continueToPayment: "Continue to Payment",
     pleaseCompleteForm: "Please complete the case form before proceeding to payment.",
+    skipAndContinue: "Skip & Continue to Payment / छोड़ें और भुगतान पर जारी रखें",
+    skipConfirmation: "Are you sure you want to skip filling the case details? You can provide this information later during your consultation. / क्या आप वाकई केस विवरण भरना छोड़ना चाहते हैं? आप यह जानकारी बाद में अपनी परामर्श के दौरान दे सकते हैं।",
   };
 
   if (!state) return (
@@ -38,6 +42,26 @@ export default function OfflineDetailsPage() {
     }
     navigate("/payment-offline", { state: { ...state, formData } });
   };
+
+ const handleSkipToPayment = () => {
+  toast(
+    <ConfirmToast
+      message={translations.skipConfirmation}
+      onConfirm={() =>
+        navigate("/payment-offline", { state: { ...state, formData: null } })
+      }
+      onCancel={() => {
+        /* do nothing */
+      }}
+    />,
+    {
+      position: "top-center",
+      autoClose: false,
+      closeOnClick: false,
+      draggable: false,
+    }
+  );
+};
 
   const handleFormComplete = (complete) => {
     setIsFormComplete(complete);
@@ -100,6 +124,18 @@ export default function OfflineDetailsPage() {
             <p className="text-gray-600 text-sm">
               {translations.provideCaseDetails}
             </p>
+          </div>
+
+          {/* Skip Button */}
+          <div className="mb-6 flex justify-center">
+            <button
+              onClick={handleSkipToPayment}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold 
+                py-3 px-6 rounded-md transition duration-200 ease-in-out
+                shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+            >
+              {translations.skipAndContinue}
+            </button>
           </div>
 
           {/* Case Form */}

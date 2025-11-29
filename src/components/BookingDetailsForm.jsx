@@ -6,16 +6,11 @@ import ServiceInfo from "../components/ServiceInfo";
 import {
   useCreateUserMutation,
   useUpdateUserMutation,
-  useGetUserQuery,
 } from "../store/api/userApi";
 import {
-  storeUserIdForFuture,
-  getStoredUserId,
-  storeUserData,
-  getStoredUserData,
   clearStoredUserData,
-  clearUserDataOnly,
   setUserId,
+  setUserData,
 } from "../store/slices/userSlice";
 
 const BookingDetailsForm = ({ selectedType, onSubmit }) => {
@@ -27,13 +22,6 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
 
   const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
-
-  const { data: fetchedUserData, isLoading: isUserLoading } = useGetUserQuery(
-    userId,
-    {
-      skip: !userId || !!userData, // Skip if no userId or userData already exists
-    }
-  );
 
   const translations = {
     yourBasicDetails: "Your Basic Details / आपका बुनियादी विवरण",
@@ -70,36 +58,19 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
     updateAppointment: "Update Appointment / अपॉइंटमेंट अपडेट करें",
   };
 
+  // Clear all previous session data on component mount
   useEffect(() => {
-    // Only fetch stored data if not already in Redux state
-    if (!userId) {
-      dispatch(getStoredUserId());
-    }
-    if (!userData) {
-      dispatch(getStoredUserData());
-    }
-  }, [dispatch, userId, userData]);
-
-  useEffect(() => {
-    // Prioritize existing userData over fetched data to avoid unnecessary re-renders
-    if (userData) {
-      formik.setValues({
-        name: userData.fullName || "",
-        phone: userData.mobile || "",
-        email: userData.email || "",
-      });
-      setSelectedMode(userData.mode || "");
-    } else if (fetchedUserData?.success && fetchedUserData.data?.user) {
-      const user = fetchedUserData.data.user;
-      formik.setValues({
-        name: user.fullName || "",
-        phone: user.mobile || "",
-        email: user.email || "",
-      });
-      setSelectedMode(user.mode || "");
-      dispatch(storeUserData(user));
-    }
-  }, [fetchedUserData, userData, dispatch]);
+    // Clear Redux state
+    dispatch(clearStoredUserData());
+    
+    // Clear sessionStorage
+    sessionStorage.removeItem("userId");
+    
+    // Reset form state
+    formik.resetForm();
+    setSelectedMode(selectedType || "");
+    setServerErrors([]);
+  }, [dispatch]);
 
   const formik = useFormik({
     initialValues: {
@@ -126,64 +97,50 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
       try {
         setServerErrors([]);
 
-        // If we have userId and userData, skip API call and proceed directly
-        if (userId && userData) {
-          onSubmit({
-            ...values,
-            selectedType: selectedMode,
-            user: userData,
-            userId: userId,
-          });
-          return;
-        }
-
         const userPayload = {
           fullName: values.name.trim(),
           mobile: values.phone,
           mode: selectedMode.toLowerCase(),
           isBookingDone: false,
         };
+        
         if (values.email && values.email.trim()) {
           userPayload.email = values.email.trim();
         }
 
+        // ALWAYS create a new user - never skip creation
         let result;
-        if (userId) {
-          // Only update if data has actually changed
-          const hasChanges =
-            userData?.fullName !== values.name.trim() ||
-            userData?.mobile !== values.phone ||
-            userData?.email !== (values.email?.trim() || "") ||
-            userData?.mode !== selectedMode.toLowerCase();
+        result = await createUser(userPayload).unwrap();
 
-          if (hasChanges) {
-            result = await updateUser({ id: userId, ...userPayload }).unwrap();
-            if (result.success) {
-              dispatch(storeUserData(result.data.user));
-            }
-          } else {
-            // No changes, use existing data
-            result = { success: true, data: { user: userData } };
-          }
-        } else {
-          result = await createUser(userPayload).unwrap();
-          if (result.success && result.data?.user?._id) {
-            const newUserId = result.data.user._id;
-            dispatch(storeUserIdForFuture(newUserId));
-            dispatch(storeUserData(result.data.user));
-          }
-        }
+        if (result.success && result.data?.user?._id) {
+          const newUserId = result.data.user._id;
+          
+          // Store userId ONLY in sessionStorage for temporary use
+          sessionStorage.setItem("userId", newUserId);
+          
+          // Also update Redux state for current session
+          dispatch(setUserId(newUserId));
+          dispatch(setUserData(result.data.user));
 
-        if (result.success) {
+          // Proceed with the form submission
           onSubmit({
             ...values,
             selectedType: selectedMode,
             user: result.data.user,
-            userId: result.data.user._id,
+            userId: newUserId,
           });
         }
       } catch (error) {
-        // error handling code as before
+        console.error("Error creating user:", error);
+        
+        // Handle API errors
+        if (error.data && error.data.errors) {
+          setServerErrors(error.data.errors);
+        } else if (error.data && error.data.message) {
+          setServerErrors([{ message: error.data.message }]);
+        } else {
+          setServerErrors([{ message: "Failed to create booking. Please try again." }]);
+        }
       } finally {
         setSubmitting(false);
       }
@@ -213,8 +170,7 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
     }
   };
 
-  const isLoading =
-    isCreating || isUpdating || formik.isSubmitting || isUserLoading;
+  const isLoading = isCreating || isUpdating || formik.isSubmitting;
 
   return (
     <div className="w-full max-w-6xl mx-auto py-6 px-3 sm:px-6 lg:px-8">
@@ -230,7 +186,6 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
           <p className="text-gray-500 text-sm mt-1">
             {translations.pleaseFillDetails}
           </p>
-
 
           {serverErrors.length > 0 && (
             <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -376,9 +331,7 @@ const BookingDetailsForm = ({ selectedType, onSubmit }) => {
               }`}
             >
               {isLoading
-                ? userId
-                  ? translations.updatingUser
-                  : translations.creatingUser
+                ? translations.creatingUser
                 : translations.continue}
             </button>
           </form>
