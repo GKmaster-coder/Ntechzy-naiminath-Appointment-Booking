@@ -36,7 +36,7 @@ export default function OfflineDetailsPage() {
       alert(translations.pleaseCompleteForm);
       return;
     }
-    navigate("/payment", { state: { ...state, formData } });
+    navigate("/payment-offline", { state: { ...state, formData } });
   };
 
   const handleFormComplete = (complete) => {

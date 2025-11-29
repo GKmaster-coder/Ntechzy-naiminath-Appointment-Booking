@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import BackButton from "../components/BackButton";
 import { CaseForm } from "../components/caseForm";
+import { toast } from "react-toastify";
+import ConfirmToast from "../utils/ConfirmToast";
 
 export default function OnlineDetailsPage() {
   const { state } = useLocation();
@@ -16,6 +18,9 @@ export default function OnlineDetailsPage() {
     continueToPayment: "Continue to Payment / भुगतान पर जारी रखें",
     pleaseCompleteForm:
       "Please complete the case form before proceeding to payment. / कृपया भुगतान के लिए आगे बढ़ने से पहले केस फॉर्म पूरा करें।",
+    skipAndContinue: "Skip & Continue to Payment / छोड़ें और भुगतान पर जारी रखें",
+    skipConfirmation:
+      "Are you sure you want to skip filling the case details? You can provide this information later during your consultation. / क्या आप वाकई केस विवरण भरना छोड़ना चाहते हैं? आप यह जानकारी बाद में अपनी परामर्श के दौरान दे सकते हैं।",
   };
 
   if (!state)
@@ -23,11 +28,31 @@ export default function OnlineDetailsPage() {
 
   const handleNext = () => {
     if (!isFormComplete) {
-      alert(translations.pleaseCompleteForm);
+     toast.error(translations.pleaseCompleteForm);
       return;
     }
-    navigate("/payment", { state: { ...state, formData } });
+    navigate("/payment-online", { state: { ...state, formData } });
   };
+
+ const handleSkipToPayment = () => {
+  toast(
+    <ConfirmToast
+      message={translations.skipConfirmation}
+      onConfirm={() =>
+        navigate("/payment-online", { state: { ...state, formData: null } })
+      }
+      onCancel={() => {
+        /* do nothing */
+      }}
+    />,
+    {
+      position: "top-center",
+      autoClose: false,
+      closeOnClick: false,
+      draggable: false,
+    }
+  );
+};
 
   const handleFormComplete = (complete) => setIsFormComplete(complete);
   const handleFormSubmit = (submittedFormData) => {
@@ -82,6 +107,18 @@ export default function OnlineDetailsPage() {
             Your appointment date & time will be scheduled by the hospital team.
             You will receive confirmation through sms/email after verification.
           </p>
+        </div>
+
+        {/* Skip Button */}
+        <div className="mb-6 flex justify-center">
+          <button
+            onClick={handleSkipToPayment}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold 
+              py-3 px-6 rounded-md transition duration-200 ease-in-out
+              shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+          >
+            {translations.skipAndContinue}
+          </button>
         </div>
 
         {/* Form */}

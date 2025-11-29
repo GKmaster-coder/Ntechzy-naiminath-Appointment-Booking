@@ -14,6 +14,8 @@ import ScrollToTop from "./components/ScrollToTop";
 import OrderDetailsPage from "./pages/OrderDetailsPage";
 import AdminLogin from "./pages/AdminLogin";
 import { ToastContainer } from "react-toastify";
+import OnlinePaymentPage from "./pages/OnlinePaymentPage";
+import OfflinePaymentPage from "./pages/OfflinePaymentPage";
 import "react-toastify/dist/ReactToastify.css";
 
 const ProtectedRoute = ({ children }) => {
@@ -52,6 +54,8 @@ function App() {
         <Route path="/online-details" element={<OnlineDetailsPage />} />
         <Route path="/offline-details" element={<OfflineDetailsPage />} />
         <Route path="/payment" element={<PaymentPage />} />
+        <Route path="/payment-online" element={<OnlinePaymentPage />} />
+        <Route path="/payment-offline" element={<OfflinePaymentPage />} />
         <Route path="/confirmation" element={<ConfirmationPage />} />
         <Route path="/order/order-medicine" element={<OrderDetailsPage />} />
         <Route
