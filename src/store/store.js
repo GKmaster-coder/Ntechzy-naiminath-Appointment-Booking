@@ -3,6 +3,9 @@ import { configureStore } from "@reduxjs/toolkit";
 // APIs
 import { api } from "../api";
 import { userApi } from "./api/userApi";
+import { offlineAppointmentApi } from "./api/offlineAppointmentApi";
+import { slotsApi } from "./api/slotsApi";
+import { paymentApi } from "./api/paymentApi";
 
 // Slices
 import userReducer from "./slices/userSlice";
