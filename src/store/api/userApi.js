@@ -6,7 +6,7 @@ const BACKEND_API = import.meta.env.VITE_BACKEND_API;
 export const userApi = createApi({
   reducerPath: "userApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: `${BACKEND_API}/users/`, // <-- using env variable
+    baseUrl: `${BACKEND_API}/users`,
     prepareHeaders: (headers) => {
       headers.set("Content-Type", "application/json");
       return headers;
