@@ -6,53 +6,57 @@ import Step2MedicalHistory from './steps/Step2MedicalHistory';
 import Step3Symptoms from './steps/Step3Symptoms';
 import Step4FamilyHistory from './steps/Step4FamilyHistory';
 import { initialValues } from './initialValues';
-import { validationSchemas } from './validationSchemas';
+import { validationSchemas, completeFormSchema } from './validationSchemas';
 import { translations } from './translations';
+import { useCreateOfflineAppointmentMutation } from '../../store/api/offlineAppointmentApi';
+import { useCreatePaymentOrderMutation, useVerifyPaymentMutation, useRecordPaymentFailureMutation } from '../../store/api/paymentApi';
+import { useSelector } from 'react-redux';
+import { formatOfflineAppointmentData } from '../../utils/appointmentUtils';
 
-const OfflineCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: externalFormComplete, onClose }) => {
+const OfflineCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: externalFormComplete, onClose, appointmentData }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 4;
   const [isSaved, setIsSaved] = useState(false);
   const [internalFormComplete, setInternalFormComplete] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [language, setLanguage] = useState('en'); // 'en' or 'hi'
+  const [createOfflineAppointment, { isLoading: isSubmitting }] = useCreateOfflineAppointmentMutation();
+  const [createPaymentOrder] = useCreatePaymentOrderMutation();
+  const [verifyPayment] = useVerifyPaymentMutation();
+  const [recordPaymentFailure] = useRecordPaymentFailureMutation();
+  const user = useSelector((state) => state.user);
+  const userId = user?.userId || user?.userData?._id || user?.userData?.id;
 
   const formik = useFormik({
     initialValues,
-    validationSchema: validationSchemas[currentStep - 1],
+    validationSchema: completeFormSchema,
     onSubmit: async (values) => {
-      console.log('Essential Form Data:', values);
-      
-      // Show success message
-      setShowSuccessMessage(true);
-      
-      // Mark form as complete
-      setInternalFormComplete(true);
-      
-      // Notify parent component about form submission
-      if (onFormSubmit) {
-        onFormSubmit(values);
+      try {
+        // Prepare API payload using utility function
+        const payload = formatOfflineAppointmentData(
+          userId,
+          appointmentData?.selectedSlot,
+          values
+        );
+
+        const appointmentResult = await createOfflineAppointment(payload).unwrap();
+        const appointmentId = appointmentResult.data._id;
+        
+        // Initiate payment
+        await initiatePayment(appointmentId);
+        
+      } catch (error) {
+        console.error('Failed to submit appointment:', error);
+        const errorMessage = error?.data?.message || error?.message || 'Failed to submit appointment. Please try again.';
+        alert(errorMessage);
       }
-      
-      // Notify parent component about form completion
-      if (onFormComplete) {
-        onFormComplete(true);
-      }
-      
-      // Auto close after 3 seconds
-      setTimeout(() => {
-        if (onClose) {
-          onClose();
-        }
-      }, 3000);
     },
   });
 
   // Check if form is completely filled and valid
   const checkFormCompletion = async () => {
     try {
-      // Only validate step 4 as compulsory
-      await validationSchemas[3].validate(formik.values, { abortEarly: false });
+      await completeFormSchema.validate(formik.values, { abortEarly: false });
       setInternalFormComplete(true);
       if (onFormComplete) {
         onFormComplete(true);
@@ -71,15 +75,20 @@ const OfflineCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: externa
   }, [formik.values]);
 
   const nextStep = async () => {
-    // Allow moving to next step without validation for steps 1-3
-    // Only validate current step if it's step 4
-    if (currentStep === 4) {
-      try {
-        await validationSchemas[3].validate(formik.values, { abortEarly: false });
-      } catch (errors) {
-        console.log('Validation errors:', errors);
-        return; // Don't proceed if step 4 validation fails
+    // Validate current step before proceeding
+    try {
+      await validationSchemas[currentStep - 1].validate(formik.values, { abortEarly: false });
+    } catch (errors) {
+      console.log('Validation errors:', errors);
+      // Mark fields as touched to show validation errors
+      const touchedFields = {};
+      if (errors.inner) {
+        errors.inner.forEach(error => {
+          touchedFields[error.path] = true;
+        });
       }
+      formik.setTouched({ ...formik.touched, ...touchedFields });
+      return; // Don't proceed if validation fails
     }
     
     if (currentStep < totalSteps) {
@@ -136,6 +145,94 @@ const OfflineCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: externa
     const error = formik.errors[fieldName];
     const touched = formik.touched[fieldName];
     return touched && error ? error : null;
+  };
+
+  const initiatePayment = async (appointmentId) => {
+    try {
+      const orderResult = await createPaymentOrder({ 
+        appointmentId, 
+        amount: 708 // ₹708 including GST
+      }).unwrap();
+      
+      openRazorpayCheckout(orderResult.data, appointmentId);
+    } catch (error) {
+      console.error('Payment order creation failed:', error);
+      alert('Failed to initiate payment. Please try again.');
+    }
+  };
+
+  const openRazorpayCheckout = (orderData, appointmentId) => {
+    const options = {
+      key: orderData.key,
+      amount: orderData.amount,
+      currency: orderData.currency,
+      name: "Naiminath Clinic",
+      description: "Appointment Booking Fee",
+      order_id: orderData.orderId,
+      handler: function(response) {
+        handlePaymentSuccess(response, appointmentId);
+      },
+      prefill: {
+        name: user?.userData?.name || "Patient",
+        email: user?.userData?.email || "",
+        contact: user?.userData?.phone || ""
+      },
+      theme: {
+        color: "#3399cc"
+      },
+      modal: {
+        ondismiss: function() {
+          handlePaymentFailure(appointmentId, "Payment cancelled by user");
+        }
+      }
+    };
+    
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+
+  const handlePaymentSuccess = async (paymentResponse, appointmentId) => {
+    try {
+      await verifyPayment({
+        razorpay_order_id: paymentResponse.razorpay_order_id,
+        razorpay_payment_id: paymentResponse.razorpay_payment_id,
+        razorpay_signature: paymentResponse.razorpay_signature,
+        appointmentId
+      }).unwrap();
+      
+      setShowSuccessMessage(true);
+      setInternalFormComplete(true);
+      
+      if (onFormSubmit) {
+        onFormSubmit(formik.values);
+      }
+      
+      if (onFormComplete) {
+        onFormComplete(true);
+      }
+      
+      setTimeout(() => {
+        if (onClose) {
+          onClose();
+        }
+      }, 2000);
+    } catch (error) {
+      console.error('Payment verification failed:', error);
+      alert('Payment verification failed. Please contact support.');
+    }
+  };
+
+  const handlePaymentFailure = async (appointmentId, errorMessage) => {
+    try {
+      await recordPaymentFailure({
+        appointmentId,
+        error: errorMessage
+      }).unwrap();
+      
+      alert('Payment failed. Please try again.');
+    } catch (error) {
+      console.error('Error recording payment failure:', error);
+    }
   };
 
   return (
@@ -276,14 +373,14 @@ const OfflineCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: externa
               ) : (
                 <button
                   type="submit"
-                  disabled={showSuccessMessage}
+                  disabled={showSuccessMessage || isSubmitting}
                   className={`px-8 py-3 font-bold rounded-md transition ${
-                    showSuccessMessage
+                    showSuccessMessage || isSubmitting
                       ? 'bg-green-600 text-white cursor-not-allowed'
                       : 'bg-green-600 hover:bg-green-700 text-white'
                   }`}
                 >
-                  {showSuccessMessage ? t.common.submitted : t.common.submit}
+                  {isSubmitting ? 'Submitting...' : showSuccessMessage ? t.common.submitted : t.common.submit}
                 </button>
               )}
             </div>

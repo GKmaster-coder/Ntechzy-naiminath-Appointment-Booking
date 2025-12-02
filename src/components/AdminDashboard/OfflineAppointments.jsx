@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-// Mock data removed - using API data
-const appointments = []; // TODO: Replace with API data
+import { useGetOfflineAppointmentsQuery } from "../../store/api/offlineAppointmentApi";
 
 const OfflineAppointments = () => {
   const navigate = useNavigate();
@@ -15,13 +14,16 @@ const OfflineAppointments = () => {
 
   const rowsPerPage = 10;
 
+  const { data: appointmentsData, isLoading, error } = useGetOfflineAppointmentsQuery();
+  const appointments = appointmentsData?.data || [];
+
   // Get unique values for filter dropdowns
   const uniqueDates = [...new Set(appointments.map((apt) => apt.date))].sort();
   const uniqueOpdNumbers = [
-    ...new Set(appointments.map((apt) => apt.opdNumber)),
+    ...new Set(appointments.map((apt) => apt.opdNumber).filter(Boolean)),
   ].sort();
   const uniqueTimeSlots = [
-    ...new Set(appointments.map((apt) => apt.timeSlot)),
+    ...new Set(appointments.map((apt) => apt.time)),
   ].sort();
 
   // Filter appointments based on filters
@@ -32,14 +34,14 @@ const OfflineAppointments = () => {
         (filters.opdNumber === "" ||
           appointment.opdNumber === filters.opdNumber) &&
         (filters.timeSlot === "" ||
-          appointment.timeSlot === filters.timeSlot) &&
+          appointment.time === filters.timeSlot) &&
         (filters.patientName === "" ||
           appointment.name
             .toLowerCase()
             .includes(filters.patientName.toLowerCase()))
       );
     });
-  }, [filters]);
+  }, [filters, appointments]);
 
   // Pagination calculations
   const totalPages = Math.ceil(filteredAppointments.length / rowsPerPage);
@@ -172,9 +174,24 @@ const OfflineAppointments = () => {
           </div>
         </div>
 
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex justify-center items-center py-12">
+            <div className="text-gray-500">Loading appointments...</div>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="text-red-600">Error loading appointments: {error.message}</div>
+          </div>
+        )}
+
         {/* Appointments Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {currentAppointments.length > 0 ? (
+        {!isLoading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {currentAppointments.length > 0 ? (
             currentAppointments.map((appointment) => {
               const status = appointment.status || "confirmed";
 
@@ -197,17 +214,19 @@ const OfflineAppointments = () => {
                         <h4 className="font-bold text-gray-900 text-xl mb-1">
                           {appointment.name}
                         </h4>
-                        <p className="text-sm text-gray-500 flex items-center">
-                          <svg
-                            className="w-4 h-4 mr-1"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                          </svg>
-                          {appointment.email}
-                        </p>
+                        {appointment.email && (
+                          <p className="text-sm text-gray-500 flex items-center">
+                            <svg
+                              className="w-4 h-4 mr-1"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                            </svg>
+                            {appointment.email}
+                          </p>
+                        )}
                       </div>
                       <div className="flex flex-col items-end space-y-2">
                         <span
@@ -221,9 +240,11 @@ const OfflineAppointments = () => {
                         >
                           {status.toUpperCase()}
                         </span>
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
-                          OPD: {appointment.opdNumber}
-                        </span>
+                        {appointment.opdNumber && (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                            OPD: {appointment.opdNumber}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -264,7 +285,7 @@ const OfflineAppointments = () => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      <span>Time: {appointment.timeSlot}</span>
+                      <span>Time: {appointment.time}</span>
                     </div>
                   </div>
                   <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
@@ -353,8 +374,9 @@ const OfflineAppointments = () => {
                 Try adjusting your filters to see more results
               </p>
             </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
 
         {/* Pagination */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mt-6">

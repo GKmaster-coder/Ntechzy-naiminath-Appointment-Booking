@@ -4,7 +4,7 @@ import BackButton from "./BackButton";
 import ServiceInfo from "./ServiceInfo";
 import CalendarPicker from "./CalendarPicker";
 import TimeSlotsPanel from "./TimeSlotsPanel";
-import { slotsData } from "../utils/slotsData";
+import { useGetSlotsByDateQuery } from "../store/api/slotsApi";
 
 const BookingWrapper = () => {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -30,16 +30,29 @@ const BookingWrapper = () => {
           time: slot.time,
           total: slot.total,
           booked: slot.booked,
+          available: slot.available,
+          date: `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${selectedDate.getDate().toString().padStart(2, '0')}`,
           dateFormatted: formattedDate,
         },
       },
     });
   };
 
+  const dateKey = selectedDate ? 
+    `${selectedDate.getDate().toString().padStart(2, '0')}-${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${selectedDate.getFullYear()}` : null;
+  const { data: slotsResponse, isLoading, error } = useGetSlotsByDateQuery(dateKey, {
+    skip: !dateKey,
+  });
+
   const getTimeSlotsForSelectedDate = () => {
-    if (!selectedDate) return [];
-    const dateKey = selectedDate.toISOString().split("T")[0];
-    return slotsData[dateKey] || [];
+    if (!slotsResponse?.success || !slotsResponse?.data?.slots) return [];
+    
+    return Object.entries(slotsResponse.data.slots).map(([time, slot]) => ({
+      time,
+      total: slot.total,
+      booked: slot.booked,
+      available: slot.available,
+    }));
   };
 
   return (
@@ -90,11 +103,25 @@ const BookingWrapper = () => {
         >
           {selectedDate && (
             <div className="h-full overflow-y-auto p-1 scrollbar-hide mt-4 md:mt-0">
-              <TimeSlotsPanel
-                selectedDate={selectedDate}
-                timeSlots={getTimeSlotsForSelectedDate()}
-                onTimeSelect={handleTimeSelect}
-              />
+              {isLoading ? (
+                <div className="flex justify-center items-center h-32">
+                  <div className="text-gray-500">Loading slots...</div>
+                </div>
+              ) : error ? (
+                <div className="flex justify-center items-center h-32">
+                  <div className="text-red-500">Error loading slots</div>
+                </div>
+              ) : slotsResponse?.data?.isBlocked ? (
+                <div className="flex justify-center items-center h-32">
+                  <div className="text-red-500">Date is blocked</div>
+                </div>
+              ) : (
+                <TimeSlotsPanel
+                  selectedDate={selectedDate}
+                  timeSlots={getTimeSlotsForSelectedDate()}
+                  onTimeSelect={handleTimeSelect}
+                />
+              )}
             </div>
           )}
         </div>

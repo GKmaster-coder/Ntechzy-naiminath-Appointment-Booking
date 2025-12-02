@@ -4,12 +4,23 @@ import BackButton from "../components/BackButton";
 import OfflineCaseForm from "../components/offlineCaseForm/OfflineCaseForm";
 import { toast } from "react-toastify";
 import ConfirmToast from "../utils/ConfirmToast";
+import { useCreateOfflineAppointmentMutation } from "../store/api/offlineAppointmentApi";
+import { useCreatePaymentOrderMutation, useVerifyPaymentMutation, useRecordPaymentFailureMutation } from "../store/api/paymentApi";
+import { useSelector } from "react-redux";
+import { formatOfflineAppointmentData } from "../utils/appointmentUtils";
+import PaymentSummary from "../components/PaymentSummary";
 
 export default function OfflineDetailsPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const [isFormComplete, setIsFormComplete] = useState(false);
   const [formData, setFormData] = useState(null);
+  const [createOfflineAppointment, { isLoading: isSkipSubmitting }] = useCreateOfflineAppointmentMutation();
+  const [createPaymentOrder] = useCreatePaymentOrderMutation();
+  const [verifyPayment] = useVerifyPaymentMutation();
+  const [recordPaymentFailure] = useRecordPaymentFailureMutation();
+  const user = useSelector((state) => state.user);
+  const userId = user?.userId || user?.userData?._id || user?.userData?.id;
 
   const translations = {
     noDataFound: "No data found. / कोई डेटा नहीं मिला।",
@@ -25,7 +36,7 @@ export default function OfflineDetailsPage() {
     <div className="min-h-screen bg-linear-to-br from-[#e6e2ff] via-[#d8f0ff] to-[#7ddfff] flex items-center justify-center p-4">
       <div className="text-center">
         <div className="text-gray-500 text-lg mb-2">{translations.noDataFound}</div>
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="text-blue-600 hover:text-blue-800 text-sm font-medium"
         >
@@ -43,25 +54,42 @@ export default function OfflineDetailsPage() {
     navigate("/payment-offline", { state: { ...state, formData } });
   };
 
- const handleSkipToPayment = () => {
-  toast(
-    <ConfirmToast
-      message={translations.skipConfirmation}
-      onConfirm={() =>
-        navigate("/payment-offline", { state: { ...state, formData: null } })
+  const handleSkipToPayment = () => {
+    toast(
+      <ConfirmToast
+        message={translations.skipConfirmation}
+        onConfirm={async () => {
+          try {
+            // Create appointment with empty form data using utility function
+            const payload = formatOfflineAppointmentData(
+              userId,
+              state?.selectedSlot,
+              null  
+            );
+
+            const appointmentResult = await createOfflineAppointment(payload).unwrap();
+            const appointmentId = appointmentResult.data._id;
+            
+            // Initiate payment
+            await initiatePayment(appointmentId);
+          } catch (error) {
+            console.error('Failed to create appointment:', error);
+            const errorMessage = error?.data?.message || error?.message || 'Failed to create appointment. Please try again.';
+            alert(errorMessage);
+          }
+        }}
+        onCancel={() => {
+          /* do nothing */
+        }}
+      />,
+      {
+        position: "top-center",
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
       }
-      onCancel={() => {
-        /* do nothing */
-      }}
-    />,
-    {
-      position: "top-center",
-      autoClose: false,
-      closeOnClick: false,
-      draggable: false,
-    }
-  );
-};
+    );
+  };
 
   const handleFormComplete = (complete) => {
     setIsFormComplete(complete);
@@ -69,9 +97,85 @@ export default function OfflineDetailsPage() {
   };
 
   const handleFormSubmit = (submittedFormData) => {
+    console.log(submittedFormData);
+
     console.log('Form submitted with data:', submittedFormData);
     setFormData(submittedFormData);
     setIsFormComplete(true);
+  };
+
+  const initiatePayment = async (appointmentId) => {
+    try {
+      const orderResult = await createPaymentOrder({ 
+        appointmentId, 
+        amount: 708 // ₹708 including GST
+      }).unwrap();
+      
+      openRazorpayCheckout(orderResult.data, appointmentId);
+    } catch (error) {
+      console.error('Payment order creation failed:', error);
+      alert('Failed to initiate payment. Please try again.');
+    }
+  };
+
+  const openRazorpayCheckout = (orderData, appointmentId) => {
+    const options = {
+      key: orderData.key,
+      amount: orderData.amount,
+      currency: orderData.currency,
+      name: "Naiminath Clinic",
+      description: "Appointment Booking Fee",
+      order_id: orderData.orderId,
+      handler: function(response) {
+        handlePaymentSuccess(response, appointmentId);
+      },
+      prefill: {
+        name: user?.userData?.name || "Patient",
+        email: user?.userData?.email || "",
+        contact: user?.userData?.phone || ""
+      },
+      theme: {
+        color: "#3399cc"
+      },
+      modal: {
+        ondismiss: function() {
+          handlePaymentFailure(appointmentId, "Payment cancelled by user");
+        }
+      }
+    };
+    
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+
+  const handlePaymentSuccess = async (paymentResponse, appointmentId) => {
+    try {
+      await verifyPayment({
+        razorpay_order_id: paymentResponse.razorpay_order_id,
+        razorpay_payment_id: paymentResponse.razorpay_payment_id,
+        razorpay_signature: paymentResponse.razorpay_signature,
+        appointmentId
+      }).unwrap();
+      
+      alert('Appointment booked successfully!');
+      navigate('/confirmation', { state: { appointmentId } });
+    } catch (error) {
+      console.error('Payment verification failed:', error);
+      alert('Payment verification failed. Please contact support.');
+    }
+  };
+
+  const handlePaymentFailure = async (appointmentId, errorMessage) => {
+    try {
+      await recordPaymentFailure({
+        appointmentId,
+        error: errorMessage
+      }).unwrap();
+      
+      alert('Payment failed. Please try again.');
+    } catch (error) {
+      console.error('Error recording payment failure:', error);
+    }
   };
 
   return (
@@ -92,20 +196,20 @@ export default function OfflineDetailsPage() {
           <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
             Appointment Summary
           </h1>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="text-center p-4 bg-blue-50 rounded-xl">
               <div className="text-xs font-medium text-blue-600 mb-1">MODE</div>
               <div className="text-lg font-semibold text-gray-900">Offline</div>
             </div>
-            
+
             <div className="text-center p-4 bg-blue-50 rounded-xl">
               <div className="text-xs font-medium text-blue-600 mb-1">DATE</div>
               <div className="text-lg font-semibold text-gray-900">
                 {state.selectedSlot?.dateFormatted || "Not Selected"}
               </div>
             </div>
-            
+
             <div className="text-center p-4 bg-blue-50 rounded-xl">
               <div className="text-xs font-medium text-blue-600 mb-1">TIME</div>
               <div className="text-lg font-semibold text-gray-900">
@@ -130,11 +234,15 @@ export default function OfflineDetailsPage() {
           <div className="mb-6 flex justify-center">
             <button
               onClick={handleSkipToPayment}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold 
-                py-3 px-6 rounded-md transition duration-200 ease-in-out
-                shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              disabled={isSkipSubmitting}
+              className={`font-semibold py-3 px-6 rounded-md transition duration-200 ease-in-out
+                shadow-md hover:shadow-lg transform hover:-translate-y-0.5 ${
+                  isSkipSubmitting
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                }`}
             >
-              {translations.skipAndContinue}
+              {isSkipSubmitting ? 'Creating Appointment...' : translations.skipAndContinue}
             </button>
           </div>
 
@@ -143,7 +251,13 @@ export default function OfflineDetailsPage() {
             onFormComplete={handleFormComplete}
             onFormSubmit={handleFormSubmit}
             isFormComplete={isFormComplete}
+            appointmentData={state}
           />
+        </div>
+
+        {/* Payment Summary */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <PaymentSummary />
         </div>
 
         {/* Action Section */}
@@ -167,7 +281,7 @@ export default function OfflineDetailsPage() {
                 </>
               )}
             </div>
-            
+
             <div className="text-xs text-gray-500">
               {isFormComplete ? "✓ All set" : "Required"}
             </div>
