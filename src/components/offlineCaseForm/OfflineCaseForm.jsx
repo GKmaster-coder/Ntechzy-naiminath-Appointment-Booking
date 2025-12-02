@@ -42,8 +42,7 @@ const OfflineCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: externa
 
         const appointmentResult = await createOfflineAppointment(payload).unwrap();
         const appointmentId = appointmentResult.data.appointmentId;
-        console.log(appointmentId);
-
+        
         // Initiate payment
         await initiatePayment(appointmentId);
 

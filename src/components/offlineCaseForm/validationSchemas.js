@@ -4,7 +4,7 @@ export const validationSchemas = [
   // Step 1: Personal Background
   Yup.object({
     timeline: Yup.string().min(10, 'Please provide at least 10 characters').required('Brief timeline is required'),
-    childhood: Yup.string().min(10, 'Please provide at least 10 characters').required('Please describe your childhood'),
+    childhood: Yup.string().required('Please describe your childhood'),
     hobbies: Yup.string().optional(),
     stressFactors: Yup.object({
       family: Yup.boolean(),
@@ -28,7 +28,7 @@ export const validationSchemas = [
     symptomDuration: Yup.string().min(3, 'Please provide at least 3 characters').required('Symptom duration is required'),
     symptomsBetter: Yup.string().optional(),
     symptomsWorse: Yup.string().optional(),
-    dailyBasis: Yup.string().min(3, 'Please provide at least 3 characters').required('Please indicate if symptoms occur daily'),
+    dailyBasis: Yup.string().required('Please indicate if symptoms occur daily'),
   }),
 
   // Step 4: Family Health History
@@ -40,7 +40,7 @@ export const validationSchemas = [
 // Complete form validation schema
 export const completeFormSchema = Yup.object({
   timeline: Yup.string().min(10, 'Please provide at least 10 characters').required('Brief timeline is required'),
-  childhood: Yup.string().min(10, 'Please provide at least 10 characters').required('Please describe your childhood'),
+  childhood: Yup.string().required('Please describe your childhood'),
   hobbies: Yup.string().optional(),
   stressFactors: Yup.object({
     family: Yup.boolean(),
@@ -56,6 +56,6 @@ export const completeFormSchema = Yup.object({
   symptomDuration: Yup.string().min(3, 'Please provide at least 3 characters').required('Symptom duration is required'),
   symptomsBetter: Yup.string().optional(),
   symptomsWorse: Yup.string().optional(),
-  dailyBasis: Yup.string().min(3, 'Please provide at least 3 characters').required('Please indicate if symptoms occur daily'),
+  dailyBasis: Yup.string().required('Please indicate if symptoms occur daily'),
   familyHealthSummary: Yup.string().min(10, 'Please provide at least 10 characters').required('Family health history is required'),
 });

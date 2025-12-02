@@ -73,7 +73,7 @@ export default function ConfirmationPage() {
                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            Payment Successful • ₹540.00
+            Payment Successful • ₹708.00
           </div>
         </div>
 
