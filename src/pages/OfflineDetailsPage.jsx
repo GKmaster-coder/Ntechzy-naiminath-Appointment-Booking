@@ -52,7 +52,7 @@ export default function OfflineDetailsPage() {
       alert(translations.pleaseCompleteForm);
       return;
     }
-    navigate("/payment-offline", { state: { ...state, formData } });
+    navigate("/confirmation", { state: { ...state, formData } });
   };
 
   const handleSkipToPayment = () => {

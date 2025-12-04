@@ -11,7 +11,6 @@ import ConfirmationPage from "./pages/ConfirmationPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import OnlineConfirmationPage from "./pages/OnlineConfirmationPage";
 import ScrollToTop from "./components/ScrollToTop";
-import OrderDetailsPage from "./pages/OrderDetailsPage";
 import AdminLogin from "./pages/AdminLogin";
 import { ToastContainer } from "react-toastify";
 import OnlinePaymentPage from "./pages/OnlinePaymentPage";
@@ -80,29 +79,31 @@ function App() {
           }
         />
         <Route
-  path="/online-details"
-  element={
-    <ProtectedBookingRoute>
-      <OnlineDetailsPage />
-    </ProtectedBookingRoute>
-  }
-/>
-<Route
-  path="/offline-details"
-  element={
-    <ProtectedBookingRoute>
-      <OfflineDetailsPage />
-    </ProtectedBookingRoute>
-  }
-/>
+          path="/online-details"
+          element={
+            <ProtectedBookingRoute>
+              <OnlineDetailsPage />
+            </ProtectedBookingRoute>
+          }
+        />
+        <Route
+          path="/offline-details"
+          element={
+            <ProtectedBookingRoute>
+              <OfflineDetailsPage />
+            </ProtectedBookingRoute>
+          }
+        />
         <Route path="/admin-login" element={<AdminLogin />} />
-       
-
-        <Route path="/payment" element={<PaymentPage />} />
         <Route path="/payment-online" element={<OnlinePaymentPage />} />
         <Route path="/payment-offline" element={<OfflinePaymentPage />} />
-        <Route path="/confirmation" element={<ConfirmationPage />} />
-        <Route path="/order/order-medicine" element={<OrderDetailsPage />} />
+        <Route
+          path="/confirmation"
+          element={
+            <ProtectedBookingRoute>
+              <ConfirmationPage />
+            </ProtectedBookingRoute>
+          } />
         <Route
           path="/onlineconfirmation"
           element={<OnlineConfirmationPage />}
