@@ -6,7 +6,6 @@ import BookingWrapper from "./components/BookingWrapper";
 import BookingDetailsPage from "./pages/BookingDetailsPage";
 import OnlineDetailsPage from "./pages/OnlineDetailsPage";
 import OfflineDetailsPage from "./pages/OfflineDetailsPage";
-import PaymentPage from "./pages/PaymentPage";
 import ConfirmationPage from "./pages/ConfirmationPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import OnlineConfirmationPage from "./pages/OnlineConfirmationPage";
@@ -15,8 +14,9 @@ import AdminLogin from "./pages/AdminLogin";
 import { ToastContainer } from "react-toastify";
 import OnlinePaymentPage from "./pages/OnlinePaymentPage";
 import OfflinePaymentPage from "./pages/OfflinePaymentPage";
-import { initializeUserFromSession } from "./store/slices/userSlice"
+import { initializeUserFromSession } from "./store/slices/userSlice";
 import "react-toastify/dist/ReactToastify.css";
+import AppointmentDetailsPage from "./pages/AppointmentDetailsPage";
 
 const ProtectedRoute = ({ children }) => {
   const { token } = useSelector((state) => state.admin);
@@ -44,15 +44,11 @@ const ProtectedBookingRoute = ({ children }) => {
   return children;
 };
 
-
-
 function App() {
-
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(initializeUserFromSession());
   }, [dispatch]);
-
 
   return (
     <BrowserRouter>
@@ -104,6 +100,10 @@ function App() {
               <ConfirmationPage />
             </ProtectedBookingRoute>
           } />
+        <Route
+          path="/offline-appointments/:id"
+          element={<AppointmentDetailsPage />}
+        />
         <Route
           path="/onlineconfirmation"
           element={<OnlineConfirmationPage />}
