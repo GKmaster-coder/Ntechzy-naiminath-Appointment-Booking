@@ -32,10 +32,7 @@ export default function OnlinePaymentPage() {
   }, [consultationType]);
 
   const handleSuccess = async () => {
-    if (!state?.formData) {
-      toast.error('Form data not found. Please go back and try again.');
-      return;
-    }
+
 
     if (isProcessing) return;
     setIsProcessing(true);
