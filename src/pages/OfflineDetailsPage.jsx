@@ -60,8 +60,7 @@ export default function OfflineDetailsPage() {
       <ConfirmToast
         message={translations.skipConfirmation}
         onConfirm={async () => {
-          try {
-            // Create appointment with empty form data using utility function
+          try { 
             const payload = formatOfflineAppointmentData(
               userId,
               state?.selectedSlot,
@@ -70,8 +69,7 @@ export default function OfflineDetailsPage() {
 
             const appointmentResult = await createOfflineAppointment(payload).unwrap();
             const appointmentId = appointmentResult.data.appointmentId;
-            
-            // Initiate payment
+             
             await initiatePayment(appointmentId);
           } catch (error) {
             console.error('Failed to create appointment:', error);
@@ -79,8 +77,7 @@ export default function OfflineDetailsPage() {
             alert(errorMessage);
           }
         }}
-        onCancel={() => {
-          /* do nothing */
+        onCancel={() => { 
         }}
       />,
       {
@@ -105,7 +102,7 @@ export default function OfflineDetailsPage() {
     try {
       const orderResult = await createPaymentOrder({ 
         appointmentId, 
-        amount: 708 // ₹708 including GST
+        amount: 708  
       }).unwrap();
       
       openRazorpayCheckout(orderResult.data, appointmentId);

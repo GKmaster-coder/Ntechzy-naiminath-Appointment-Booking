@@ -35,8 +35,7 @@ const ProtectedRoute = ({ children }) => {
 const ProtectedBookingRoute = ({ children }) => {
   const { userId } = useSelector((state) => state.user);
   const sessionUserId = sessionStorage.getItem("userId");
-
-  // if userId doesn't exist, block access
+ 
   if (!userId && !sessionUserId) {
     return <Navigate to="/" replace />;
   }

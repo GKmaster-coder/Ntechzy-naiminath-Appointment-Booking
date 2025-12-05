@@ -40,7 +40,7 @@ const OnlineAppointments = () => {
       toast.success(res.message);
       refetch();
     } catch (err) {
-     toast.error(err?.data?.message || "Failed to cancel appointment");
+      toast.error(err?.data?.message || "Failed to cancel appointment");
     }
   };
 
@@ -61,8 +61,8 @@ const OnlineAppointments = () => {
         date: confirmDate,
         time: confirmTime,
       }).unwrap();
-      
-     toast.success(res.message || "Appointment confirmed successfully!");
+
+      toast.success(res.message || "Appointment confirmed successfully!");
       setShowConfirmModal(false);
       setConfirmDate("");
       setConfirmTime("");
@@ -89,7 +89,6 @@ const OnlineAppointments = () => {
     "4:00 PM",
   ];
 
-  // FILTERS
   const filteredAppointments = appointments.filter((appt) => {
     const matchesSearch =
       appt.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -184,12 +183,12 @@ const OnlineAppointments = () => {
         </div>
       </div>
 
-      {/* APPOINTMENTS GRID */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {currentAppointments.map((appointment) => {
           let status = appointment.bookingStatus || "pending";
           if (status === "submitted") status = "pending";
           const isSubmitted = appointment.formSubmitted || false;
+          console.log(appointment);
 
           return (
             <div
@@ -197,11 +196,11 @@ const OnlineAppointments = () => {
               className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 overflow-hidden"
               style={{
                 borderLeftColor:
-                  status === "confirmed"
+                  status === "scheduled"
                     ? "#10B981"
                     : status === "cancelled"
-                    ? "#EF4444"
-                    : "#F59E0B",
+                      ? "#EF4444"
+                      : "#F59E0B",
               }}
             >
               {/* CARD HEADER */}
@@ -226,13 +225,12 @@ const OnlineAppointments = () => {
 
                   <div className="flex flex-col items-end space-y-2">
                     <span
-                      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                        status === "confirmed"
-                          ? "bg-green-100 text-green-800 border border-green-200"
-                          : status === "cancelled"
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${status === "confirmed"
+                        ? "bg-green-100 text-green-800 border border-green-200"
+                        : status === "cancelled"
                           ? "bg-red-100 text-red-800 border border-red-200"
                           : "bg-yellow-100 text-yellow-800 border border-yellow-200"
-                      }`}
+                        }`}
                     >
                       {status.toUpperCase()}
                     </span>
@@ -295,7 +293,7 @@ const OnlineAppointments = () => {
               {/* CARD FOOTER */}
               <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
                 <div className="flex space-x-2">
-                  {(status === "pending" || status === "confirmed") && (
+                  {(status === "booked") && (
                     <>
                       <button
                         onClick={() => handleConfirmSlot(appointment)}
@@ -354,11 +352,10 @@ const OnlineAppointments = () => {
               <button
                 key={i}
                 onClick={() => setCurrentPage(i + 1)}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  currentPage === i + 1
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${currentPage === i + 1
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-600 hover:bg-gray-100"
+                  }`}
               >
                 {i + 1}
               </button>

@@ -1,4 +1,3 @@
-// src/components/OfflineAppointments.jsx
 import React, { useState } from "react";
 import { useDisableSlotMutation, useAddSlotMutation } from "../../api/endpoints/slots";
 import { toast } from "react-toastify";
@@ -21,20 +20,20 @@ const OfflineAppointments = () => {
   const [addSlotApi, { isLoading: isAddLoading }] = useAddSlotMutation();
 
   const SLOT_LIST = [
-    "10:00-10:30",
-    "10:30-11:00",
-    "11:00-11:30",
-    "11:30-12:00",
+    "10:00",
+    "10:30",
+    "11:00",
+    "11:30",
 
-    "12:00-12:30",
-    "12:30-01:00",
-    "01:00-01:30",
-    "01:30-02:00",
+    "12:00",
+    "12:30",
+    "01:00",
+    "01:30",
 
-    "02:00-02:30",
-    "02:30-03:00",
-    "03:00-03:30",
-    "03:30-04:00",
+    "02:00",
+    "02:30",
+    "03:00",
+    "03:30",
   ];
 
   const monthNames = [
@@ -116,7 +115,7 @@ const OfflineAppointments = () => {
         capacity: capacity,
       }).unwrap();
 
-     toast.success(res.message || "Slot added successfully!");
+      toast.success(res.message || "Slot added successfully!");
       setCustomTime('');
     } catch (error) {
       console.error('Failed to add slot:', error);
@@ -129,28 +128,13 @@ const OfflineAppointments = () => {
     handleAddSlot(null);
   };
 
-  // ⭐ Convert 30-min slots → backend hour-block format
-  const convertTime = (slot) => {
-    // slot: "10:00-10:30"
-    const [start, end] = slot.split("-"); // ["10:00", "10:30"]
 
-    let hour = parseInt(start.split(":")[0]); // "10:00" → 10
+  const handleDisableSlot = async (slot) => { 
 
-    let mer = hour >= 12 ? "pm" : "am";
-    if (hour > 12) hour -= 12;
-    if (hour === 0) hour = 12;
-
-    let nextHour = hour + 1;
-    if (nextHour > 12) nextHour -= 12;
-
-    return `${hour}-${nextHour} ${mer}`;
-  };
-
-  const handleDisableSlot = async (slot) => {
     if (!selectedDate) return;
 
     try {
-      const convertedTime = convertTime(slot);
+      const convertedTime = slot;
 
       const res = await disableSlotApi({
         date: selectedDate,
@@ -163,9 +147,9 @@ const OfflineAppointments = () => {
           ? exists.filter((s) => s !== slot)
           : [...exists, slot];
         return { ...prev, [selectedDate]: updated };
-      });
+      }); 
 
-     toast.success(res.message || "Slot disabled successfully!");
+      toast.success(res.message || "Slot disabled successfully!");
     } catch (error) {
       console.error('Failed to disable slot:', error);
       toast.error(error?.data?.message || "Failed to disable slot");
@@ -280,11 +264,10 @@ const OfflineAppointments = () => {
                       <button
                         key={slot}
                         onClick={() => handleDisableSlot(slot)}
-                        className={`py-2 rounded-lg border text-sm px-3 ${
-                          isDisabled
-                            ? "bg-red-100 text-red-700 border-red-300"
-                            : "bg-white text-gray-700 hover:bg-gray-100"
-                        }`}
+                        className={`py-2 rounded-lg border text-sm px-3 ${isDisabled
+                          ? "bg-red-100 text-red-700 border-red-300"
+                          : "bg-white text-gray-700 hover:bg-gray-100"
+                          }`}
                       >
                         <div className="flex justify-between items-center">
                           <span>{slot}</span>
