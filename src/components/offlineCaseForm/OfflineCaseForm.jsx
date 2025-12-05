@@ -8,48 +8,21 @@ import Step4FamilyHistory from './steps/Step4FamilyHistory';
 import { initialValues } from './initialValues';
 import { validationSchemas, completeFormSchema } from './validationSchemas';
 import { translations } from './translations';
-import { useCreateOfflineAppointmentMutation } from '../../store/api/offlineAppointmentApi';
-import { useCreatePaymentOrderMutation, useVerifyPaymentMutation, useRecordPaymentFailureMutation } from '../../store/api/paymentApi';
-import { useSelector } from 'react-redux';
-import { formatOfflineAppointmentData } from '../../utils/appointmentUtils';
 
-const OfflineCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: externalFormComplete, onClose, appointmentData }) => {
+const OfflineCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: externalFormComplete, appointmentData }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 4;
   const [isSaved, setIsSaved] = useState(false);
   const [internalFormComplete, setInternalFormComplete] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [language, setLanguage] = useState('en'); // 'en' or 'hi'
-  const [createOfflineAppointment, { isLoading: isSubmitting }] = useCreateOfflineAppointmentMutation();
-  const [createPaymentOrder] = useCreatePaymentOrderMutation();
-  const [verifyPayment] = useVerifyPaymentMutation();
-  const [recordPaymentFailure] = useRecordPaymentFailureMutation();
-  const user = useSelector((state) => state.user);
-  const userId = user?.userId || user?.userData?._id || user?.userData?.id;
 
   const formik = useFormik({
     initialValues,
     validationSchema: completeFormSchema,
     onSubmit: async (values) => {
-      console.log("here");
-      
-      try {
-        const payload = formatOfflineAppointmentData(
-          userId,
-          appointmentData?.selectedSlot,
-          values
-        );
-
-        const appointmentResult = await createOfflineAppointment(payload).unwrap();
-        const appointmentId = appointmentResult.data.appointmentId;
-        
-        // Initiate payment
-        await initiatePayment(appointmentId);
-
-      } catch (error) {
-        console.error('Failed to submit appointment:', error);
-        const errorMessage = error?.data?.message || error?.message || 'Failed to submit appointment. Please try again.';
-        alert(errorMessage);
+      // Simply pass the form data back to parent
+      if (onFormSubmit) {
+        onFormSubmit(values);
       }
     },
   });
@@ -148,118 +121,9 @@ const OfflineCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: externa
     return touched && error ? error : null;
   };
 
-  const initiatePayment = async (appointmentId) => {
-    try {
-      const orderResult = await createPaymentOrder({
-        appointmentId,
-        amount: 708 // ₹708 including GST
-      }).unwrap();
-
-      openRazorpayCheckout(orderResult.data, appointmentId);
-    } catch (error) {
-      console.error('Payment order creation failed:', error);
-      alert('Failed to initiate payment. Please try again.');
-    }
-  };
-
-  const openRazorpayCheckout = (orderData, appointmentId) => {
-    const options = {
-      key: orderData.key,
-      amount: orderData.amount,
-      currency: orderData.currency,
-      name: "Naiminath Clinic",
-      description: "Appointment Booking Fee",
-      order_id: orderData.orderId,
-      handler: function (response) {
-        handlePaymentSuccess(response, appointmentId);
-      },
-      prefill: {
-        name: user?.userData?.name || "Patient",
-        email: user?.userData?.email || "",
-        contact: user?.userData?.phone || ""
-      },
-      theme: {
-        color: "#3399cc"
-      },
-      modal: {
-        ondismiss: function () {
-          handlePaymentFailure(appointmentId, "Payment cancelled by user");
-        }
-      }
-    };
-
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-  };
-
-  const handlePaymentSuccess = async (paymentResponse, appointmentId) => {
-    try {
-      await verifyPayment({
-        razorpay_order_id: paymentResponse.razorpay_order_id,
-        razorpay_payment_id: paymentResponse.razorpay_payment_id,
-        razorpay_signature: paymentResponse.razorpay_signature,
-        appointmentId
-      }).unwrap();
-
-      setShowSuccessMessage(true);
-      setInternalFormComplete(true);
-
-      if (onFormSubmit) {
-        onFormSubmit(formik.values);
-      }
-
-      if (onFormComplete) {
-        onFormComplete(true);
-      }
-
-      setTimeout(() => {
-        if (onClose) {
-          onClose();
-        }
-      }, 2000);
-    } catch (error) {
-      console.error('Payment verification failed:', error);
-      alert('Payment verification failed. Please contact support.');
-    }
-  };
-
-  const handlePaymentFailure = async (appointmentId, errorMessage) => {
-    try {
-      await recordPaymentFailure({
-        appointmentId,
-        error: errorMessage
-      }).unwrap();
-
-      alert('Payment failed. Please try again.');
-    } catch (error) {
-      console.error('Error recording payment failure:', error);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-
-        {/* Success Message */}
-        {showSuccessMessage && (
-          <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
-            <div className="flex items-center">
-              <div className="shrink-0">
-                <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-green-800">
-                  {t.success.title}
-                </h3>
-                <p className="text-sm text-green-600 mt-1">
-                  {t.success.message}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Language Toggle */}
         <div className="flex justify-between items-center mb-4">
@@ -373,13 +237,13 @@ const OfflineCaseForm = ({ onFormComplete, onFormSubmit, isFormComplete: externa
               ) : (
                 <button
                   type="submit"
-                  disabled={showSuccessMessage || isSubmitting}
-                  className={`px-8 py-3 font-bold rounded-md transition ${showSuccessMessage || isSubmitting
-                    ? 'bg-green-600 text-white cursor-not-allowed'
-                    : 'bg-green-600 hover:bg-green-700 text-white'
+                  disabled={!isFormComplete}
+                  className={`px-8 py-3 font-bold rounded-md transition ${isFormComplete
+                    ? 'bg-green-600 hover:bg-green-700 text-white'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                 >
-                  {isSubmitting ? 'Submitting...' : showSuccessMessage ? t.common.submitted : t.common.submit}
+                  {t.common.completeForm}
                 </button>
               )}
             </div>

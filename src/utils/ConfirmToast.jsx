@@ -8,7 +8,7 @@ const ConfirmToast = ({ message, onConfirm, onCancel }) => {
       {/* Message */}
       <div className="mb-4">
         <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 mt-0.5">
+          <div className="shrink-0 mt-0.5">
             <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
               <svg 
                 className="w-4 h-4 text-blue-600" 
@@ -40,7 +40,7 @@ const ConfirmToast = ({ message, onConfirm, onCancel }) => {
           }}
           className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg 
                    hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 
-                   transition-colors duration-200 min-w-[80px]"
+                   transition-colors duration-200 min-w-80px"
         >
           Cancel
         </button>
@@ -52,7 +52,7 @@ const ConfirmToast = ({ message, onConfirm, onCancel }) => {
           }}
           className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg 
                    hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 
-                   transition-colors duration-200 min-w-[80px]"
+                   transition-colors duration-200 min-w-20"
         >
           Confirm
         </button>

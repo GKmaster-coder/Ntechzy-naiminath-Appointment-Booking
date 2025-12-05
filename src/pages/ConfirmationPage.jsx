@@ -1,11 +1,22 @@
-// src/pages/ConfirmationPage.jsx
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { FiCopy, FiCheck } from "react-icons/fi";
 
 export default function ConfirmationPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState(5);
+  const [copied, setCopied] = useState(false);
+
+  // Fixed handleCopy function - now uses razorpay_payment_id
+  const handleCopy = () => {
+    const paymentId = state?.razorpay_payment_id;
+    if (paymentId) {
+      navigator.clipboard.writeText(paymentId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -18,7 +29,6 @@ export default function ConfirmationPage() {
         return prev - 1;
       });
     }, 1000);
-
     return () => clearInterval(timer);
   }, [navigate]);
 
@@ -26,13 +36,14 @@ export default function ConfirmationPage() {
     navigate("/");
   };
 
+
   const handleViewAppointment = () => {
     // Navigate to appointments page or show details
     console.log("View appointment details");
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-[#e6e2ff] via-[#d8f0ff] to-[#7ddfff] py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#e6e2ff] via-[#d8f0ff] to-[#7ddfff] py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
         {/* Success Header */}
         <div className="text-center mb-8">
@@ -73,7 +84,7 @@ export default function ConfirmationPage() {
                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            Payment Successful • ₹708.00
+            Payment Successful • ₹600.00
           </div>
         </div>
 
@@ -82,14 +93,48 @@ export default function ConfirmationPage() {
           <div className="p-8 bg-linear-to-r from-green-500 to-emerald-600 text-white">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold">Your Appointment Details</h2>
-              <div className="bg-white text-green-700 font-bold bg-opacity-20 rounded-lg px-3 py-1 text-sm">
-                Confirmed
-              </div>
+   <div className="bg-yellow-100 text-yellow-800 px-3 py-1 text-sm font-semibold rounded-full border border-yellow-300">
+  Confirmed
+</div>
+
             </div>
             <p className="text-green-100">
               We've sent a confirmation email with all the details
             </p>
           </div>
+
+          {/* Payment ID Section - Added Here */}
+          {state?.razorpay_payment_id && (
+            <div className="p-6 border-b border-gray-100 bg-gray-50">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Payment ID</p>
+                  <p className="text-lg font-mono font-bold text-gray-800 break-all">
+                    {state.razorpay_payment_id}
+                  </p>
+                </div>
+                <button
+                  onClick={handleCopy}
+                  className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700 hover:text-gray-900"
+                >
+                  {copied ? (
+                    <>
+                      <FiCheck className="w-4 h-4 text-green-600" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <FiCopy className="w-4 h-4" />
+                      Copy ID
+                    </>
+                  )}
+                </button>
+              </div>
+              <p className="text-sm text-gray-500 mt-2">
+                Save this ID for future reference and payment tracking
+              </p>
+            </div>
+          )}
 
           {/* Appointment Details */}
           <div className="p-8">
@@ -153,6 +198,38 @@ export default function ConfirmationPage() {
                     </p>
                   </div>
                 </div>
+
+                {/* Payment Information Card - Added in Left Column */}
+                {state?.razorpay_payment_id && (
+                  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
+                    <div className="flex items-center mb-2">
+                      <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <p className="text-sm font-semibold text-green-800">Payment Details</p>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Amount:</span>
+                        <span className="font-medium text-gray-800">₹600.00</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Status:</span>
+                        <span className="font-medium text-green-600">Paid</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Date:</span>
+                        <span className="font-medium text-gray-800">
+                          {new Date().toLocaleDateString('en-IN', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Right Column */}
@@ -177,12 +254,14 @@ export default function ConfirmationPage() {
                     <p className="text-sm text-gray-500 font-medium">
                       Date & Time
                     </p>
-                    <p className="text-lg font-semibold text-gray-900">
-                      {state?.selectedSlot?.time}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {state?.selectedSlot?.dateFormatted}
-                    </p>
+                   <p className="text-lg font-semibold text-gray-900">
+  {state?.slotTime || "Time not specified"}
+</p>
+
+<p className="text-sm text-gray-600">
+  {state?.appointmentDate || "Date not specified"}
+</p>
+
                   </div>
                 </div>
 
@@ -211,6 +290,25 @@ export default function ConfirmationPage() {
                     </p>
                   </div>
                 </div>
+
+                {/* Payment ID Badge - Added in Right Column */}
+                {state?.razorpay_payment_id && (
+                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center">
+                      <div className="mr-3">
+                        <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                      <div className="overflow-hidden">
+                        <p className="text-xs font-medium text-blue-800">Payment ID:</p>
+                        <p className="text-xs font-mono text-blue-600 truncate">
+                          {state.razorpay_payment_id}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -235,21 +333,18 @@ export default function ConfirmationPage() {
               <ul className="text-sm text-yellow-700 space-y-2">
                 <li className="flex items-start">
                   <span className="mr-2">•</span>
-                  Please carry your ID proof and previous medical reports (if
-                  any)
+                  Please carry your ID proof and previous medical reports (if any)
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2">•</span>
-                  For online consultations, ensure stable internet connection
+                  Emergency contacts: +91-9837247775, +91-9837247776.
                 </li>
-                <li className="flex items-start">
-                  <span className="mr-2">•</span>
-                  Cancellation allowed up to 2 hours before appointment
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2">•</span>
-                  Emergency contact: +91 98765 43210
-                </li>
+                {state?.razorpay_payment_id && (
+                  <li className="flex items-start">
+                    <span className="mr-2">•</span>
+                    Keep your Payment ID ({state.razorpay_payment_id.substring(0, 8)}...) for future reference
+                  </li>
+                )}
               </ul>
             </div>
 
@@ -310,7 +405,7 @@ export default function ConfirmationPage() {
                     </svg>
                   </div>
                   <p className="font-medium text-blue-900">Reminder</p>
-                  <p className="text-blue-700">1 hour before appointment</p>
+                  <p className="text-blue-700">Arrive 10-15 minutes early</p>
                 </div>
                 <div className="text-center">
                   <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-2 border border-blue-200">
@@ -333,7 +428,31 @@ export default function ConfirmationPage() {
                 </div>
               </div>
             </div>
+
+            {/* Action Buttons */}
+            <div className="mt-8 flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={handleBookAnother}
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all font-medium"
+              >
+                Book Another Appointment
+              </button>
+              <button
+                onClick={handleViewAppointment}
+                className="flex-1 px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium"
+              >
+                View Appointment Details
+              </button>
+            </div>
           </div>
+        </div>
+
+        {/* Countdown Timer */}
+        <div className="text-center text-gray-600 text-sm">
+          <p>
+            Redirecting to home page in{" "}
+            <span className="font-bold text-blue-600">{countdown}</span> seconds...
+          </p>
         </div>
       </div>
     </div>

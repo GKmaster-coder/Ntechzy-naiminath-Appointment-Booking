@@ -20,8 +20,13 @@ export default function OfflineDetailsPage() {
   const [createPaymentOrder] = useCreatePaymentOrderMutation();
   const [verifyPayment] = useVerifyPaymentMutation();
   const [recordPaymentFailure] = useRecordPaymentFailureMutation();
+  const [paymentId, setPaymentId] = useState(null);
+const [appointmentDate, setAppointmentDate] = useState(state.selectedSlot?.dateFormatted);
+const [slotTime, setSlotTime] = useState(state.selectedSlot?.time );
+
   const user = useSelector((state) => state.user);
   const userId = user?.userId || user?.userData?._id || user?.userData?.id;
+  
 
   const translations = {
     noDataFound: "No data found. / कोई डेटा नहीं मिला।",
@@ -47,13 +52,33 @@ export default function OfflineDetailsPage() {
     </div>
   );
 
-  const handleNext = () => {
-    if (!isFormComplete) {
-      alert(translations.pleaseCompleteForm);
-      return;
-    }
-    navigate("/confirmation", { state: { ...state, formData } });
-  };
+// Update the handleNext function in OfflineDetailsPage
+const handleNext = async () => {
+  if (!isFormComplete) {
+    alert(translations.pleaseCompleteForm);
+    return;
+  }
+
+  try {
+    const payload = formatOfflineAppointmentData(
+      userId,
+      state?.selectedSlot,
+      formData  // This contains the form data from handleFormSubmit
+    );
+
+    // Create appointment first
+    const appointmentResult = await createOfflineAppointment(payload).unwrap();
+    const appointmentId = appointmentResult.data.appointmentId;
+    
+    // Then initiate payment
+    await initiatePayment(appointmentId);
+    
+  } catch (error) {
+    console.error('Failed to create appointment:', error);
+    const errorMessage = error?.data?.message || error?.message || 'Failed to create appointment. Please try again.';
+    alert(errorMessage);
+  }
+};
 
   const handleSkipToPayment = () => {
     toast(
@@ -93,16 +118,19 @@ export default function OfflineDetailsPage() {
     setIsFormComplete(complete);
   };
 
-  const handleFormSubmit = (submittedFormData) => {
-    setFormData(submittedFormData);
-    setIsFormComplete(true);
-  };
+ // Update the handleFormSubmit function
+const handleFormSubmit = (submittedFormData) => {
+  setFormData(submittedFormData);
+  setIsFormComplete(true);
+  // Don't automatically navigate or initiate payment here
+  // Just store the data and let the user click "Continue to Payment"
+};
 
   const initiatePayment = async (appointmentId) => {
     try {
       const orderResult = await createPaymentOrder({ 
         appointmentId, 
-        amount: 708  
+        amount: 600  
       }).unwrap();
       
       openRazorpayCheckout(orderResult.data, appointmentId);
@@ -117,7 +145,7 @@ export default function OfflineDetailsPage() {
       key: orderData.key,
       amount: orderData.amount,
       currency: orderData.currency,
-      name: "Naiminath Clinic",
+      name: "Naiminath Homeopathic Hospital",
       description: "Appointment Booking Fee",
       order_id: orderData.orderId,
       handler: function(response) {
@@ -152,9 +180,20 @@ export default function OfflineDetailsPage() {
         razorpay_signature: paymentResponse.razorpay_signature,
         appointmentId
       }).unwrap();
+
+        // Save it in state
+    setPaymentId(paymentResponse.razorpay_payment_id);
       
       // Navigate to confirmation page after successful verification
-      navigate('/confirmation', { state: { appointmentId } });
+         navigate('/confirmation', { 
+      state: { 
+        appointmentId,
+        razorpay_payment_id: paymentResponse.razorpay_payment_id,
+        appointmentDate,
+        slotTime
+      } 
+    });
+
     } catch (error) {
       console.error('Payment verification failed:', error);
       setIsProcessingPayment(false); // Stop loader on error
@@ -271,18 +310,16 @@ export default function OfflineDetailsPage() {
               </button>
             </div>
 
-            {/* Case Form */}
-            <OfflineCaseForm
-              onFormComplete={handleFormComplete}
-              onFormSubmit={handleFormSubmit}
-              isFormComplete={isFormComplete}
-              appointmentData={state}
-            />
-          </div>
-
-          {/* Payment Summary */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+                 <div className="bg-white rounded-2xl   mb-6">
             <PaymentSummary />
+          </div>
+            {/* Case Form */}
+         <OfflineCaseForm
+  onFormComplete={handleFormComplete}
+  onFormSubmit={handleFormSubmit}  // This just stores the form data
+  isFormComplete={isFormComplete}
+  appointmentData={state}
+/>
           </div>
 
           {/* Action Section */}
