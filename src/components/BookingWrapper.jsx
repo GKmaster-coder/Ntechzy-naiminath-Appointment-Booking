@@ -23,6 +23,7 @@ const BookingWrapper = () => {
     const formattedDate = dateFormatter(selectedDate);
 
     navigate("/offline-details", {
+      replace: true,
       state: {
         collegeName: "Naiminath Medical College",
         selectedType: type,
