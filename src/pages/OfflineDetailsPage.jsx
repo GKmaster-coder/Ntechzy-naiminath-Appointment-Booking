@@ -21,12 +21,12 @@ export default function OfflineDetailsPage() {
   const [verifyPayment] = useVerifyPaymentMutation();
   const [recordPaymentFailure] = useRecordPaymentFailureMutation();
   const [paymentId, setPaymentId] = useState(null);
-const [appointmentDate, setAppointmentDate] = useState(state.selectedSlot?.dateFormatted);
-const [slotTime, setSlotTime] = useState(state.selectedSlot?.time );
+  const [appointmentDate, setAppointmentDate] = useState(state.selectedSlot?.dateFormatted);
+  const [slotTime, setSlotTime] = useState(state.selectedSlot?.time);
 
   const user = useSelector((state) => state.user);
   const userId = user?.userId || user?.userData?._id || user?.userData?.id;
-  
+
 
   const translations = {
     noDataFound: "No data found. / कोई डेटा नहीं मिला।",
@@ -52,57 +52,57 @@ const [slotTime, setSlotTime] = useState(state.selectedSlot?.time );
     </div>
   );
 
-// Update the handleNext function in OfflineDetailsPage
-const handleNext = async () => {
-  if (!isFormComplete) {
-    alert(translations.pleaseCompleteForm);
-    return;
-  }
+  // Update the handleNext function in OfflineDetailsPage
+  const handleNext = async () => {
+    if (!isFormComplete) {
+      toast.warning(translations.pleaseCompleteForm, { position: "top-center" });
+      return;
+    }
 
-  try {
-    const payload = formatOfflineAppointmentData(
-      userId,
-      state?.selectedSlot,
-      formData  // This contains the form data from handleFormSubmit
-    );
+    try {
+      const payload = formatOfflineAppointmentData(
+        userId,
+        state?.selectedSlot,
+        formData  // This contains the form data from handleFormSubmit
+      );
 
-    // Create appointment first
-    const appointmentResult = await createOfflineAppointment(payload).unwrap();
-    const appointmentId = appointmentResult.data.appointmentId;
-    
-    // Then initiate payment
-    await initiatePayment(appointmentId);
-    
-  } catch (error) {
-    console.error('Failed to create appointment:', error);
-    const errorMessage = error?.data?.message || error?.message || 'Failed to create appointment. Please try again.';
-    alert(errorMessage);
-  }
-};
+      // Create appointment first
+      const appointmentResult = await createOfflineAppointment(payload).unwrap();
+      const appointmentId = appointmentResult.data.appointmentId;
+
+      // Then initiate payment
+      await initiatePayment(appointmentId);
+
+    } catch (error) {
+      console.error('Failed to create appointment:', error);
+      const errorMessage = error?.data?.message || error?.message || 'Failed to create appointment. Please try again.';
+      toast.error(errorMessage, { position: "top-center" });
+    }
+  };
 
   const handleSkipToPayment = () => {
     toast(
       <ConfirmToast
         message={translations.skipConfirmation}
         onConfirm={async () => {
-          try { 
+          try {
             const payload = formatOfflineAppointmentData(
               userId,
               state?.selectedSlot,
-              null  
+              null
             );
 
             const appointmentResult = await createOfflineAppointment(payload).unwrap();
             const appointmentId = appointmentResult.data.appointmentId;
-             
+
             await initiatePayment(appointmentId);
           } catch (error) {
             console.error('Failed to create appointment:', error);
             const errorMessage = error?.data?.message || error?.message || 'Failed to create appointment. Please try again.';
-            alert(errorMessage);
+            toast.error(errorMessage, { position: "top-center" });
           }
         }}
-        onCancel={() => { 
+        onCancel={() => {
         }}
       />,
       {
@@ -118,25 +118,27 @@ const handleNext = async () => {
     setIsFormComplete(complete);
   };
 
- // Update the handleFormSubmit function
-const handleFormSubmit = (submittedFormData) => {
-  setFormData(submittedFormData);
-  setIsFormComplete(true);
-  // Don't automatically navigate or initiate payment here
-  // Just store the data and let the user click "Continue to Payment"
-};
+  // Update the handleFormSubmit function
+  const handleFormSubmit = (submittedFormData) => {
+    setFormData(submittedFormData);
+    setIsFormComplete(true);
+    // Don't automatically navigate or initiate payment here
+    // Just store the data and let the user click "Continue to Payment"
+  };
 
   const initiatePayment = async (appointmentId) => {
     try {
-      const orderResult = await createPaymentOrder({ 
-        appointmentId, 
-        amount: 600  
+      const orderResult = await createPaymentOrder({
+        appointmentId,
+        amount: 600
       }).unwrap();
-      
+
       openRazorpayCheckout(orderResult.data, appointmentId);
     } catch (error) {
       console.error('Payment order creation failed:', error);
-      alert('Failed to initiate payment. Please try again.');
+      toast.error('Failed to initiate payment. Please try again.', {
+        position: "top-center",
+      });
     }
   };
 
@@ -148,7 +150,7 @@ const handleFormSubmit = (submittedFormData) => {
       name: "Naiminath Homeopathic Hospital",
       description: "Appointment Booking Fee",
       order_id: orderData.orderId,
-      handler: function(response) {
+      handler: function (response) {
         handlePaymentSuccess(response, appointmentId);
       },
       prefill: {
@@ -160,19 +162,19 @@ const handleFormSubmit = (submittedFormData) => {
         color: "#3399cc"
       },
       modal: {
-        ondismiss: function() {
+        ondismiss: function () {
           handlePaymentFailure(appointmentId, "Payment cancelled by user");
         }
       }
     };
-    
+
     const rzp = new window.Razorpay(options);
     rzp.open();
   };
 
   const handlePaymentSuccess = async (paymentResponse, appointmentId) => {
     setIsProcessingPayment(true); // Start loader
-    
+
     try {
       await verifyPayment({
         razorpay_order_id: paymentResponse.razorpay_order_id,
@@ -181,23 +183,30 @@ const handleFormSubmit = (submittedFormData) => {
         appointmentId
       }).unwrap();
 
-        // Save it in state
-    setPaymentId(paymentResponse.razorpay_payment_id);
-      
+            toast.success("Payment verified successfully!", {
+  position: "top-center",
+});
+      // Save it in state
+      setPaymentId(paymentResponse.razorpay_payment_id);
+
+
+
       // Navigate to confirmation page after successful verification
-         navigate('/confirmation', { 
-      state: { 
-        appointmentId,
-        razorpay_payment_id: paymentResponse.razorpay_payment_id,
-        appointmentDate,
-        slotTime
-      } 
-    });
+      navigate('/confirmation', {
+        state: {
+          appointmentId,
+          razorpay_payment_id: paymentResponse.razorpay_payment_id,
+          appointmentDate,
+          slotTime
+        }
+      });
 
     } catch (error) {
       console.error('Payment verification failed:', error);
       setIsProcessingPayment(false); // Stop loader on error
-      alert('Payment verification failed. Please contact support.');
+      toast.error('Payment verification failed. Please contact support.', {
+   position: "top-center",
+ });
     }
   };
 
@@ -207,8 +216,10 @@ const handleFormSubmit = (submittedFormData) => {
         appointmentId,
         error: errorMessage
       }).unwrap();
-      
-      alert('Payment failed. Please try again.');
+
+     toast.error('Payment failed. Please try again.', {
+   position: "top-center",
+ });
     } catch (error) {
       console.error('Error recording payment failure:', error);
     }
@@ -223,14 +234,14 @@ const handleFormSubmit = (submittedFormData) => {
           <div className="w-16 h-16 border-4 border-blue-200 rounded-full"></div>
           <div className="w-16 h-16 border-4 border-blue-600 rounded-full absolute top-0 left-0 animate-spin border-t-transparent"></div>
         </div>
-        
+
         <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-2">
           Processing Payment
         </h3>
         <p className="text-gray-600 text-center text-sm">
           Please wait while we verify your payment...
         </p>
-        
+
         <div className="mt-4 text-xs text-gray-500">
           This may take a few seconds
         </div>
@@ -242,7 +253,7 @@ const handleFormSubmit = (submittedFormData) => {
     <>
       {/* Payment Loader */}
       {isProcessingPayment && <PaymentLoader />}
-      
+
       <div className="min-h-screen bg-linear-to-br from-[#e6e2ff] via-[#d8f0ff] to-[#7ddfff] py-4 px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="max-w-4xl mx-auto mb-6">
@@ -300,26 +311,25 @@ const handleFormSubmit = (submittedFormData) => {
                 onClick={handleSkipToPayment}
                 disabled={isSkipSubmitting}
                 className={`font-semibold py-3 px-6 rounded-md transition duration-200 ease-in-out
-                  shadow-md hover:shadow-lg transform hover:-translate-y-0.5 ${
-                    isSkipSubmitting
-                      ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  shadow-md hover:shadow-lg transform hover:-translate-y-0.5 ${isSkipSubmitting
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
                   }`}
               >
                 {isSkipSubmitting ? 'Creating Appointment...' : translations.skipAndContinue}
               </button>
             </div>
 
-                 <div className="bg-white rounded-2xl   mb-6">
-            <PaymentSummary />
-          </div>
+            <div className="bg-white rounded-2xl   mb-6">
+              <PaymentSummary />
+            </div>
             {/* Case Form */}
-         <OfflineCaseForm
-  onFormComplete={handleFormComplete}
-  onFormSubmit={handleFormSubmit}  // This just stores the form data
-  isFormComplete={isFormComplete}
-  appointmentData={state}
-/>
+            <OfflineCaseForm
+              onFormComplete={handleFormComplete}
+              onFormSubmit={handleFormSubmit}  // This just stores the form data
+              isFormComplete={isFormComplete}
+              appointmentData={state}
+            />
           </div>
 
           {/* Action Section */}

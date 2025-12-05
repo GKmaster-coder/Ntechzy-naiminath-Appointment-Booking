@@ -157,7 +157,6 @@ onSubmit: async (values, { setSubmitting }) => {
 
     // Check if we can reuse existing user
     if (canReuseUser()) {
-      console.log("Updating existing user:", userId);
       result = await updateUser({
         id: userId,
         ...userPayload
@@ -168,7 +167,6 @@ onSubmit: async (values, { setSubmitting }) => {
         dispatch(setUserData(userToSubmit));
       }
     } else {
-      console.log("Creating new user");
       result = await createUser(userPayload).unwrap();
 
       if (result.success && result.data?.user?._id) {
@@ -202,7 +200,7 @@ onSubmit: async (values, { setSubmitting }) => {
     }
 
   } catch (error) {
-    console.error("Error processing user:", error);
+
 
     if (error.data && error.data.errors) {
       setServerErrors(error.data.errors);
