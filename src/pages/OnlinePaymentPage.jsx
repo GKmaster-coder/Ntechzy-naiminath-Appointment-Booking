@@ -52,11 +52,11 @@ export default function OnlinePaymentPage() {
         }
       };
 
-      const appointmentResult = await createOnlineAppointment(appointmentData).unwrap();
+      // const appointmentResult = await createOnlineAppointment(appointmentData).unwrap();
 
-      const appointmentId = appointmentResult.data.appointmentId;
+      // const appointmentId = appointmentResult.data.appointmentId;
 
-      await initiatePayment(appointmentId);
+      await initiatePayment(userId);
     } catch (error) {
       console.error('Failed to create appointment:', error);
       const errorMessage = error?.data?.message || error?.message || 'Failed to create appointment. Please try again.';
@@ -66,22 +66,22 @@ export default function OnlinePaymentPage() {
     }
   };
 
-  const initiatePayment = async (appointmentId) => {
+  const initiatePayment = async (userId) => {
     try {
       const orderResult = await createPaymentOrder({
-        appointmentId,
+        userId,
         amount: total,
         appointmentType: "online"
       }).unwrap();
 
-      openRazorpayCheckout(orderResult.data, appointmentId);
+      openRazorpayCheckout(orderResult.data);
     } catch (error) {
       console.error('Payment order creation failed:', error);
       alert('Failed to initiate payment. Please try again.');
     }
   };
 
-  const openRazorpayCheckout = (orderData, appointmentId) => {
+  const openRazorpayCheckout = (orderData) => {
     if (!window.Razorpay) {
       console.error('Razorpay SDK not loaded');
       toast.error('Payment system not available. Please refresh the page and try again.');
@@ -95,7 +95,8 @@ export default function OnlinePaymentPage() {
       description: "Online Consultation Fee",
       order_id: orderData.orderId,
       handler: function (response) {
-        handlePaymentSuccess(response, appointmentId);
+        let paymentId = orderData.paymentId
+        handlePaymentSuccess(response, paymentId);
       },
       prefill: {
         name: user?.userData?.name || "Patient",
@@ -107,7 +108,7 @@ export default function OnlinePaymentPage() {
       },
       modal: {
         ondismiss: function () {
-          handlePaymentFailure(appointmentId, "Payment cancelled by user");
+          handlePaymentFailure(null, "Payment cancelled by user");
         }
       }
     };
@@ -116,7 +117,7 @@ export default function OnlinePaymentPage() {
     rzp.open();
   };
 
-  const handlePaymentSuccess = async (paymentResponse, appointmentId) => {
+  const handlePaymentSuccess = async (paymentResponse, paymentId) => {
     setIsProcessing(true);
 
     try {
@@ -124,13 +125,24 @@ export default function OnlinePaymentPage() {
         razorpay_order_id: paymentResponse.razorpay_order_id,
         razorpay_payment_id: paymentResponse.razorpay_payment_id,
         razorpay_signature: paymentResponse.razorpay_signature,
-        appointmentId
+        paymentId: paymentResponse.razorpay_payment_id,
+        appointmentType: "online",
+        payload: {
+          userId,
+          date: null,
+          time: null,
+          formData: state?.formData,
+          paymentDetails: {
+            patientType,
+            consultationType,
+            amount: total
+          }
+        }
       }).unwrap();
 
       // Navigate to confirmation page after successful verification
       navigate('/onlineconfirmation', {
         state: {
-          appointmentId,
           amount: total,
           currency: "₹",
           patientType,

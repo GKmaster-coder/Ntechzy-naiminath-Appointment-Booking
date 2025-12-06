@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   submitOnlineAppointment,
   setAppointmentSubmitted,
@@ -25,6 +26,7 @@ export const useCaseForm = ({
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const userId = useSelector((state) => state.user.userId);
   const { isLoading, error, isSubmitted } = useSelector(
     (state) => state.onlineAppointment
@@ -172,29 +174,16 @@ export const useCaseForm = ({
       return;
     }
 
-    try {
-      if (!userId) {
-        throw new Error(
-          "User ID not found. Please complete user registration first."
-        );
-      }
-
-      const backendData = transformToBackendFormat(formData);
-      const result = await dispatch(submitOnlineAppointment(backendData));
-
-      if (result.success) {
-        setIsFormComplete(true);
-        setSubmitted(true);
-        onFormComplete && onFormComplete(true);
-        onFormSubmit && onFormSubmit(backendData);
-       toast.success("Form submitted successfully!");
-      } else {
-        throw new Error(result.message || "Failed to submit appointment");
-      }
-    } catch (error) {
-      console.error('Failed to submit appointment:', error);
-     toast.error(`Failed to submit form. Please try again. Error: ${error.message}`);
+    if (!userId) {
+      toast.error("User ID not found. Please complete user registration first.");
+      return;
     }
+
+    const backendData = transformToBackendFormat(formData);
+    toast.success("Form submitted successfully!");
+    setTimeout(() => {
+      navigate('/payment-online', { state: { formData: backendData } });
+    }, 1000);
   };
 
   const handleEditForm = () => {
@@ -216,30 +205,20 @@ export const useCaseForm = ({
       return;
     }
 
-    try {
-      if (!userId) {
-        throw new Error(
-          "User ID not found. Please complete user registration first."
-        );
-      }
-
-      const backendData = transformToBackendFormat(formData);
-      const result = await dispatch(
-        submitOnlineAppointment(backendData)
-      ).unwrap();
-
-      if (result.success) {
-        setIsEditing(false);
-        setIsFormComplete(true);
-        setSubmitted(true);
-        onFormComplete && onFormComplete(true);
-        
-toast.success("Form updated successfully!");
-      }
-    } catch (error) {
-      console.error('Failed to update appointment:', error);
-      toast.error(`Failed to submit form. Please try again. Error: ${error.message}`);
+    if (!userId) {
+      toast.error("User ID not found. Please complete user registration first.");
+      return;
     }
+
+    const backendData = transformToBackendFormat(formData);
+    setIsEditing(false);
+    setIsFormComplete(true);
+    setSubmitted(true);
+    onFormComplete && onFormComplete(true);
+    toast.success("Form updated successfully!");
+    setTimeout(() => {
+      navigate('/payment-online', { state: { formData: backendData } });
+    }, 1000);
   };
 
   return {

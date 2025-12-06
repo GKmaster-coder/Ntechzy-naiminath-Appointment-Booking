@@ -1,199 +1,287 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import BackButton from "../components/BackButton";
+import { useCreateOfflineAppointmentMutation } from "../store/api/offlineAppointmentApi";
+import { useCreatePaymentOrderMutation, useVerifyPaymentMutation, useRecordPaymentFailureMutation } from "../store/api/paymentApi";
+import { formatOfflineAppointmentData } from "../utils/appointmentUtils";
+import { toast } from "react-toastify";
 
 export default function OfflinePaymentPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const baseAmount = 600;
-  const tax = baseAmount * 0.18; // 18% GST
-  const total = baseAmount + tax;
+  console.log('OfflinePaymentPage - Received state:', state);
+  console.log('Form data from state:', state?.formData);
+  const [createOfflineAppointment] = useCreateOfflineAppointmentMutation();
+  const [createPaymentOrder] = useCreatePaymentOrderMutation();
+  const [verifyPayment] = useVerifyPaymentMutation();
+  const [recordPaymentFailure] = useRecordPaymentFailureMutation();
+  const user = useSelector((state) => state.user);
+  const userId = user?.userId || user?.userData?._id || user?.userData?.id;
 
-  const handleConfirm = () => {
+  const baseAmount = 600;
+  const total = baseAmount;
+
+  const handleConfirm = async () => {
+    if (isProcessing) return;
     setIsProcessing(true);
-    setTimeout(() => {
-      navigate("/confirmation", { 
-        state: { 
-          ...state, 
-          amount: total,
-          currency: "₹",
-          paymentType: "offline"
-        } 
+
+    try {
+
+      await initiatePayment(userId);
+    } catch (error) {
+      console.error('Failed to create appointment:', error);
+      const errorMessage = error?.data?.message || error?.message || 'Failed to create appointment. Please try again.';
+      alert(errorMessage);
+      setIsProcessing(false);
+    }
+  };
+
+  const initiatePayment = async (userId) => {
+    try {
+      const orderResult = await createPaymentOrder({
+        userId,
+        date: state?.selectedSlot?.date,
+        time: state?.selectedSlot?.time,
+        amount: total
+      }).unwrap();
+
+      openRazorpayCheckout(orderResult.data);
+    } catch (error) {
+      console.error('Payment order creation failed:', error);
+      alert('Failed to initiate payment. Please try again.');
+      toast.error(error.data.message)
+      setIsProcessing(false);
+    }
+  };
+
+  const openRazorpayCheckout = (orderData) => {
+    const options = {
+      key: orderData.key,
+      amount: orderData.amount,
+      currency: orderData.currency,
+      name: "Naiminath Clinic",
+      description: "Offline Appointment Fee",
+      order_id: orderData.orderId,
+      handler: function (response) {
+        let paymentId = orderData.paymentId
+        handlePaymentSuccess(response, paymentId);
+      },
+      prefill: {
+        name: user?.userData?.name || "Patient",
+        email: user?.userData?.email || "",
+        contact: user?.userData?.phone || ""
+      },
+      theme: {
+        color: "#3399cc"
+      },
+      modal: {
+        ondismiss: function () {
+          handlePaymentFailure(null, "Payment cancelled by user");
+        }
+      }
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+
+  const handlePaymentSuccess = async (paymentResponse, paymentId) => {
+    try {
+      const payload = formatOfflineAppointmentData(
+        userId,
+        state?.selectedSlot,
+        state?.formData
+      ); 
+      await verifyPayment({
+        razorpay_order_id: paymentResponse.razorpay_order_id,
+        razorpay_payment_id: paymentResponse.razorpay_payment_id,
+        razorpay_signature: paymentResponse.razorpay_signature,
+        paymentId,
+        appointmentType: "offline",
+        payload: {
+          userId,
+          date: state?.selectedSlot?.date,
+          time: state?.selectedSlot?.time,
+          formData: state?.formData
+        }
+      }).unwrap();
+
+      navigate('/confirmation', {
+        state: {
+          razorpay_payment_id: paymentResponse.razorpay_payment_id,
+          appointmentDate: state?.selectedSlot?.dateFormatted,
+          slotTime: state?.selectedSlot?.time
+        }
       });
-    }, 1500);
+    } catch (error) {
+      console.error('Payment verification failed:', error);
+      setIsProcessing(false);
+      alert('Payment verification failed. Please contact support.');
+    }
+  };
+
+  const handlePaymentFailure = async (appointmentId, errorMessage) => {
+    try {
+      if (appointmentId) {
+        await recordPaymentFailure({
+          appointmentId,
+          error: errorMessage
+        }).unwrap();
+      }
+      alert('Payment failed. Please try again.');
+    } catch (error) {
+      console.error('Error recording payment failure:', error);
+    }
+    setIsProcessing(false);
   };
 
   const handleBack = () => {
     navigate(-1);
   };
 
-  return (
-    <div className="min-h-screen bg-linear-to-br from-[#e6e2ff] via-[#d8f0ff] to-[#7ddfff] py-12 px-4 sm:px-6 lg:px-8">
-      <div className="mb-6 max-w-2xl mx-auto">
-        <BackButton />
-      </div>
-
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Offline Visit Payment
-          </h1>
-          <p className="text-gray-600">Pay at clinic during your visit</p>
+  // Loader Component
+  const PaymentLoader = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl p-8 max-w-sm mx-4 flex flex-col items-center">
+        <div className="relative">
+          <div className="w-16 h-16 border-4 border-blue-200 rounded-full"></div>
+          <div className="w-16 h-16 border-4 border-blue-600 rounded-full absolute top-0 left-0 animate-spin border-t-transparent"></div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          {/* Payment Information */}
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-center mb-4">
-              <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mr-4">
-                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <h2 className="text-xl font-semibold text-gray-900">Pay at Clinic</h2>
-            </div>
-            <p className="text-gray-600 text-center mb-4">
-              You will pay the amount when you visit the clinic for your appointment.
-            </p>
-          </div>
+        <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-2">
+          Processing Payment
+        </h3>
+        <p className="text-gray-600 text-center text-sm">
+          Please wait while we verify your payment...
+        </p>
 
-          {/* Expected Charges */}
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Expected Charges
-            </h2>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Consultation Fee</span>
-                <span className="font-medium text-gray-900">₹600.00</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">GST (18%)</span>
-                <span className="font-medium text-gray-900">₹108.00</span>
-              </div>
-              <div className="flex justify-between pt-3 border-t border-gray-200">
-                <span className="text-lg font-semibold text-gray-900">
-                  Total Amount
-                </span>
-                <span className="text-lg font-bold text-blue-600">₹708.00</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Payment Instructions */}
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Payment Instructions
-            </h2>
-            <div className="space-y-3 text-sm text-gray-600">
-              <div className="flex items-start">
-                <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium mr-3 mt-0.5 shrink-0">1</span>
-                <p>Visit the clinic at your scheduled appointment time</p>
-              </div>
-              <div className="flex items-start">
-                <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium mr-3 mt-0.5 shrink-0">2</span>
-                <p>Present your appointment confirmation at the reception</p>
-              </div>
-              <div className="flex items-start">
-                <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium mr-3 mt-0.5 shrink-0">3</span>
-                <p>Pay the amount using cash, card, or UPI at the clinic</p>
-              </div>
-              <div className="flex items-start">
-                <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium mr-3 mt-0.5 shrink-0">4</span>
-                <p>Receive your payment receipt and proceed with consultation</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Accepted Payment Methods */}
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Accepted Payment Methods at Clinic
-            </h2>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                  <span className="text-green-600 font-bold text-sm">₹</span>
-                </div>
-                <span className="font-medium text-gray-900">Cash</span>
-              </div>
-              <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                  </svg>
-                </div>
-                <span className="font-medium text-gray-900">Card</span>
-              </div>
-              <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                  <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <span className="font-medium text-gray-900">UPI</span>
-              </div>
-              <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center mr-3">
-                  <svg className="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
-                <span className="font-medium text-gray-900">Net Banking</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="p-6">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button
-                onClick={handleBack}
-                disabled={isProcessing}
-                className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
-              >
-                Back
-              </button>
-
-              <button
-                onClick={handleConfirm}
-                disabled={isProcessing}
-                className="flex-1 bg-orange-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-700 transition-colors disabled:opacity-50 flex items-center justify-center"
-              >
-                {isProcessing ? "Confirming..." : "Confirm Appointment"}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Clinic Information */}
-        <div className="mt-6 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Clinic Information</h3>
-          <div className="space-y-2 text-sm text-gray-600">
-            <div className="flex items-start">
-              <svg className="w-4 h-4 text-gray-400 mt-0.5 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <p>123 Medical Street, Healthcare District, City - 560001</p>
-            </div>
-            <div className="flex items-start">
-              <svg className="w-4 h-4 text-gray-400 mt-0.5 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <p>Monday - Saturday: 9:00 AM - 6:00 PM</p>
-            </div>
-            <div className="flex items-start">
-              <svg className="w-4 h-4 text-gray-400 mt-0.5 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-              <p>+91 98765 43210</p>
-            </div>
-          </div>
+        <div className="mt-4 text-xs text-gray-500">
+          This may take a few seconds
         </div>
       </div>
     </div>
+  );
+
+  return (
+    <>
+      {isProcessing && <PaymentLoader />}
+
+      <div className="min-h-screen bg-linear-to-br from-[#e6e2ff] via-[#d8f0ff] to-[#7ddfff] py-12 px-4 sm:px-6 lg:px-8">
+        <div className="mb-6 max-w-2xl mx-auto">
+          <BackButton />
+        </div>
+
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Offline Visit Payment
+            </h1>
+            <p className="text-gray-600">Secure payment for your offline appointment</p>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            {/* Order Summary */}
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                Order Summary
+              </h2>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Consultation Fee</span>
+                  <span className="font-medium text-gray-900">₹{baseAmount.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between pt-3 border-t border-gray-200">
+                  <span className="text-lg font-semibold text-gray-900">
+                    Total Amount
+                  </span>
+                  <span className="text-lg font-bold text-blue-600">₹{total.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Payment Methods */}
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                Payment Method
+              </h2>
+              <div className="space-y-3">
+                <label className="flex items-center p-4 border border-blue-500 bg-blue-50 rounded-lg cursor-pointer">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="razorpay"
+                    checked={true}
+                    readOnly
+                    className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                  />
+                  <div className="ml-3 flex items-center">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                      <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                      </svg>
+                    </div>
+                    <span className="font-medium text-gray-900">Razorpay</span>
+                    <span className="ml-2 text-sm text-gray-500">(UPI, Cards, Net Banking)</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            {/* Security Notice */}
+            <div className="p-6 bg-blue-50 border-b border-blue-200">
+              <div className="flex items-start">
+                <svg className="w-5 h-5 text-blue-600 mt-0.5 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <p className="text-sm text-blue-700">
+                  Your payment is secure and encrypted. We do not store your payment details.
+                </p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="p-6">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button
+                  onClick={handleBack}
+                  disabled={isProcessing}
+                  className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+                >
+                  Back
+                </button>
+
+                <button
+                  onClick={handleConfirm}
+                  disabled={isProcessing}
+                  className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center"
+                >
+                  {isProcessing ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      Processing...
+                    </>
+                  ) : (
+                    `Pay ₹${total.toLocaleString()}`
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Trust Badges */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-500 mb-4">Secure payment with</p>
+            <div className="flex justify-center items-center space-x-6 text-gray-400">
+              <span>🔒 SSL</span>
+              <span>PCI DSS</span>
+              <span>RBI Certified</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

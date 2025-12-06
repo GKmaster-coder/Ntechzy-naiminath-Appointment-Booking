@@ -1,4 +1,4 @@
-// src/store/api/userApi.js
+
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const BACKEND_API = import.meta.env.VITE_BACKEND_API;
