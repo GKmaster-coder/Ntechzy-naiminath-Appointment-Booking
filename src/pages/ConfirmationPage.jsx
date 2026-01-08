@@ -93,9 +93,9 @@ export default function ConfirmationPage() {
           <div className="p-8 bg-linear-to-r from-green-500 to-emerald-600 text-white">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold">Your Appointment Details</h2>
-   <div className="bg-yellow-100 text-yellow-800 px-3 py-1 text-sm font-semibold rounded-full border border-yellow-300">
-  Confirmed
-</div>
+              <div className="bg-yellow-100 text-yellow-800 px-3 py-1 text-sm font-semibold rounded-full border border-yellow-300">
+                Confirmed
+              </div>
 
             </div>
             <p className="text-green-100">
@@ -254,13 +254,13 @@ export default function ConfirmationPage() {
                     <p className="text-sm text-gray-500 font-medium">
                       Date & Time
                     </p>
-                   <p className="text-lg font-semibold text-gray-900">
-  {state?.slotTime || "Time not specified"}
-</p>
+                    <p className="text-lg font-semibold text-gray-900">
+                      {state?.slotTime || "Time not specified"}
+                    </p>
 
-<p className="text-sm text-gray-600">
-  {state?.appointmentDate || "Date not specified"}
-</p>
+                    <p className="text-sm text-gray-600">
+                      {state?.appointmentDate || "Date not specified"}
+                    </p>
 
                   </div>
                 </div>
@@ -334,6 +334,10 @@ export default function ConfirmationPage() {
                 <li className="flex items-start">
                   <span className="mr-2">•</span>
                   Please carry your ID proof and previous medical reports (if any)
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  For your convenience, please allow  3-4 hours for the full appointment process.
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2">•</span>

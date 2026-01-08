@@ -58,14 +58,14 @@ export default function OnlineDetailsPage() {
   const handleFormSubmit = (submittedFormData) => {
     setFormData(submittedFormData);
     setIsFormComplete(true);
-    
+
     // Auto-navigate to payment page after form submission
     setTimeout(() => {
-      navigate('/payment-online', { 
-        state: { 
-          ...state, 
-          formData: submittedFormData 
-        } 
+      navigate('/payment-online', {
+        state: {
+          ...state,
+          formData: submittedFormData
+        }
       });
     }, 1000); // Small delay to show success message
   };
@@ -125,6 +125,9 @@ export default function OnlineDetailsPage() {
           <p className="text-center text-xs sm:text-sm text-blue-800 font-medium mt-4">
             Your appointment date & time will be scheduled by the hospital team.
             You will receive confirmation through sms/email after verification.
+          </p>
+          <p className="text-center text-xs sm:text-sm text-red-500 font-medium mt-4">
+           * For your convenience, please allow 3-4 hours for the full appointment process. / कृपया पूरे अपॉइंटमेंट की प्रक्रिया हेतु 3-4 घंटे का समय रखें।,
           </p>
         </div>
 
