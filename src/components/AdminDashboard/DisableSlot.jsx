@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useDisableSlotMutation, useAddSlotMutation } from "../../api/endpoints/slots";
+import React, { useEffect, useState } from "react";
+import { useDisableSlotMutation, useAddSlotMutation, useGetAvailableSlotsQuery } from "../../api/endpoints/slots";
 import { toast } from "react-toastify";
 
 const OfflineAppointments = () => {
@@ -18,6 +18,24 @@ const OfflineAppointments = () => {
   const [disableSlotApi, { isLoading: isDisableLoading }] =
     useDisableSlotMutation();
   const [addSlotApi, { isLoading: isAddLoading }] = useAddSlotMutation();
+  const {data : slotDetails} = useGetAvailableSlotsQuery(selectedDate , {skip: !selectedDate});
+
+useEffect(() => {
+  const slots = slotDetails?.data?.slots;
+
+  if (slots && selectedDate) {
+    const disabledTimes = Object.entries(slots)
+      .filter(([_, info]) => Number(info?.available) === 0)
+      .map(([time]) => time);
+
+    setDisabledSlots(prev => ({
+      ...prev,
+      [selectedDate]: disabledTimes  // <-- ARRAY store karna
+    }));
+  }
+}, [slotDetails, selectedDate]);
+
+
 
   const SLOT_LIST = [
     "10:00",
@@ -353,6 +371,36 @@ const OfflineAppointments = () => {
                   >
                     Add Custom Time Slot
                   </button>
+
+                  {/* add a beaytufyk created slot section where we will show extra slots from the getavailableslot query */}
+                   {slotDetails?.data?.extraSlots && slotDetails.data.extraSlots.length > 0 && (
+                    <div className="border-t border-gray-200 pt-6 mb-6">
+                      <h4 className="text-sm font-semibold text-gray-700 mb-4">
+                        📌 Added Slots:
+                      </h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                        {slotDetails.data.extraSlots.map((slot) => (
+                          <div key={slot.time} className="relative">
+                            <button
+                              // onClick={() => handleAddSlot(slot.time)}
+                              className="py-3 px-4 rounded-xl border-2 text-sm bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-700 border-blue-300 hover:bg-blue-100 hover:border-blue-400 transition-all font-medium w-full"
+                            >
+                              <div className="text-sm font-semibold">{slot.time}</div>
+                              <div className="text-xs text-blue-600">
+                                {slot.available} available
+                              </div>
+                            </button>
+                            <button
+                              onClick={() => handleRemoveSlot(slot.time)} // Add your remove function here
+                              className="absolute top-1 right-1 text-red-500 hover:text-red-700 transition-all cursor-pointer"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="border-t border-gray-200 pt-6">
                     <h4 className="text-sm font-semibold text-gray-700 mb-4">

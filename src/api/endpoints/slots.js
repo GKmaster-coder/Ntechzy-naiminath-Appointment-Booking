@@ -21,7 +21,7 @@ export const slotsApi = api.injectEndpoints({
     }),
 
     getAvailableSlots: builder.query({
-      query: (date) => `/appointments/slots/available?date=${date}`,
+      query: (date) => `/appointments/slots/${date}`,
       providesTags: ["Slot"],
     }),
   }),

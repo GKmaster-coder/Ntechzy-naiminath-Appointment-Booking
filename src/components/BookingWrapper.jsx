@@ -47,6 +47,24 @@ const BookingWrapper = () => {
 
   const getTimeSlotsForSelectedDate = () => {
     if (!slotsResponse?.success || !slotsResponse?.data?.slots) return [];
+
+    const finalSlots = Object.entries(slotsResponse.data.slots).map(([time, slot]) => ({
+      time,
+      total: slot.total,
+      booked: slot.booked,
+      available: slot.available,
+    }));
+
+    if(slotsResponse?.data?.extraSlots) {
+      const extraSlots = slotsResponse.data.extraSlots.map((slot) => ({
+        time: slot.time,
+        total: slot.total,
+        booked: slot.booked,
+        available: slot.available,
+      }));
+
+      return [...finalSlots, ...extraSlots];
+    }
     
     return Object.entries(slotsResponse.data.slots).map(([time, slot]) => ({
       time,
