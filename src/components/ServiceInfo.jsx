@@ -11,7 +11,7 @@ const ServiceInfo = ({ textData, height = "h-full" }) => {
     appointmentBooking: "Appointment Booking / अपॉइंटमेंट बुकिंग",
     consultation: "",
     consultationTime: "30 min consultation / 30 मिनट का परामर्श",
-    note: "For your convenience, please allow 3-4 hours for the full appointment process. / कृपया पूरे अपॉइंटमेंट की प्रक्रिया हेतु 3-4 घंटे का समय रखें।",
+    note: "For your convenience, please note that it will take 3-4 hours for the complete case taking and consultation process at the Hospital. /आपकी सुविधा के लिए कृपया ध्यान दें कि अस्पताल में पूरी केस-टेकिंग और परामर्श प्रक्रिया में लगभग 3–4 घंटे लगेंगे।",
     availableModes:
       "Available: Online / Offline / उपलब्ध: ऑनलाइन / ऑफलाइन",
     address:
