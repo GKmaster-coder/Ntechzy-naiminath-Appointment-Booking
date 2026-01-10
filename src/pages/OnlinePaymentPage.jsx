@@ -85,8 +85,8 @@ export default function OnlinePaymentPage() {
 
     const options = {
       key: orderData.key,
-      // amount: orderData.amount,
-      // currency: orderData.currency,
+      amount: orderData.amount,
+      currency: orderData.currency,
       name: "Naiminath Clinic",
       description: "Online Consultation Fee",
       order_id: orderData.orderId,
