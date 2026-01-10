@@ -61,7 +61,7 @@ const AdminDashboard = () => {
     { key: "online", label: "Online Appointments", icon: HiCalendar },
     { key: "offline", label: "Offline Appointments", icon: HiOfficeBuilding },
     { key: "disable", label: "Disable Slot/Off Day", icon: HiBan },
-    { key: "completed", label: "Completed", icon: MdOutlineDownloadDone },
+    // { key: "completed", label: "Completed", icon: MdOutlineDownloadDone },
   ];
 
   const handleNavigation = (key) => {

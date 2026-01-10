@@ -2,7 +2,6 @@ import { api } from "../index.js";
 
 export const appointmentsApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    // Online appointments
     createOnlineAppointment: builder.mutation({
       query: (appointmentData) => ({
         url: "/appointments/online",
