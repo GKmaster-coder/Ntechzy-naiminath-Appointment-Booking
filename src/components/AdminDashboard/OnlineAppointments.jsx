@@ -37,6 +37,7 @@ const OnlineAppointments = () => {
 
     try {
       const res = await cancelAppointment(appointmentId).unwrap();
+      console.log("here")
       toast.success(res.message);
       refetch();
     } catch (err) {
@@ -163,17 +164,17 @@ const OnlineAppointments = () => {
             className="w-full px-4 py-2 border border-gray-300 rounded-lg"
           />
 
-       <select
-  value={statusFilter}
-  onChange={(e) => setStatusFilter(e.target.value)}
-  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
->
-  <option value="all">All Status</option>
-  <option value="form_submitted">Form Submitted</option>
-  <option value="booked">Booked (Confirmed)</option>
-  <option value="scheduled">Scheduled</option>
-  <option value="cancelled">Cancelled</option>
-</select>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+          >
+            <option value="all">All Status</option>
+            <option value="form_submitted">Form Submitted</option>
+            <option value="booked">Booked (Confirmed)</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
 
 
           <input
