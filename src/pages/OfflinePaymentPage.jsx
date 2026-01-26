@@ -21,7 +21,7 @@ export default function OfflinePaymentPage() {
   const user = useSelector((state) => state.user);
   const userId = user?.userId || user?.userData?._id || user?.userData?.id;
 
-  const baseAmount = 600;
+  const baseAmount = 1;
   const total = baseAmount;
 
   const handleConfirm = async () => {
