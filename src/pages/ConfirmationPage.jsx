@@ -337,7 +337,7 @@ export default function ConfirmationPage() {
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2">•</span>
-                  For your convenience, please allow  3-4 hours for the full appointment process.
+                  For your convenience, please note that it will take 3-4 hours for the complete case taking and consultation process at the Hospital. 
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2">•</span>

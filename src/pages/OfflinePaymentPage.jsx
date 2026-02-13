@@ -12,6 +12,11 @@ export default function OfflinePaymentPage() {
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const baseAmount = 600;
+  const razorpayFee = Math.round(baseAmount * 0.02);
+  const gst = Math.round(razorpayFee * 0.18);
+  const total = baseAmount + razorpayFee + gst;
+
   console.log('OfflinePaymentPage - Received state:', state);
   console.log('Form data from state:', state?.formData);
   const [createOfflineAppointment] = useCreateOfflineAppointmentMutation();
@@ -20,9 +25,6 @@ export default function OfflinePaymentPage() {
   const [recordPaymentFailure] = useRecordPaymentFailureMutation();
   const user = useSelector((state) => state.user);
   const userId = user?.userId || user?.userData?._id || user?.userData?.id;
-
-  const baseAmount = 600;
-  const total = baseAmount;
 
   const handleConfirm = async () => {
     if (isProcessing) return;
@@ -191,13 +193,21 @@ export default function OfflinePaymentPage() {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Consultation Fee</span>
-                  <span className="font-medium text-gray-900">₹{baseAmount.toLocaleString()}</span>
+                  <span className="font-medium text-gray-900">₹{baseAmount}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Razorpay Fee (2%)</span>
+                  <span className="font-medium text-gray-900">₹{razorpayFee}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">GST (18% on fee)</span>
+                  <span className="font-medium text-gray-900">₹{gst}</span>
                 </div>
                 <div className="flex justify-between pt-3 border-t border-gray-200">
                   <span className="text-lg font-semibold text-gray-900">
                     Total Amount
                   </span>
-                  <span className="text-lg font-bold text-blue-600">₹{total.toLocaleString()}</span>
+                  <span className="text-lg font-bold text-blue-600">₹{total}</span>
                 </div>
               </div>
             </div>
